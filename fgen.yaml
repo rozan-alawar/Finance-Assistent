@@ -1,0 +1,13 @@
+# Install: dart pub global activate flutter_asset_generator
+# Use: fgen --no-watch
+# or: fgen
+# For help: fgen -h
+
+name: AppAssets
+output: lib/src/core/gen/app_assets.dart
+
+assets:
+  include:
+    - assets/**
+  exclude:
+    - assets/l10n/**
