@@ -28,10 +28,8 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/images/dummy/
     - assets/icons/
     - assets/icons/nav/
-    - assets/icons/dummy/
 
   fonts:
     - family: ExpoArabic
