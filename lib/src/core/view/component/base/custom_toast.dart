@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -56,7 +57,8 @@ abstract class CustomToast {
     return Fluttertoast.showToast(
       msg: msg,
       fontSize: Sizes.font16,
-      backgroundColor: backgroundColor ?? appSwitcherColors(context).toastBGColor,
+      backgroundColor:
+          backgroundColor ?? appSwitcherColors(context).toastBGColor,
       toastLength: toastLength,
       gravity: toastGravity,
     );
@@ -90,6 +92,8 @@ abstract class CustomToast {
     showToast(
       context,
       toastGravity: ToastGravity.TOP,
+      backgroundColor: appCommonUIColors(context).buttonSecondaryLight,
+      borderRadius: 50,
       child: Row(
         children: [
           Icon(
@@ -97,9 +101,7 @@ abstract class CustomToast {
             color: appSwitcherColors(context).successColor,
           ),
           const SizedBox(width: Sizes.marginH8),
-          Expanded(
-            child: Text(message, style: TextStyles.f14(context)),
-          ),
+          Expanded(child: Text(message, style: TextStyles.f14(context).bold)),
         ],
       ),
     );

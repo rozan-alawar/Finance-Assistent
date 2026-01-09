@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_color/app_colors.dart';
 import 'app_color/app_colors_dark.dart';
 import 'app_color/app_colors_light.dart';
-
+import 'app_color/extensions_color.dart' as ex;
 
 /// App theme mode enumeration
 enum AppThemeMode {
@@ -55,11 +55,16 @@ class AppTheme {
 
   late final Color _scaffoldBackgroundColor = _appColors.background;
 
-  late final ButtonColors _customButtonColors = _appColors.customButtonColors;
+  late final ex.ButtonColors _customButtonColors =
+      _appColors.customButtonColors;
 
-  late final GradientColors _gradientColors = _appColors.gradientColors;
+  late final ex.GradientColors _gradientColors = _appColors.gradientColors;
 
-  late final SwitcherColors _switcherColors = _appColors.switcherColors;
+  late final ex.SwitcherColors _switcherColors = _appColors.switcherColors;
+
+  late final ex.TextFieldColors _textFieldColors = _appColors.textFieldColors;
+
+  late final ex.CommonUIColors _commonUIColors = _appColors.commonUIColors;
 
   late final _inputDecorationTheme = InputDecorationTheme(
     isDense: true,
@@ -82,10 +87,7 @@ class AppTheme {
       fontSize: 12,
       fontWeight: FontWeight.w400,
     ),
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 14,
-    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     border: OutlineInputBorder(
       borderSide: BorderSide(color: _appColors.outline),
       borderRadius: const BorderRadius.all(Radius.circular(12)),
@@ -112,7 +114,9 @@ class AppTheme {
     disabledBorder: const OutlineInputBorder(
       borderSide: BorderSide(color: Colors.transparent),
       borderRadius: BorderRadius.all(Radius.circular(12)),
+
     ),
+
   );
 
   late final _checkboxTheme = CheckboxThemeData(
@@ -160,39 +164,40 @@ class AppTheme {
 
   late final NavigationBarThemeData _navigationBarTheme =
       NavigationBarThemeData(
-    height: 60,
-    backgroundColor: _appColors.surface,
-    surfaceTintColor: Colors.transparent,
-    shadowColor: Colors.transparent,
-    indicatorColor: Colors.transparent,
-    overlayColor: WidgetStateProperty.resolveWith((states) {
-      return Colors.transparent;
-    }),
-    iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
-      if (states.contains(WidgetState.selected)) {
-        return IconThemeData(color: _appColors.primary, size: 24);
-      }
-      return IconThemeData(
-        color: _appColors.onSurface.withOpacity(0.6),
-        size: 24,
+        height: 60,
+        backgroundColor: _appColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        indicatorColor: Colors.transparent,
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          return Colors.transparent;
+        }),
+        iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return IconThemeData(color: _appColors.primary, size: 24);
+          }
+          return IconThemeData(
+            color: _appColors.onSurface.withOpacity(0.6),
+            size: 24,
+          );
+        }),
+
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TextStyle(
+              color: _appColors.primary,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            );
+          }
+          return TextStyle(
+            color: _appColors.tertiaryFixed,
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+          );
+        }),
+        elevation: 0,
       );
-    }),
-    labelTextStyle: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) {
-        return TextStyle(
-          color: _appColors.primary,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        );
-      }
-      return TextStyle(
-        color: _appColors.tertiaryFixed,
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-      );
-    }),
-    elevation: 0,
-  );
 
   late final expansionTileThemeData = ExpansionTileThemeData(
     textColor: _appColors.onSurface,
@@ -217,10 +222,7 @@ class AppTheme {
       borderRadius: BorderRadius.circular(8),
       side: const BorderSide(color: Colors.transparent),
     ),
-    childrenPadding: const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 24,
-    ),
+    childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
   );
 
   ThemeData getThemeData(String fontFamily) {
@@ -258,8 +260,16 @@ class AppTheme {
         tertiary: _appColors.secondary,
         onTertiary: _appColors.onSecondary,
       ),
-      dividerTheme: DividerThemeData(color: _appColors.outline.withOpacity(0.2)),
-
+      dividerTheme: DividerThemeData(
+        color: _appColors.outline.withOpacity(0.2),
+      ),
+      extensions: [
+        _customButtonColors,
+        _gradientColors,
+        _switcherColors,
+        _textFieldColors,
+        _commonUIColors,
+      ],
       navigationBarTheme: _navigationBarTheme,
       cupertinoOverrideTheme: NoDefaultCupertinoThemeData(
         brightness: _colorSchemeBrightness,
@@ -305,9 +315,7 @@ class AppTheme {
           );
         }),
         position: PopupMenuPosition.under,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       listTileTheme: ListTileThemeData(
         iconColor: _appColors.onSurface,
@@ -351,9 +359,7 @@ class AppTheme {
             );
           }),
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
       ),
@@ -382,9 +388,7 @@ class AppTheme {
             );
           }),
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           side: WidgetStateProperty.resolveWith((states) {
             return BorderSide(
@@ -420,9 +424,7 @@ class AppTheme {
             );
           }),
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           elevation: WidgetStateProperty.all(0),
         ),
@@ -443,11 +445,9 @@ extension AppThemeExtension on BuildContext {
   /// Get current app colors
   AppColors get colors {
     final brightness = Theme.of(this).brightness;
-    return brightness == Brightness.dark 
-        ? AppColorsDark() 
-        : AppColorsLight();
+    return brightness == Brightness.dark ? AppColorsDark() : AppColorsLight();
   }
-  
+
   /// Check if current theme is dark
   bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
 }

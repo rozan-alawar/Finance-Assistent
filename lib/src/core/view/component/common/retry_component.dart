@@ -6,7 +6,6 @@ import '../../../config/theme/styles/styles.dart';
 import '../../../utils/const/sizes.dart';
 import '../base/button.dart';
 
-
 class ScreenRetry extends StatelessWidget {
   const ScreenRetry({
     required this.description,

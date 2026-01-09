@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
+import 'extensions_color.dart';
+
 abstract class AppColors {
   // Brand colors
   Color get primary;
   Color get seedColor;
   Color get primaryContainer;
   Color get onPrimary;
-  
+
   Color get secondary;
   Color get onSecondary;
   Color get secondaryLight;
-  
+
   Color get tertiaryFixed;
-  
+
   // Surface colors
   Color get surface;
   Color get surfaceTint;
@@ -20,103 +22,42 @@ abstract class AppColors {
   Color get surfaceBright;
   Color get onSurface;
   Color get onSurfaceDim;
-  
+
+  GradientColors get gradientColors;
+
+  ButtonColors get customButtonColors;
+
+  SwitcherColors get switcherColors;
+
+  TextFieldColors get textFieldColors;
+
+  CommonUIColors get commonUIColors;
   // Surface variants
   Color get surfaceContainerHighest;
   Color get surfaceContainerHigh;
   Color get surfaceContainerLow;
-  
+
   // Outline colors
   Color get outline;
   Color get outlineVariant;
-  
+
   // Background
   Color get background;
-  
+
   // Status colors
   Color get error;
-  
+
   // UI element colors
   Color get icon;
   Color get font;
   Color get expansionTileColor;
-  
+
   // Text field colors
   Color get hintColor;
   Color get textFieldFieldColor;
   Color get textFieldFocusBorderColor;
   Color get textFieldPrefixIconColor;
   Color get textFieldSuffixIconColor;
-  
-  // Complex color systems
-  GradientColors get gradientColors;
-  ButtonColors get customButtonColors;
-  SwitcherColors get switcherColors;
-}
-
-/// Button color scheme
-class ButtonColors {
-  final Color primaryButtonBGColor;
-  final Color primaryButtonFGColor;
-  final Color secondaryButtonBGColor;
-  final Color secondaryButtonFGColor;
-  final Color secondaryLightButtonBGColor;
-  final Color secondaryLightButtonFGColor;
-  final Color dangerButtonBGColor;
-  final Color dangerButtonFGColor;
-  final Color txtButtonColor;
-  final Color disabledButtonBGColor;
-  final Color disabledButtonFGColor;
-
-  const ButtonColors({
-    required this.primaryButtonBGColor,
-    required this.primaryButtonFGColor,
-    required this.secondaryButtonBGColor,
-    required this.secondaryButtonFGColor,
-    required this.secondaryLightButtonBGColor,
-    required this.secondaryLightButtonFGColor,
-    required this.dangerButtonBGColor,
-    required this.dangerButtonFGColor,
-    required this.txtButtonColor,
-    required this.disabledButtonBGColor,
-    required this.disabledButtonFGColor,
-  });
-}
-
-/// Gradient color scheme
-class GradientColors {
-  final LinearGradient scaffold;
-  final LinearGradient cardLoginOrRegister;
-
-  const GradientColors({
-    required this.scaffold,
-    required this.cardLoginOrRegister,
-  });
-}
-
-/// Switcher color scheme
-class SwitcherColors {
-  final Color primaryColor;
-  final Color dangerColor;
-  final Color warningColor;
-  final Color successColor;
-  final Color bottomSheetBackground;
-  final Color toastBGColor;
-  final NeutralColors neutralColors;
-  final PrimaryColors primaryColors;
-  final BlueColors blueSwitch;
-
-  const SwitcherColors({
-    required this.primaryColor,
-    required this.dangerColor,
-    required this.warningColor,
-    required this.successColor,
-    required this.bottomSheetBackground,
-    required this.toastBGColor,
-    required this.neutralColors,
-    required this.primaryColors,
-    required this.blueSwitch,
-  });
 }
 
 /// Neutral color swatch

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
-
 /// Contains all color constants from the design system
 class ColorPalette {
   ColorPalette._();
 
   // App Colors - Brand
-  static const Color primary = Color(0xFF3347AA); // Primary color #3347AA
-  static const Color secondary = Color(0xFFEEAEB8); // Secondary color #EEAEB8
+  static const Color primary = Color(0xFF3447AA); // Primary color #3447AA
+  static const Color secondary = Color(0xFFFBEAEB); // Secondary color #EEAEB8
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
 

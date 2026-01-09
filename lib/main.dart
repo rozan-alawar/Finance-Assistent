@@ -1,3 +1,5 @@
+import 'package:finance_assistent/src/core/config/theme/app_theme.dart';
+import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/routing/navigation_service.dart';
 import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
 import 'package:flutter/material.dart';
@@ -12,17 +14,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
 
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Finance Assistent',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const Scaffold(),
+      theme: AppTheme(themeMode: AppThemeMode.light).getThemeData('ExpoArabic'),
+      routerConfig: goRouter(),
       builder: (_, child) {
         return GestureDetector(
           onTap: NavigationService.removeFocus,

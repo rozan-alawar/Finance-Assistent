@@ -28,10 +28,7 @@ abstract class NavigationService {
     }
   }
 
-  static void popDialog<T extends Object?>(
-    BuildContext context, {
-    T? result,
-  }) {
+  static void popDialog<T extends Object?>(BuildContext context, {T? result}) {
     final navigator = Navigator.of(context, rootNavigator: true);
     if (navigator.canPop()) {
       return navigator.pop(result);
@@ -40,11 +37,9 @@ abstract class NavigationService {
 
   static void popLoadingDialog(BuildContext context) {
     final navigator = Navigator.of(context, rootNavigator: true);
-    navigator.popUntil(
-      (route) {
-        return route.settings.name != Dialogs.loadingDialogName;
-      },
-    );
+    navigator.popUntil((route) {
+      return route.settings.name != Dialogs.loadingDialogName;
+    });
   }
 
   /// Closes all routes & dialogs until the route of the passed context is the top-most route.

@@ -92,6 +92,12 @@ class AppAssets {
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/warning.svg)
   static const String ASSETS_ICONS_WARNING_SVG = 'assets/icons/warning.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/apple.png)
+  static const String ASSETS_IMAGES_APPLE_PNG = 'assets/images/apple.png';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/google.png)
+  static const String ASSETS_IMAGES_GOOGLE_PNG = 'assets/images/google.png';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/logo.png)
   static const String ASSETS_IMAGES_LOGO_PNG = 'assets/images/logo.png';
 

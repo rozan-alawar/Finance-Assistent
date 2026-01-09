@@ -133,10 +133,11 @@ class AppButton extends StatelessWidget {
         onPressed: isLoading || disableButton ? null : onPressed,
         child: isLoading
             ? const SizedBox(
-          height: Sizes.paddingV16,
-          width: Sizes.paddingV16,
-          child: LoadingAppIndicator(),
-        ): child,
+                height: Sizes.paddingV20,
+                width: Sizes.paddingV20,
+                child: LoadingAppIndicator(),
+              )
+            : child,
       ),
     );
   }

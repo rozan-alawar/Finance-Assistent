@@ -61,9 +61,9 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
 
   @override
   ThemeExtension<ButtonColors> lerp(
-      covariant ThemeExtension<ButtonColors>? other,
-      double t,
-      ) {
+    covariant ThemeExtension<ButtonColors>? other,
+    double t,
+  ) {
     if (other is! ButtonColors) {
       return copyWith();
     }
@@ -195,9 +195,9 @@ class CommonUIColors extends ThemeExtension<CommonUIColors> {
 
   @override
   ThemeExtension<CommonUIColors> lerp(
-      covariant ThemeExtension<CommonUIColors>? other,
-      double t,
-      ) {
+    covariant ThemeExtension<CommonUIColors>? other,
+    double t,
+  ) {
     if (other is! CommonUIColors) {
       return copyWith();
     }
@@ -220,8 +220,16 @@ class CommonUIColors extends ThemeExtension<CommonUIColors> {
       black: Color.lerp(black, other.black, t)!,
       blueText: Color.lerp(blueText, other.blueText, t)!,
       dangerLight: Color.lerp(dangerLight, other.dangerLight, t)!,
-      bottomSheetHandle: Color.lerp(bottomSheetHandle, other.bottomSheetHandle, t)!,
-      buttonSecondaryLight: Color.lerp(buttonSecondaryLight, other.buttonSecondaryLight, t)!,
+      bottomSheetHandle: Color.lerp(
+        bottomSheetHandle,
+        other.bottomSheetHandle,
+        t,
+      )!,
+      buttonSecondaryLight: Color.lerp(
+        buttonSecondaryLight,
+        other.buttonSecondaryLight,
+        t,
+      )!,
       hamburgerButton: Color.lerp(hamburgerButton, other.hamburgerButton, t)!,
     );
   }
@@ -269,9 +277,9 @@ class TextFieldColors extends ThemeExtension<TextFieldColors> {
 
   @override
   ThemeExtension<TextFieldColors> lerp(
-      covariant ThemeExtension<TextFieldColors>? other,
-      double t,
-      ) {
+    covariant ThemeExtension<TextFieldColors>? other,
+    double t,
+  ) {
     if (other is! TextFieldColors) {
       return copyWith();
     }
@@ -310,9 +318,9 @@ class GradientColors extends ThemeExtension<GradientColors> {
 
   @override
   ThemeExtension<GradientColors> lerp(
-      covariant ThemeExtension<GradientColors>? other,
-      double t,
-      ) {
+    covariant ThemeExtension<GradientColors>? other,
+    double t,
+  ) {
     if (other is! GradientColors) {
       return copyWith();
     }
@@ -367,9 +375,9 @@ class SwitcherColors extends ThemeExtension<SwitcherColors> {
 
   @override
   ThemeExtension<SwitcherColors> lerp(
-      covariant ThemeExtension<SwitcherColors>? other,
-      double t,
-      ) {
+    covariant ThemeExtension<SwitcherColors>? other,
+    double t,
+  ) {
     if (other is! SwitcherColors) {
       return copyWith();
     }

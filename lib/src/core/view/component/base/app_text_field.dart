@@ -1,12 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../config/theme/app_color/extensions_color.dart';
 import '../../../config/theme/styles/styles.dart';
 import '../../../utils/extensions/text_ex.dart';
+import '../../../utils/extensions/widget_ex.dart';
 
-enum TextFieldType { email, name, multiline, other, phone }
+enum TextFieldType { email, name, multiline, other, phone, password }
 
 class AppTextField extends StatefulWidget {
   final TextEditingController? controller;
@@ -55,11 +55,12 @@ class AppTextField extends StatefulWidget {
   final String? label;
   final String? hint;
   final bool isRequired;
-  final TextDirection? textDirection;
+  final String? errorMinimumPasswordLength;
 
   final String? title;
   final TextStyle? titleTextStyle;
   final double spacingBetweenTitleAndTextFormField;
+  final bool obscureText;
 
   const AppTextField({
     this.controller,
@@ -92,6 +93,7 @@ class AppTextField extends StatefulWidget {
     this.cursorWidth,
     this.cursorHeight,
     this.inputFormatters,
+    this.errorMinimumPasswordLength,
 
     this.textAlignVertical,
     this.expands = false,
@@ -112,9 +114,9 @@ class AppTextField extends StatefulWidget {
     super.key,
     this.label,
     this.isRequired = true,
-    this.textDirection,
     this.prefixIcon,
     this.hint,
+    this.obscureText = false,
   });
 
   @override
@@ -124,11 +126,63 @@ class AppTextField extends StatefulWidget {
 class AppTextFieldState extends State<AppTextField> {
   bool isPasswordVisible = false;
 
+  void onPasswordVisibilityChange(bool val) {
+    isPasswordVisible = val;
+    setState(() {});
+  }
+
+  Widget? suffixIcon() {
+    if (widget.textFieldType == TextFieldType.password) {
+      if (widget.suffix != null) {
+        return widget.suffix;
+      } else {
+        if (isPasswordVisible) {
+          if (widget.suffixPasswordVisibleWidget != null) {
+            return widget.suffixPasswordVisibleWidget!.onTap(() {
+              onPasswordVisibilityChange(false);
+            });
+          } else {
+            return Icon(
+              Icons.visibility,
+              color:
+                  widget.suffixIconColor ??
+                  appSwitcherColors(context).neutralColors.shade200,
+            ).onTap(() {
+              onPasswordVisibilityChange(false);
+            });
+          }
+        } else {
+          if (widget.suffixPasswordInvisibleWidget != null) {
+            return widget.suffixPasswordInvisibleWidget!.onTap(() {
+              onPasswordVisibilityChange(true);
+            });
+          } else {
+            return Icon(
+              Icons.visibility_off,
+              color:
+                  widget.suffixIconColor ??
+                  appSwitcherColors(context).neutralColors.shade200,
+            ).onTap(() {
+              onPasswordVisibilityChange(true);
+            });
+          }
+        }
+      }
+    } else {
+      return widget.suffix;
+    }
+  }
+
   Widget textFormFieldWidget() {
     final textFieldColors = appTextFieldColors(context);
 
     return TextFormField(
-      textDirection: widget.textDirection,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+
+      obscureText:
+          widget.textFieldType == TextFieldType.password &&
+          !isPasswordVisible &&
+          widget.obscureText,
       controller: widget.controller,
       validator: widget.validator,
       textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
@@ -146,6 +200,11 @@ class AppTextFieldState extends State<AppTextField> {
       },
       keyboardType: widget.keyboardType ?? TextInputType.text,
       decoration: InputDecoration(
+        suffixIcon:
+            widget.suffix ??
+            (widget.textFieldType == TextFieldType.password
+                ? suffixIcon()
+                : SizedBox()),
         filled: true,
         fillColor: widget.fillColor ?? textFieldColors.fillColor,
         label: widget.label != null
@@ -178,7 +237,6 @@ class AppTextFieldState extends State<AppTextField> {
                 ).colorWith(textFieldColors.hintColor),
               )
             : null,
-        suffixIcon: widget.suffix,
         prefixIcon: widget.prefixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(textFieldColors.borderRadius),
@@ -243,7 +301,7 @@ class AppTextFieldState extends State<AppTextField> {
             widget.title!,
             style: widget.titleTextStyle ?? TextStyles.f16(context),
           ),
-       SizedBox(height:   widget.spacingBetweenTitleAndTextFormField,),
+          SizedBox(height: widget.spacingBetweenTitleAndTextFormField),
           textFormFieldWidget(),
         ],
       );

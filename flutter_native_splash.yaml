@@ -2,15 +2,18 @@
 
 flutter_native_splash:
 
-  image: ssets/images/logo.png
+  image: assets/images/logo.png
   image_dark: assets/images/logo.png
+  color: "#FFFFFF"
+  color_dark: "#1e1e1e"
 
 
   android_12:
     image: assets/images/logo.png
     image_dark: assets/images/logo.png
-
-
+    color: "#FFFFFF"
+    color_dark: "#1e1e1e"
+    
   fullscreen: true
 
   android_gravity: center

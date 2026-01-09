@@ -174,10 +174,7 @@ class AppAssetsSvgSafe extends StatelessWidget {
         colorFilter: color != null
             ? ColorFilter.mode(color!, BlendMode.srcIn)
             : null,
-        placeholderBuilder: (context) => SizedBox(
-          height: height,
-          width: width,
-        ),
+        placeholderBuilder: (context) => SizedBox(height: height, width: width),
       ),
     );
   }
