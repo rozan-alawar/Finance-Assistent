@@ -90,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
             listener: (context, state) {
               if (state is AuthSuccess) {
                 CustomToast.showSuccessMessage( context,"Login Successful!");
+                HomeRoute().go(context);
               } else if (state is AuthFailure) {
                 CustomToast.showErrorMessage( context, state.message);
               }

@@ -55,16 +55,32 @@ class AppAssets {
   static const String ASSETS_ICONS_NAV_BUDGET_SVG =
       'assets/icons/nav/budget.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/budget_filled.svg)
+  static const String ASSETS_ICONS_NAV_BUDGET_FILLED_SVG =
+      'assets/icons/nav/budget_filled.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/home.svg)
   static const String ASSETS_ICONS_NAV_HOME_SVG = 'assets/icons/nav/home.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/home_filled.svg)
+  static const String ASSETS_ICONS_NAV_HOME_FILLED_SVG =
+      'assets/icons/nav/home_filled.svg';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/reminder.svg)
   static const String ASSETS_ICONS_NAV_REMINDER_SVG =
       'assets/icons/nav/reminder.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/reminder_filled.svg)
+  static const String ASSETS_ICONS_NAV_REMINDER_FILLED_SVG =
+      'assets/icons/nav/reminder_filled.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/service.svg)
   static const String ASSETS_ICONS_NAV_SERVICE_SVG =
       'assets/icons/nav/service.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/nav/service_filled.svg)
+  static const String ASSETS_ICONS_NAV_SERVICE_FILLED_SVG =
+      'assets/icons/nav/service_filled.svg';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/notification.svg)
   static const String ASSETS_ICONS_NOTIFICATION_SVG =
