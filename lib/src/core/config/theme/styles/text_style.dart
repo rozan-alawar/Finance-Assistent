@@ -7,6 +7,7 @@ enum _Fonts {
   f14(fontSize: Sizes.font14, height: Sizes.lineHeight),
   f16(fontSize: Sizes.font16, height: Sizes.lineHeight),
   f18(fontSize: Sizes.font18, height: Sizes.lineHeight),
+  f19(fontSize: Sizes.font19, height: Sizes.lineHeight),
   f20(fontSize: Sizes.font20, height: Sizes.lineHeight),
   f22(fontSize: Sizes.font22, height: Sizes.lineHeight),
   f24(fontSize: Sizes.font24, height: Sizes.lineHeight),
@@ -39,6 +40,7 @@ final class TextStyles {
   static TextStyle f14(BuildContext context) => _Fonts.f14.style(context);
   static TextStyle f16(BuildContext context) => _Fonts.f16.style(context);
   static TextStyle f18(BuildContext context) => _Fonts.f18.style(context);
+  static TextStyle f19(BuildContext context) => _Fonts.f19.style(context);
   static TextStyle f20(BuildContext context) => _Fonts.f20.style(context);
   static TextStyle f22(BuildContext context) => _Fonts.f22.style(context);
   static TextStyle f24(BuildContext context) => _Fonts.f24.style(context);

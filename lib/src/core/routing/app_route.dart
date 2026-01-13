@@ -7,6 +7,7 @@ import 'package:finance_assistent/src/features/auth/presentation/screens/otp_ver
 import 'package:finance_assistent/src/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/reminder/presentation/screens/reminder_screen.dart';
 import '../../features/services/presentation/screens/service_screen.dart';
@@ -22,7 +23,7 @@ part 'routes/branches/reminder_branch_routes.dart';
 part 'app_route.g.dart';
 part 'routes/auth_routes.dart';
 part 'routes/home_shell.dart';
-
+part 'routes/onboarding_route.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -33,7 +34,7 @@ GoRouter goRouter() {
     debugLogDiagnostics: true,
     restorationScopeId: 'router',
     navigatorKey: _rootNavigatorKey,
-    initialLocation: const LoginRoute().location,
+    initialLocation: const OnboardingRoute().location,
     routes: $appRoutes,
     observers: [],
     refreshListenable: listenToRefresh,
