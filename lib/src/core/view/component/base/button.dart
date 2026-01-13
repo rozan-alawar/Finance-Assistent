@@ -61,7 +61,7 @@ enum AppButtonType {
   }
 
   EdgeInsetsGeometry padding() {
-    const padding = EdgeInsets.symmetric(vertical: Sizes.buttonPaddingV14);
+    const padding = EdgeInsets.symmetric(vertical: Sizes.buttonPaddingV20);
     return switch (this) {
       outline || primarySm => const EdgeInsets.symmetric(
         horizontal: Sizes.buttonPaddingV10,

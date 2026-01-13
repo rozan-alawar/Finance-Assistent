@@ -1,0 +1,51 @@
+# Flutter/Dart/Pub
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# Build outputs
+build/
+coverage/
+
+# Logs
+*.log
+
+# IDEs / Editors
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.fleet/
+
+# Cursor (optional, but usually not committed)
+.cursor/
+
+# Android
+**/.gradle/
+**/local.properties
+**/key.properties
+**/*.jks
+**/*.keystore
+
+# iOS / macOS
+**/Pods/
+**/.symlinks/
+**/DerivedData/
+**/*.xcuserstate
+**/Flutter/ephemeral/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment / secrets (if you use them)
+.env
+.env.*
+
+

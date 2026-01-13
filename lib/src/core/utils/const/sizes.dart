@@ -14,6 +14,7 @@ abstract class Sizes {
   static const double screenPaddingH16 = 16;
 
   /// Padding Vertically Around Components
+  static const double paddingV30 = 30;
   static const double paddingV26 = 26;
   static const double paddingV24 = 24;
   static const double paddingV20 = 20;
@@ -48,6 +49,7 @@ abstract class Sizes {
   static const double marginV170 = 170;
   static const double marginV64 = 64;
   static const double paddingV50 = 50;
+  static const double paddingV40 = 40;
   static const double marginV48 = 48;
   static const double marginV45 = 45;
   static const double marginV40 = 40;
@@ -88,6 +90,7 @@ abstract class Sizes {
   static const double font22 = 22;
   static const double font20 = 20;
   static const double font18 = 18;
+  static const double font19 = 19;
   static const double font16 = 16;
   static const double font14 = 14;
   static const double font12 = 12;
@@ -114,6 +117,9 @@ abstract class Sizes {
   static const double radius100 = 100;
 
   /// Buttons Padding
+  static const double buttonPaddingV20 = 20;
+  static const double buttonPaddingV18 = 18;
+  static const double buttonPaddingV16 = 16;
   static const double buttonPaddingV14 = 14;
   static const double buttonPaddingH10 = 10;
   static const double buttonPaddingV10 = 10;
