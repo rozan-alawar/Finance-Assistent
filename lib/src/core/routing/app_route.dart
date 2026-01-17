@@ -5,6 +5,7 @@ import 'package:finance_assistent/src/features/auth/presentation/screens/registe
 import 'package:finance_assistent/src/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:finance_assistent/src/features/auth/presentation/screens/otp_verification_screen.dart';
 import 'package:finance_assistent/src/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:finance_assistent/src/features/home/presentation/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/home/presentation/screens/home_screen.dart';

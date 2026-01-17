@@ -6,7 +6,37 @@ part of 'app_route.dart';
 // GoRouterGenerator
 // **************************************************************************
 
-List<RouteBase> get $appRoutes => [$loginRoute, $homeShellRouteData];
+List<RouteBase> get $appRoutes => [
+  $notificationRoute,
+  $loginRoute,
+  $homeShellRouteData,
+];
+
+RouteBase get $notificationRoute => GoRouteData.$route(
+  path: '/notification',
+  factory: $NotificationRoute._fromState,
+);
+
+mixin $NotificationRoute on GoRouteData {
+  static NotificationRoute _fromState(GoRouterState state) =>
+      const NotificationRoute();
+
+  @override
+  String get location => GoRouteData.$location('/notification');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
 
 RouteBase get $loginRoute => GoRouteData.$route(
   path: '/login',

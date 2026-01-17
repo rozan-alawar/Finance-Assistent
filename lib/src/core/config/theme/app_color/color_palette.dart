@@ -6,7 +6,7 @@ class ColorPalette {
 
   // App Colors - Brand
   static const Color primary = Color(0xFF3447AA); // Primary color #3447AA
-  static const Color secondary = Color(0xFFFBEAEB); // Secondary color #EEAEB8
+  static const Color secondary = Color(0xFFEEAEB8); // Secondary color #EEAEB8
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
 
