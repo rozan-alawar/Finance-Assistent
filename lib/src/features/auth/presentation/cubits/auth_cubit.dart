@@ -1,8 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
+
+  Future<void> checkSession() async {
+    final isGuest = HiveService.get(HiveService.settingsBoxName, 'isGuest', defaultValue: false);
+    if (isGuest) {
+      emit(AuthSuccess());
+    }
+  }
 
   Future<void> register({
     required String name,
@@ -69,6 +77,17 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await Future.delayed(const Duration(seconds: 2));
       emit(PasswordResetSuccess());
+    } catch (e) {
+      emit(AuthFailure(e.toString()));
+    }
+  }
+
+  Future<void> loginAsGuest() async {
+    emit(AuthLoading());
+    try {
+      await Future.delayed(const Duration(seconds: 1)); // Simulate local processing
+      await HiveService.put(HiveService.settingsBoxName, 'isGuest', true);
+      emit(AuthSuccess());
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
