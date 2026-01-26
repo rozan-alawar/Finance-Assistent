@@ -58,22 +58,22 @@ GoRouter goRouter(AuthCubit authCubit) {
       final bool isLogin = location == const LoginRoute().location;
       final bool isRegister = location == const RegisterRoute().location;
 
-      /// 1️⃣ Force onboarding ONLY if not completed
+      /// Force onboarding ONLY if not completed
       if (!onBoardingSeen && !isOnboarding) {
         return const OnboardingRoute().location;
       }
 
-      /// 2️⃣ If onboarding is done, never go back to it
+      /// If onboarding is done, never go back to it
       if (onBoardingSeen && isOnboarding) {
         return const HomeRoute().location;
       }
 
-      /// 3️⃣ If user is logged in, block auth screens
+      /// If user is logged in, block auth screens
       if (isLoggedIn && (isLogin || isRegister)) {
         return const HomeRoute().location;
       }
 
-      /// 4️⃣ Guests are allowed everywhere else
+      /// Guests are allowed everywhere else
       return null;
     },
 
