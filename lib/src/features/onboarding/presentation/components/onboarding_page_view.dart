@@ -30,7 +30,7 @@ class OnboardingPageView extends StatelessWidget {
             children: [
               const SizedBox(height: Sizes.paddingV40),
               // Title
-              Text(title, style: TextStyles.f19(context).bold),
+              Text(title, style: TextStyles.f18(context).bold),
               const SizedBox(height: Sizes.paddingV30),
             ],
           ),

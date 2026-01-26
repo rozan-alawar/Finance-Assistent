@@ -345,7 +345,7 @@ class SwitcherColors extends ThemeExtension<SwitcherColors> {
     required this.successColor,
     required this.primaryColors,
     required this.blueSwitch,
-    required this.bottomSheetBackground,
+    required this.bottomSheetBackground, required this.secondaryColor,
   });
 
   final Color primaryColor;
@@ -357,6 +357,7 @@ class SwitcherColors extends ThemeExtension<SwitcherColors> {
   final NeutralColors neutralColors;
   final PrimaryColors primaryColors;
   final BlueColors blueSwitch;
+  final Color secondaryColor;
 
   @override
   ThemeExtension<SwitcherColors> copyWith() {
@@ -369,7 +370,7 @@ class SwitcherColors extends ThemeExtension<SwitcherColors> {
       successColor: successColor,
       primaryColors: primaryColors,
       blueSwitch: blueSwitch,
-      bottomSheetBackground: bottomSheetBackground,
+      bottomSheetBackground: bottomSheetBackground, secondaryColor: secondaryColor,
     );
   }
 
@@ -513,7 +514,8 @@ class SwitcherColors extends ThemeExtension<SwitcherColors> {
         bottomSheetBackground,
         other.bottomSheetBackground,
         t,
-      )!,
+      )!, secondaryColor:      Color.lerp(secondaryColor, other.secondaryColor, t)!,
+
     );
   }
 }

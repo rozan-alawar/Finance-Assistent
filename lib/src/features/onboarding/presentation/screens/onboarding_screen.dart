@@ -13,6 +13,8 @@ import '../../../../core/view/component/base/safe_scaffold.dart';
 import '../components/onboarding_page_view.dart';
 import '../cubits/onboarding_cubit.dart';
 import '../cubits/onboarding_state.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -57,7 +59,13 @@ class OnboardingScreen extends StatelessWidget {
                     vertical: Sizes.paddingV40,
                   ),
                   child: AppButton(
-                    onPressed: () {},
+
+                    onPressed: () async {
+                      await HiveService.put(HiveService.settingsBoxName, 'onboarded', true);
+                      if (context.mounted) {
+                         context.read<AuthCubit>().loginAsGuest();
+                      }
+                    },
                     type: AppButtonType.primary,
                     child: Text(
                       AppStrings.getStarted,

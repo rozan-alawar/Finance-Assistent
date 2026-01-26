@@ -92,7 +92,7 @@ abstract class CustomToast {
     showToast(
       context,
       toastGravity: ToastGravity.TOP,
-      backgroundColor: appCommonUIColors(context).buttonSecondaryLight,
+      backgroundColor: appCommonUIColors(context).buttonSecondaryLight.withValues(alpha: 0.2),
       borderRadius: 50,
       child: Row(
         children: [

@@ -111,6 +111,9 @@ class AppAssets {
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/apple.png)
   static const String ASSETS_IMAGES_APPLE_PNG = 'assets/images/apple.png';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/avatar.png)
+  static const String ASSETS_IMAGES_AVATAR_PNG = 'assets/images/avatar.png';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/google.png)
   static const String ASSETS_IMAGES_GOOGLE_PNG = 'assets/images/google.png';
 
@@ -128,6 +131,9 @@ class AppAssets {
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/placeholder.png)
   static const String ASSETS_IMAGES_PLACEHOLDER_PNG =
       'assets/images/placeholder.png';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/test.png)
+  static const String ASSETS_IMAGES_TEST_PNG = 'assets/images/test.png';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/user_placeholder.png)
   static const String ASSETS_IMAGES_USER_PLACEHOLDER_PNG =

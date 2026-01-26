@@ -7,7 +7,7 @@ import 'extensions_color.dart';
 class AppColorsLight implements AppColors {
   // Brand colors
   @override
-  Color get seedColor => ColorPalette.blue30; // #30AAFA
+  Color get seedColor => ColorPalette.secondary; // #30AAFA
 
   @override
   Color get primary => ColorPalette.primary;
@@ -140,6 +140,7 @@ class AppColorsLight implements AppColors {
   @override
   SwitcherColors get switcherColors => SwitcherColors(
     primaryColor: primary,
+    
     dangerColor: error,
     warningColor: ColorPalette.orange30,
     successColor: ColorPalette.green40,
@@ -147,7 +148,7 @@ class AppColorsLight implements AppColors {
     toastBGColor: ColorPalette.gray80,
     neutralColors: _neutralColors,
     primaryColors: _primaryColors,
-    blueSwitch: _blueColors,
+    blueSwitch: _blueColors, secondaryColor: seedColor,
   );
   @override
   TextFieldColors get textFieldColors => TextFieldColors(

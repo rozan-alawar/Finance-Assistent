@@ -17,3 +17,13 @@ class HomeRoute extends GoRouteData
   Widget build(BuildContext context, GoRouterState state) =>
       const HomeScreen();
 }
+
+@TypedGoRoute<NotificationRoute>(path: '/notification')
+class NotificationRoute extends GoRouteData with $NotificationRoute {
+  const NotificationRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const NotificationScreen();
+}
+

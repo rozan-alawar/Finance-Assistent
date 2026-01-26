@@ -38,23 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // ========= Methods ===========
   void verifyValidation() {
-      final isEmailValid =
-          ValidatorFields.isValidEmail(
-            context,
-          )?.call(emailCtr.text.trim()) ==
-              null;
-      final isPasswordValid =
-          ValidatorFields.isValidPassword(
-            context,
-          )?.call(passwordCtr.text) ==
-              null;
+    final isEmailValid =
+        ValidatorFields.isValidEmail(context)?.call(emailCtr.text.trim()) ==
+        null;
+    final isPasswordValid =
+        ValidatorFields.isValidPassword(context)?.call(passwordCtr.text) ==
+        null;
 
-      fieldsIsValidNotifier.value =
-              isEmailValid &&
-              isPasswordValid ;
+    fieldsIsValidNotifier.value = isEmailValid && isPasswordValid;
   }
-
-
 
   @override
   void initState() {
@@ -68,146 +60,157 @@ class _LoginScreenState extends State<LoginScreen> {
     emailCtr.addListener(verifyValidation);
     passwordCtr.addListener(verifyValidation);
   }
-@override
+
+  @override
   void dispose() {
-  emailCtr.removeListener(verifyValidation);
-  passwordCtr.removeListener(verifyValidation);
+    emailCtr.removeListener(verifyValidation);
+    passwordCtr.removeListener(verifyValidation);
 
-  emailCtr.dispose();
-  passwordCtr.dispose();
-  fieldsIsValidNotifier.dispose();
+    emailCtr.dispose();
+    passwordCtr.dispose();
+    fieldsIsValidNotifier.dispose();
 
-  super.dispose();
+    super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final sectionSpace = SizedBox(height: Sizes.marginH16);
 
-
     return BlocProvider(
-        create: (context) => AuthCubit(),
-        child: BlocConsumer<AuthCubit, AuthState>(
-            listener: (context, state) {
-              if (state is AuthSuccess) {
-                CustomToast.showSuccessMessage( context,"Login Successful!");
-                HomeRoute().go(context);
-              } else if (state is AuthFailure) {
-                CustomToast.showErrorMessage( context, state.message);
-              }
-            },
-            builder: (context, state) {
-        return SafeScaffold(
-          body: CustomScrollView(
-            slivers: [
-              SliverFillRemaining(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Form(
-                    onChanged: verifyValidation,
-                    key: formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: Sizes.marginH24),
-                        Center(child: AppLogo()),
-                        sectionSpace,
+      create: (context) => AuthCubit(),
+      child: BlocConsumer<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess) {
+            CustomToast.showSuccessMessage(context, "Login Successful!");
+            HomeRoute().go(context);
+          } else if (state is AuthFailure) {
+            CustomToast.showErrorMessage(context, state.message);
+          }
+        },
+        builder: (context, state) {
+          return SafeScaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: MediaQuery.of(context).viewInsets.bottom, // ✅ keyboard safe
+                    ),
+                    child: Form(
+                      key: formKey,
+                      onChanged: verifyValidation,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min, // ✅ important
+                        children: [
+                          SizedBox(height: Sizes.marginH24),
+                          Center(child: AppLogo()),
 
-                        Text("Login", style: TextStyles.f18(context).bold),
+                          sectionSpace,
+                          Text("Login", style: TextStyles.f18(context).bold),
 
-                        sectionSpace,
+                          sectionSpace,
+                          EmailTextField(controller: emailCtr),
 
-                        EmailTextField(controller: emailCtr),
+                          sectionSpace,
+                          PasswordTextField(controller: passwordCtr),
 
-                        sectionSpace,
-
-                        PasswordTextField(controller: passwordCtr),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Checkbox(value: false, onChanged: (val) {}),
-                            Text(
-                              "Remember me",
-                              style: TextStyles.f12(context).medium,
-                            ),
-                            Spacer(),
-                            Text(
-                              "Did you Forget password ?",
-                              style: TextStyles.f12(
-                                context,
-                              ).medium.colorWith(appCommonUIColors(context).blueText),
-                            ).onTap(() {
-                              ForgetPasswordRoute().go(context);
-                            }),
-                          ],
-                        ),
-
-                        sectionSpace,
-                        sectionSpace,
-
-                    ValueListenableBuilder<bool>(
-                      valueListenable: fieldsIsValidNotifier,
-                      builder: (BuildContext context, fieldsIsValid, Widget? child) =>
-                           AppButton(
-                               isLoading: state is AuthLoading,
-                               disableButton: state is AuthLoading ||!fieldsIsValid ,
-                               onPressed: state is AuthLoading
-                                   ? null
-                                   :
-                    () {
-                      if (formKey.currentState!.validate()&& fieldsIsValid ==true) {
-                        context.read<AuthCubit>().login(
-                          email: emailCtr.text,
-                          password: passwordCtr.text,
-                        );
-                      }
-                    },
-                            type: AppButtonType.primary,
-                            child: Text("Login"),
+                          Row(
+                            children: [
+                              Checkbox(value: false, onChanged: (val) {}),
+                              Text("Remember me",
+                                  style: TextStyles.f12(context).medium),
+                              Spacer(),
+                              Text(
+                                "Did you Forget password ?",
+                                style: TextStyles.f12(context)
+                                    .medium
+                                    .colorWith(appCommonUIColors(context).blueText),
+                              ).onTap(() {
+                                ForgetPasswordRoute().go(context);
+                              }),
+                            ],
                           ),
-                        ),
 
-                        sectionSpace,
+                          sectionSpace,
+                          sectionSpace,
 
-                        Row(
-                          children: [
-                            Expanded(child: AppDivider()),
-                            SizedBox(width: Sizes.paddingH12),
-                            Text("OR"),
-                            SizedBox(width: Sizes.paddingH12),
-                            Expanded(child: AppDivider()),
-                          ],
-                        ),
-                        sectionSpace,
-                        SocialLoginButton(providerName: "Google", providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG, onPressed: (){},),
-
-                        8.height,
-                        SocialLoginButton(providerName: "Apple", providerIcon: AppAssets.ASSETS_IMAGES_APPLE_PNG, onPressed: (){},),
-
-                        const Spacer(),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Don't have an account? "),
-                            TextButton(
-                              onPressed: () => const RegisterRoute().go(context),
-                              child: const Text('Sign Up'),
+                          ValueListenableBuilder<bool>(
+                            valueListenable: fieldsIsValidNotifier,
+                            builder: (_, fieldsIsValid, __) => AppButton(
+                              isLoading: state is AuthLoading,
+                              disableButton:
+                              state is AuthLoading || !fieldsIsValid,
+                              onPressed: state is AuthLoading
+                                  ? null
+                                  : () {
+                                if (formKey.currentState!.validate() &&
+                                    fieldsIsValid) {
+                                  context.read<AuthCubit>().login(
+                                    email: emailCtr.text,
+                                    password: passwordCtr.text,
+                                  );
+                                }
+                              },
+                              type: AppButtonType.primary,
+                              child: const Text("Login"),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+
+                          sectionSpace,
+
+                          Row(
+                            children: [
+                              Expanded(child: AppDivider()),
+                              SizedBox(width: Sizes.paddingH12),
+                              Text("OR"),
+                              SizedBox(width: Sizes.paddingH12),
+                              Expanded(child: AppDivider()),
+                            ],
+                          ),
+
+                          sectionSpace,
+                          SocialLoginButton(
+                            providerName: "Google",
+                            providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG,
+                            onPressed: () {},
+                          ),
+
+                          8.height,
+                          SocialLoginButton(
+                            providerName: "Apple",
+                            providerIcon: AppAssets.ASSETS_IMAGES_APPLE_PNG,
+                            onPressed: () {},
+                          ),
+
+                          SizedBox(height: 24), // ✅ instead of Spacer
+
+                          Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text("Don't have an account? "),
+                                TextButton(
+                                  onPressed: () =>
+                                      const RegisterRoute().go(context),
+                                  child: const Text('Sign Up'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }
-        ),
-
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
-
 }

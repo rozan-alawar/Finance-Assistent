@@ -147,7 +147,7 @@ class AppColorsDark implements AppColors {
     toastBGColor: const Color(0xFF353535),
     neutralColors: _neutralColors,
     primaryColors: _primaryColors,
-    blueSwitch: _blueColors,
+    blueSwitch: _blueColors, secondaryColor: seedColor,
   );
 
   @override

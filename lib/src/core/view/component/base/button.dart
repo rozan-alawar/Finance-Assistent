@@ -89,7 +89,7 @@ class AppButton extends StatelessWidget {
     this.disableButton = false,
     this.borderColor,
     this.roundCorner,
-    super.key,
+    super.key, this.height, this.width,
   });
 
   final VoidCallback? onPressed;
@@ -100,6 +100,8 @@ class AppButton extends StatelessWidget {
   final bool disableButton;
   final Color? borderColor;
   final double? roundCorner;
+  final double? height;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
@@ -115,12 +117,12 @@ class AppButton extends StatelessWidget {
           disabledForegroundColor: appButtonsColors(
             context,
           ).disabledButtonFGColor,
+          fixedSize: Size(width??60,height??50),
           surfaceTintColor: Colors.transparent,
           foregroundColor: type.foregroundColor(context),
           backgroundColor: type.buttonBGColor(context),
           elevation: type == AppButtonType.text ? 0.0 : 0,
           textStyle: type.textStyle(context),
-          padding: type.padding(),
           shape: RoundedRectangleBorder(
             side: disableButton
                 ? BorderSide.none
