@@ -1,7 +1,7 @@
 part of 'styles.dart';
 
 abstract class FontStyles {
-  static const String expoArabic = 'ExpoArabic';
+  static const String expoArabic = 'Roboto';
 
   static const fontWeightBold = FontWeight.w700;
   static const fontWeightSemiBold = FontWeight.w600;

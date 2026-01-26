@@ -70,21 +70,21 @@ flutter:
     - assets/icons/nav/
 
   fonts:
-    - family: ExpoArabic
+    - family: Roboto
       fonts:
-        - asset: assets/fonts/Expo_Arabic_Regular.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Expo_Arabic_Light.ttf
+        - asset: assets/fonts/Roboto-Light.ttf
           weight: 300
-        - asset: assets/fonts/Expo_Arabic_Light.ttf
+        - asset: assets/fonts/Roboto-ExtraLight.ttf
           weight: 200
-        - asset: assets/fonts/Expo_Arabic_Medium.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Expo_Arabic_SemiBold.ttf
+        - asset: assets/fonts/Roboto-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Expo_Arabic_Bold.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Expo_Arabic_Bold.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
           weight: 800
-        - asset: assets/fonts/Expo_Arabic_Bold.ttf
+        - asset: assets/fonts/Roboto-ExtraBold.ttf
           weight: 900

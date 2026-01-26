@@ -90,3 +90,4 @@ Uri? getCurrentLocation(GoRouter router) {
       : router.routerDelegate.currentConfiguration;
   return matchList.uri;
 }
+

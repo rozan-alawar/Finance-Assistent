@@ -4,13 +4,20 @@ import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
-
   Future<void> checkSession() async {
-    final isGuest = HiveService.get(HiveService.settingsBoxName, 'isGuest', defaultValue: false);
+    final isGuest = HiveService.get(
+      HiveService.settingsBoxName,
+      'isGuest',
+      defaultValue: false,
+    );
+
     if (isGuest) {
-      emit(AuthSuccess());
+      emit(AuthGuest());
+    } else {
+      emit(AuthInitial());
     }
   }
+
 
   Future<void> register({
     required String name,
@@ -81,15 +88,18 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthFailure(e.toString()));
     }
   }
-
   Future<void> loginAsGuest() async {
     emit(AuthLoading());
     try {
-      await Future.delayed(const Duration(seconds: 1)); // Simulate local processing
-      await HiveService.put(HiveService.settingsBoxName, 'isGuest', true);
-      emit(AuthSuccess());
+      await HiveService.put(
+        HiveService.settingsBoxName,
+        'isGuest',
+        true,
+      );
+      emit(AuthGuest());
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
   }
+
 }
