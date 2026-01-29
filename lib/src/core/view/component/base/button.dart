@@ -89,7 +89,10 @@ class AppButton extends StatelessWidget {
     this.disableButton = false,
     this.borderColor,
     this.roundCorner,
-    super.key, this.height, this.width,
+    this.padding,
+    super.key,
+    this.height,
+    this.width,
   });
 
   final VoidCallback? onPressed;
@@ -101,6 +104,7 @@ class AppButton extends StatelessWidget {
   final Color? borderColor;
   final double? roundCorner;
   final double? height;
+  final EdgeInsetsGeometry? padding;
   final double? width;
 
   @override
@@ -111,13 +115,14 @@ class AppButton extends StatelessWidget {
           : const BoxConstraints(minWidth: double.infinity),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+          padding: padding,
           disabledBackgroundColor: appButtonsColors(
             context,
           ).disabledButtonBGColor,
           disabledForegroundColor: appButtonsColors(
             context,
           ).disabledButtonFGColor,
-          fixedSize: Size(width??60,height??50),
+          //fixedSize: Size(width??60,height??50),
           surfaceTintColor: Colors.transparent,
           foregroundColor: type.foregroundColor(context),
           backgroundColor: type.buttonBGColor(context),

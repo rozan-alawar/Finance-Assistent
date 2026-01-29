@@ -141,4 +141,19 @@ class ColorPalette {
   static const Color coldGray80 = Color(0xFF6C3287);
   static const Color coldGray90 = Color(0xFF902111);
   static const Color coldGray100 = Color(0xFF000000);
+
+  // Custom Colors
+  static const Color fillGrey = Color(0xFFF9F9FA);
+  static const Color titleGrey1 = Color(0xFF707070);
+  static const Color textBlackColor = Color(0xFF1C1A1A);
+  static const Color dueDateGrey2 = Color(0xFFAEAEAE);
+  static const Color borderColor = Color(0xFFD9D9D9);
+  static const Color dividerGrey3 = Color(0xFFE0E0E0);
+  static const Color redBackground = Color(0xFFFFF0F2);
+  static const Color unPaidButtonColor = Color(0xFFFFF0F2);
+  static const Color unPaidTextColor = Color(0xFFFF5050);
+  static const Color paidButtonColor = Color(0xFFE8FEF1);
+  static const Color paidTextColor = Color(0xFF16C087);
+  static const Color overdueButtonColor = Color(0xFFFFF6EB);
+  static const Color overdueTextColor = Color(0xFFD88B53);
 }

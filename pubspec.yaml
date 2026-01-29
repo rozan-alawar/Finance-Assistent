@@ -17,6 +17,7 @@ dependencies:
   pinput: ^5.0.2
   smooth_page_indicator: ^2.0.1
   percent_indicator: ^4.2.5
+  fl_chart: ^1.1.1
 
 
 
