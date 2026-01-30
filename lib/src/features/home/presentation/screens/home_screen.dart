@@ -5,6 +5,7 @@ import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/button.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
+import 'package:finance_assistent/src/features/home/data/models/currency_model.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/attention_card.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/custom_service_card.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/home_app_bar.dart';
@@ -12,10 +13,23 @@ import 'package:finance_assistent/src/features/home/presentation/components/paym
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';
+import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  CurrencyModel _selectedCurrency = CurrencyModel(
+    name: "United States _ (US Dollar)",
+    code: "USD",
+    flag: AppAssets.ASSETS_ICONS_US_FLAG_SVG,
+    isAsset: true,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +47,34 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Text("Your current balance"),
                 SizedBox(height: Sizes.marginV4),
-                Text("\$31233", style: TextStyles.f16(context).bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("\$31,2966", style: TextStyles.f24(context).bold),
+                    GestureDetector(
+                      onTap: () async {
+                         final result = await SelectCurrencyRoute(activeCurrencyCode: _selectedCurrency.code).push(context);
+                         if (result != null && result is CurrencyModel) {
+                           setState(() {
+                             _selectedCurrency = result;
+                           });
+                         }
+                      },
+                      child: Row(
+                        children: [
+                         if (_selectedCurrency.isAsset)
+                           AppAssetsSvg(_selectedCurrency.flag, width: 20, height: 20)
+                         else
+                           Text(_selectedCurrency.flag, style: TextStyle(fontSize: 20)),
+                           
+                          SizedBox(width: 4),
+                          Text(_selectedCurrency.code, style: TextStyles.f14(context).medium),
+                          Icon(Icons.keyboard_arrow_down, size: 16),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: Sizes.marginV16),
                 PaymentDueCard(),
                 SizedBox(height: Sizes.marginV24),
@@ -55,10 +96,10 @@ class HomeScreen extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       final service = [
-                        {"Invoice", AppAssets.ASSETS_ICONS_INVOICE_SVG},
+                        {"Income", AppAssets.ASSETS_ICONS_REVENUES_SVG},
+                        {"Bills", AppAssets.ASSETS_ICONS_INVOICE_SVG},
                         {"Debts", AppAssets.ASSETS_ICONS_DEBTS_SVG},
                         {"Expenses", AppAssets.ASSETS_ICONS_EXPENSES_SVG},
-                        {"Revenues", AppAssets.ASSETS_ICONS_REVENUES_SVG},
                       ];
                       return CustomServiceCard(
                         label: service[index].first,
@@ -91,33 +132,39 @@ class HomeScreen extends StatelessWidget {
                   progressColor: appSwitcherColors(context).secondaryColor,
                 ),
                 AttentionCard(
-                  title: "You've Exceeded Your Budget",
-                  progress: 0.5,
-                  subTitle: "Review your expenses to stay on track",
-                  icon: AppAssets.ASSETS_ICONS_INVOICE_SVG,
-                  progressColor: appSwitcherColors(context).successColor,
+                  title: "Bill Due Soon",
+                  progress: 0.6,
+                  subTitle: "Review and pay the invoice on time",
+                  icon: AppAssets.ASSETS_ICONS_BILLS_SVG,
+                  progressColor: Color(0xFF0D47A1),
                 ),
                 AttentionCard(
-                  title: "You've Exceeded Your Budget",
-                  progress: 0.7,
-                  subTitle: "Review your expenses ",
+                  title: "Expenses Approaching Limit",
+                  progress: 0.4,
+                  subTitle: "Keep an eye on your spending",
                   icon: AppAssets.ASSETS_ICONS_EXPENSES_LIMIT_SVG,
-                  progressColor: appSwitcherColors(context).primaryColor,
+                  progressColor: Color(0xFF536DFE), // Blue/Purple
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    color: appSwitcherColors(
-                      context,
-                    ).neutralColors.shade60.withValues(alpha: 0.3),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
                       AppAssetsImage(
                         AppAssets.ASSETS_IMAGES_TEST_PNG,
-                        width: 30,
-                        height: 30,
+                        width: 40,
+                        height: 40,
                       ),
                       SizedBox(width: Sizes.paddingH16),
                       Expanded(
@@ -146,10 +193,8 @@ class HomeScreen extends StatelessWidget {
                                 Container(
                                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: appSwitcherColors(
-                                      context,
-                                    ).primaryColor,
-                                    borderRadius: BorderRadius.circular(16),
+                                    color: Color(0xFF3F51B5), // Dark Blue
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                child: Text("Ask AI", style: TextStyles.f14(context).medium.colorWith(appCommonUIColors(context).white),), ),
                               ],

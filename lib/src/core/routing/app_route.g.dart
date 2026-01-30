@@ -8,6 +8,7 @@ part of 'app_route.dart';
 
 List<RouteBase> get $appRoutes => [
   $notificationRoute,
+  $selectCurrencyRoute,
   $loginRoute,
   $homeShellRouteData,
   $onboardingRoute,
@@ -37,6 +38,69 @@ mixin $NotificationRoute on GoRouteData {
 
   @override
   void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $selectCurrencyRoute => GoRouteData.$route(
+  path: '/select-currency',
+  factory: $SelectCurrencyRoute._fromState,
+);
+
+mixin $SelectCurrencyRoute on GoRouteData {
+  static SelectCurrencyRoute _fromState(GoRouterState state) =>
+      SelectCurrencyRoute(
+        activeCurrencyCode: state.uri.queryParameters['active-currency-code'],
+        isOnboarding: _$convertMapValue(
+          'is-onboarding',
+          state.uri.queryParameters,
+          _$boolConverter,
+        ),
+      );
+
+  SelectCurrencyRoute get _self => this as SelectCurrencyRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/select-currency',
+    queryParams: {
+      if (_self.activeCurrencyCode != null)
+        'active-currency-code': _self.activeCurrencyCode,
+      if (_self.isOnboarding != null)
+        'is-onboarding': _self.isOnboarding!.toString(),
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T? Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
+}
+
+bool _$boolConverter(String value) {
+  switch (value) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    default:
+      throw UnsupportedError('Cannot convert "$value" into a bool.');
+  }
 }
 
 RouteBase get $loginRoute => GoRouteData.$route(

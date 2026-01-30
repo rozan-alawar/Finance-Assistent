@@ -27,3 +27,17 @@ class NotificationRoute extends GoRouteData with $NotificationRoute {
       const NotificationScreen();
 }
 
+@TypedGoRoute<SelectCurrencyRoute>(path: '/select-currency')
+class SelectCurrencyRoute extends GoRouteData with $SelectCurrencyRoute {
+  final String? activeCurrencyCode;
+  final bool? isOnboarding;
+  const SelectCurrencyRoute({this.activeCurrencyCode, this.isOnboarding});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      SelectCurrencyScreen(
+        activeCurrencyCode: activeCurrencyCode,
+        isOnboarding: isOnboarding ?? false,
+      );
+}
+

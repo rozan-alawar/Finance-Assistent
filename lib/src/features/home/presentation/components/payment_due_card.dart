@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/app_color/extensions_color.dart';
@@ -15,16 +16,13 @@ class PaymentDueCard extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       width: double.infinity,
       decoration: BoxDecoration(
+        image: DecorationImage(image: AssetImage(AppAssets.ASSETS_IMAGES_BG_PNG), fit: BoxFit.fill, opacity: 0.5),
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
           colors: [
             appSwitcherColors(context).primaryColor,
-            appSwitcherColors(
-              context,
-            ).primaryColor.withValues(alpha: 0.4),
-            appSwitcherColors(
-              context,
-            ).secondaryColor.withValues(alpha: 0.5),
+            appSwitcherColors(context).primaryColor.withValues(alpha: 0.5),
+            appSwitcherColors(context).secondaryColor.withValues(alpha: 0.5),
           ],
         ),
       ),
@@ -32,7 +30,7 @@ class PaymentDueCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Payment Due",
+            "Expense Due",
             style: TextStyles.f16(
               context,
             ).medium.colorWith(appCommonUIColors(context).white),
@@ -43,8 +41,8 @@ class PaymentDueCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "\$4567",
-                style: TextStyles.f18(
+                "\$4567,88",
+                style: TextStyles.f20(
                   context,
                 ).bold.colorWith(appCommonUIColors(context).white),
               ),
@@ -52,10 +50,10 @@ class PaymentDueCard extends StatelessWidget {
               SizedBox(width: Sizes.marginH32,),
               Expanded(
                 child: AppButton(
-                  roundCorner: 20,
+                  roundCorner: 16,
                   onPressed: () {},
                   type: AppButtonType.primary,
-                  child: Text("Pay Now", style: TextStyles.f16(context).medium.colorWith(appCommonUIColors(context).white),),
+                  child: Text("Track", style: TextStyles.f12(context).bold.colorWith(appCommonUIColors(context).white),),
                 ),
               ),
             ],

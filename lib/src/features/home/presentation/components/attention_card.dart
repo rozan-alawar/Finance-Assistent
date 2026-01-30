@@ -29,21 +29,25 @@ class AttentionCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: appSwitcherColors(context).neutralColors.shade60,
-          ),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: appSwitcherColors(
-                  context,
-                ).primaryColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                color: Color(0xFFF5F7FA), // Light gray/blueish background
               ),
-              child: AppAssetsSvg(icon, width: 28, height: 28),
+              child: AppAssetsSvg(icon, width: 24, height: 24),
             ),
             SizedBox(width: Sizes.paddingH16),
             Column(
