@@ -15,6 +15,7 @@ import '../../features/reminder/presentation/screens/reminder_screen.dart';
 import '../../features/services/presentation/screens/service_screen.dart';
 import '../../features/home_shell/screens/home_shell_screen.dart';
 import '../../features/budget/presentation/screens/budget_screen.dart';
+import '../../features/ask_ai/presentation/screens/ask_ai_screen.dart';
 
 import 'util/navigation_transitions.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
@@ -34,7 +35,6 @@ part 'routes/onboarding_route.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 GoRouter goRouter(AuthCubit authCubit) {
-
   final appRouter = GoRouter(
     debugLogDiagnostics: true,
     restorationScopeId: 'router',
@@ -91,7 +91,6 @@ GoRouter goRouter(AuthCubit authCubit) {
       /// Guests are allowed everywhere else
       return null;
     },
-
   );
 
   return appRouter;
@@ -105,4 +104,3 @@ Uri? getCurrentLocation(GoRouter router) {
       : router.routerDelegate.currentConfiguration;
   return matchList.uri;
 }
-
