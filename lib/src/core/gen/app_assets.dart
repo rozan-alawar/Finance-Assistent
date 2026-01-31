@@ -14,6 +14,9 @@ class AppAssets {
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/arrow.svg)
   static const String ASSETS_ICONS_ARROW_SVG = 'assets/icons/arrow.svg';
 
+  /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/ask_ai.svg)
+  static const String ASSETS_ICONS_ASK_AI_SVG = 'assets/icons/ask_ai.svg';
+
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/debts.svg)
   static const String ASSETS_ICONS_DEBTS_SVG = 'assets/icons/debts.svg';
 
@@ -58,6 +61,9 @@ class AppAssets {
 
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/lock.svg)
   static const String ASSETS_ICONS_LOCK_SVG = 'assets/icons/lock.svg';
+
+  /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/mic.svg)
+  static const String ASSETS_ICONS_MIC_SVG = 'assets/icons/mic.svg';
 
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/money-recive.svg)
   static const String ASSETS_ICONS_MONEY_RECIVE_SVG =

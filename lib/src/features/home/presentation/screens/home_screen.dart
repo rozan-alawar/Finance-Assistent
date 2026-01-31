@@ -12,6 +12,7 @@ import 'package:finance_assistent/src/features/home/presentation/components/paym
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';
+import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -134,24 +135,40 @@ class HomeScreen extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     "Smarter budgeting starts with AI insights",
-                                    style: TextStyles.f14(context).normal.colorWith(
-                                      appSwitcherColors(
-                                        context,
-                                      ).neutralColors.shade80,
-                                    ),
+                                    style: TextStyles.f14(context).normal
+                                        .colorWith(
+                                          appSwitcherColors(
+                                            context,
+                                          ).neutralColors.shade80,
+                                        ),
                                     maxLines: 3,
                                   ),
                                 ),
 
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: appSwitcherColors(
-                                      context,
-                                    ).primaryColor,
-                                    borderRadius: BorderRadius.circular(16),
+                                GestureDetector(
+                                  onTap: () {
+                                    AskAiRoute().push(context);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: appSwitcherColors(
+                                        context,
+                                      ).primaryColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      "Ask AI",
+                                      style: TextStyles.f14(context).medium
+                                          .colorWith(
+                                            appCommonUIColors(context).white,
+                                          ),
+                                    ),
                                   ),
-                               child: Text("Ask AI", style: TextStyles.f14(context).medium.colorWith(appCommonUIColors(context).white),), ),
+                                ),
                               ],
                             ),
                           ],

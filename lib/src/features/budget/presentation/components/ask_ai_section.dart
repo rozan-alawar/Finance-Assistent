@@ -4,6 +4,7 @@ import '../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../core/config/theme/app_color/extensions_color.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/gen/app_assets.dart';
+import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
 import '../../../../core/utils/extensions/text_ex.dart';
 import '../../../../core/view/component/base/image.dart';
@@ -51,20 +52,25 @@ class AskAISection extends StatelessWidget {
                       ),
                     ),
 
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: Sizes.paddingH20,
-                        vertical: Sizes.paddingV8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: appSwitcherColors(context).primaryColor,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        "Ask AI",
-                        style: TextStyles.f14(
-                          context,
-                        ).medium.colorWith(appCommonUIColors(context).white),
+                    GestureDetector(
+                      onTap: () {
+                        AskAiRoute().push(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: Sizes.paddingH20,
+                          vertical: Sizes.paddingV8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: appSwitcherColors(context).primaryColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          "Ask AI",
+                          style: TextStyles.f14(
+                            context,
+                          ).medium.colorWith(appCommonUIColors(context).white),
+                        ),
                       ),
                     ),
                   ],
