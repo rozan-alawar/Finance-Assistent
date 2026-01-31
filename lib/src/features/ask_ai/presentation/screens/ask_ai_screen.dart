@@ -15,13 +15,13 @@ class AskAiScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int msg = 0;
-
     return BlocProvider(
       create: (context) => AskAiCubit(),
       child: BlocConsumer<AskAiCubit, AskAiState>(
         listener: (context, state) {},
         builder: (context, state) {
+          final cubit = context.read<AskAiCubit>();
+
           return SafeScaffold(
             appBar: AppBar(
               title: Text('Ask AI', style: TextStyles.f20(context).semiBold),
@@ -30,79 +30,135 @@ class AskAiScreen extends StatelessWidget {
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
-            body: msg != 0
-                ? Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: msg,
-                            itemBuilder: (context, index) => Column(
-                              children: [
-                                const ChatBubble(
-                                  size: Size.zero,
-                                  message:
-                                      "Hello there!\nIs my spending healthy?",
-                                ),
-                                ChatBubbleAi(
-                                  size: Size.zero,
-                                  message:
-                                      'Your spending looks generally healthy. You’re saving 27% of your income, which is great. However, dining and entertainment are slightly above average. Cutting back by a month could boost your savings.',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SendMessageBox(scrollController: ScrollController()),
-                      ],
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Text(
-                            'What can I help with?',
-                            style: TextStyles.f20(context).semiBold.copyWith(
-                              color: const Color.fromARGB(255, 75, 74, 74),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        SendMessageBox(scrollController: ScrollController()),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Suggested Questions',
-                          style: TextStyles.f16(context).medium.copyWith(
-                            color: const Color.fromARGB(255, 84, 84, 84),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        Row(
-                          children: [
-                            SuggestionQuestion(
-                              question: 'How can I save more?',
-                            ),
-                            const SizedBox(width: 8),
-                            SuggestionQuestion(
-                              question: 'Make me AI budget suggestion',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-
-                        SuggestionQuestion(question: 'Is my spending healthy?'),
-                      ],
-                    ),
-                  ),
+            body: state is AskAiChatState
+                ? _buildChatView(context, state, cubit)
+                : _buildInitialView(context, cubit),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildChatView(
+    BuildContext context,
+    AskAiChatState state,
+    AskAiCubit cubit,
+  ) {
+    final scrollController = ScrollController();
+
+    // Auto-scroll to bottom when new messages arrive
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: state.messages.length,
+              itemBuilder: (context, index) {
+                final message = state.messages[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: message.isUser
+                      ? ChatBubble(size: Size.zero, message: message.message)
+                      : ChatBubbleAi(size: Size.zero, message: message.message),
+                );
+              },
+            ),
+          ),
+          if (state.isLoading)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: ColorPalette.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'AI is typing...',
+                    style: TextStyles.f12(
+                      context,
+                    ).copyWith(color: ColorPalette.dueDateGrey2),
+                  ),
+                ],
+              ),
+            ),
+          SendMessageBox(
+            scrollController: scrollController,
+            onSend: (message) => cubit.sendMessage(message),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInitialView(BuildContext context, AskAiCubit cubit) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Text(
+              'What can I help with?',
+              style: TextStyles.f20(
+                context,
+              ).semiBold.copyWith(color: const Color.fromARGB(255, 75, 74, 74)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SendMessageBox(
+            scrollController: ScrollController(),
+            onSend: (message) => cubit.sendMessage(message),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Suggested Questions',
+            style: TextStyles.f16(
+              context,
+            ).medium.copyWith(color: const Color.fromARGB(255, 84, 84, 84)),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              SuggestionQuestion(
+                question: 'How can I save more?',
+                onTap: () =>
+                    cubit.sendSuggestionQuestion('How can I save more?'),
+              ),
+              const SizedBox(width: 8),
+              SuggestionQuestion(
+                question: 'Make me AI budget suggestion',
+                onTap: () => cubit.sendSuggestionQuestion(
+                  'Make me AI budget suggestion',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SuggestionQuestion(
+            question: 'Is my spending healthy?',
+            onTap: () =>
+                cubit.sendSuggestionQuestion('Is my spending healthy?'),
+          ),
+        ],
       ),
     );
   }
@@ -110,19 +166,24 @@ class AskAiScreen extends StatelessWidget {
 
 class SuggestionQuestion extends StatelessWidget {
   final String question;
-  const SuggestionQuestion({super.key, required this.question});
+  final VoidCallback? onTap;
+
+  const SuggestionQuestion({super.key, required this.question, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Color(0xFFF2F2F2),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Text(
-        question,
-        style: TextStyles.f12(context).copyWith(color: ColorPalette.primary),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF2F2F2),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Text(
+          question,
+          style: TextStyles.f12(context).copyWith(color: ColorPalette.primary),
+        ),
       ),
     );
   }

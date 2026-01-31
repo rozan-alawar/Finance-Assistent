@@ -14,7 +14,6 @@ class ChatBubbleAi extends StatelessWidget {
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 24),
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           color: Color(0xFFF7F7F7),
