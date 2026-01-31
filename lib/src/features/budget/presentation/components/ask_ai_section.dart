@@ -62,8 +62,8 @@ class AskAISection extends StatelessWidget {
                           vertical: Sizes.paddingV8,
                         ),
                         decoration: BoxDecoration(
-                          color: appSwitcherColors(context).primaryColor,
-                          borderRadius: BorderRadius.circular(16),
+                          color: Color(0xFF3F51B5), // Dark Blue
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           "Ask AI",

@@ -17,6 +17,9 @@ class AppAssets {
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/ask_ai.svg)
   static const String ASSETS_ICONS_ASK_AI_SVG = 'assets/icons/ask_ai.svg';
 
+  /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/bills.svg)
+  static const String ASSETS_ICONS_BILLS_SVG = 'assets/icons/bills.svg';
+
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/icons/debts.svg)
   static const String ASSETS_ICONS_DEBTS_SVG = 'assets/icons/debts.svg';
 
@@ -135,6 +138,9 @@ class AppAssets {
 
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/images/avatar.png)
   static const String ASSETS_IMAGES_AVATAR_PNG = 'assets/images/avatar.png';
+
+  /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/images/bg.png)
+  static const String ASSETS_IMAGES_BG_PNG = 'assets/images/bg.png';
 
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/images/google.png)
   static const String ASSETS_IMAGES_GOOGLE_PNG = 'assets/images/google.png';

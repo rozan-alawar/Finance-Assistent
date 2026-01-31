@@ -51,7 +51,7 @@ class HomeAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Hello", style: TextStyles.f14(context).normal),
-              Text("Rozan", style: TextStyles.f18(context).medium),
+              Text("Ghydaa", style: TextStyles.f18(context).medium),
             ],
           ),
           const Spacer(),

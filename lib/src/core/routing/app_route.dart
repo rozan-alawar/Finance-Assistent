@@ -6,6 +6,7 @@ import 'package:finance_assistent/src/features/auth/presentation/screens/forget_
 import 'package:finance_assistent/src/features/auth/presentation/screens/otp_verification_screen.dart';
 import 'package:finance_assistent/src/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:finance_assistent/src/features/home/presentation/screens/notification_screen.dart';
+import 'package:finance_assistent/src/features/home/presentation/screens/select_currency_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -51,6 +52,12 @@ GoRouter goRouter(AuthCubit authCubit) {
         'onboarded',
         defaultValue: false,
       );
+      
+      final bool isCurrencySelected = HiveService.get(
+        HiveService.settingsBoxName,
+        'currency_selected',
+        defaultValue: true, // Default true for existing users/guests
+      );
 
       final String location = state.uri.toString();
 
@@ -71,6 +78,14 @@ GoRouter goRouter(AuthCubit authCubit) {
       /// If user is logged in, block auth screens
       if (isLoggedIn && (isLogin || isRegister)) {
         return const HomeRoute().location;
+      }
+      
+      /// Force currency selection for new users
+      if (isLoggedIn && !isCurrencySelected) {
+         // Only redirect if not already there to avoid loop
+         if (location != const SelectCurrencyRoute(isOnboarding: true).location) {
+             return const SelectCurrencyRoute(isOnboarding: true).location;
+         }
       }
 
       /// Guests are allowed everywhere else

@@ -28,6 +28,11 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await Future.delayed(const Duration(seconds: 2));
+      await HiveService.put(
+        HiveService.settingsBoxName,
+        'currency_selected',
+        false,
+      );
       emit(AuthSuccess());
     } catch (e) {
       emit(AuthFailure(e.toString()));
