@@ -72,103 +72,100 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: BlocConsumer<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (state is PasswordResetSuccess) {
-            CustomToast.showSuccessMessage(
-              context,
-              'Password reset successfully',
-            );
-           LoginRoute().go(context);
-          } else if (state is AuthFailure) {
-            CustomToast.showErrorMessage(context, state.message);
-          }
-        },
-        builder: (context, state) {
-          final sectionSpace = SizedBox(height: Sizes.marginH16);
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is PasswordResetSuccess) {
+          CustomToast.showSuccessMessage(
+            context,
+            'Password reset successfully',
+          );
+          LoginRoute().go(context);
+        } else if (state is AuthFailure) {
+          CustomToast.showErrorMessage(context, state.message);
+        }
+      },
+      builder: (context, state) {
+        final sectionSpace = SizedBox(height: Sizes.marginH16);
 
-          return SafeScaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: Sizes.marginH24),
-                          Center(child: AppLogo()),
-                          sectionSpace,
+        return SafeScaffold(
+          body: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: Sizes.marginH24),
+                        Center(child: AppLogo()),
+                        sectionSpace,
 
-                          Text(
-                            "Reset password",
-                            style: TextStyles.f18(context).bold,
+                        Text(
+                          "Reset password",
+                          style: TextStyles.f18(context).bold,
+                        ),
+
+                        sectionSpace,
+
+                        Text(
+                          "Enter the new password. Try to make it simple so that you can easily register later.",
+                          style: TextStyles.f14(context).medium.colorWith(
+                            appSwitcherColors(context).neutralColors.shade80,
                           ),
+                        ),
 
-                          sectionSpace,
+                        sectionSpace,
+                        sectionSpace,
 
-                          Text(
-                            "Enter the new password. Try to make it simple so that you can easily register later.",
-                            style: TextStyles.f14(context).medium.colorWith(
-                              appSwitcherColors(context).neutralColors.shade80,
-                            ),
-                          ),
+                        PasswordTextField(controller: newPasswordCtr),
 
-                          sectionSpace,
-                          sectionSpace,
+                        sectionSpace,
 
-                          PasswordTextField(controller: newPasswordCtr),
+                        PasswordTextField(
+                          controller: confirmPasswordCtr,
+                          isConfirmPass:true,
+                        ),
 
-                          sectionSpace,
+                        sectionSpace,
+                        sectionSpace,
 
-                          PasswordTextField(
-                            controller: confirmPasswordCtr,
-                            isConfirmPass:true,
-                          ),
-
-                          sectionSpace,
-                          sectionSpace,
-
-                          ValueListenableBuilder<bool>(
-                            valueListenable: fieldsIsValidNotifier,
-                            builder: (context, fieldsIsValid, child) =>
-                                AppButton(
-                                  isLoading: state is AuthLoading,
-                                  disableButton:
-                                      state is AuthLoading || !fieldsIsValid,
-                                  onPressed:
-                                      (state is AuthLoading || !fieldsIsValid)
-                                      ? null
-                                      : () {
-                                          if (formKey.currentState!
-                                              .validate()) {
-                                            context
-                                                .read<AuthCubit>()
-                                                .resetPassword(
-                                                  newPassword: newPasswordCtr
-                                                      .text
-                                                      .trim(),
-                                                );
-                                          }
-                                        },
-                                  type: AppButtonType.primary,
-                                  child: Text("Confirm"),
-                                ),
-                          ),
-                        ],
-                      ),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: fieldsIsValidNotifier,
+                          builder: (context, fieldsIsValid, child) =>
+                              AppButton(
+                                isLoading: state is AuthLoading,
+                                disableButton:
+                                    state is AuthLoading || !fieldsIsValid,
+                                onPressed:
+                                    (state is AuthLoading || !fieldsIsValid)
+                                        ? null
+                                        : () {
+                                            if (formKey.currentState!
+                                                .validate()) {
+                                              context
+                                                  .read<AuthCubit>()
+                                                  .resetPassword(
+                                                    newPassword: newPasswordCtr
+                                                        .text
+                                                        .trim(),
+                                                  );
+                                            }
+                                          },
+                                type: AppButtonType.primary,
+                                child: Text("Confirm"),
+                              ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

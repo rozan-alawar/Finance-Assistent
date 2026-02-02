@@ -45,6 +45,10 @@ dependencies:
   equatable: ^2.0.8
   hive_flutter: ^1.1.0
   connectivity_plus: ^7.0.0
+  fast_immutable_collections: ^11.1.0
+  pretty_dio_logger: ^1.4.0
+  fpdart: ^1.2.0
+  get_it: ^9.2.0
 
 dev_dependencies:
   flutter_test:

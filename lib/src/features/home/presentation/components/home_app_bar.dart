@@ -17,9 +17,9 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isGuest = context.select<AuthCubit, bool>(
-          (cubit) => cubit.state.isGuest,
-    );
+    final authState = context.watch<AuthCubit>().state;
+    final isGuest = authState is AuthGuest;
+    final user = authState is AuthSuccess ? authState.user : null;
 
     return AppBar(
       title: Row(
@@ -51,7 +51,10 @@ class HomeAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Hello", style: TextStyles.f14(context).normal),
-              Text("Ghydaa", style: TextStyles.f18(context).medium),
+              Text(
+                isGuest ? "Guest" : (user?.fullName ?? "User"),
+                style: TextStyles.f18(context).medium,
+              ),
             ],
           ),
           const Spacer(),

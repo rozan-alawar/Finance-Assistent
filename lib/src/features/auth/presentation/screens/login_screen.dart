@@ -77,140 +77,137 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final sectionSpace = SizedBox(height: Sizes.marginH16);
 
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: BlocConsumer<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (state is AuthSuccess) {
-            CustomToast.showSuccessMessage(context, "Login Successful!");
-            HomeRoute().go(context);
-          } else if (state is AuthFailure) {
-            CustomToast.showErrorMessage(context, state.message);
-          }
-        },
-        builder: (context, state) {
-          return SafeScaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: MediaQuery.of(context).viewInsets.bottom, // ✅ keyboard safe
-                    ),
-                    child: Form(
-                      key: formKey,
-                      onChanged: verifyValidation,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min, // ✅ important
-                        children: [
-                          SizedBox(height: Sizes.marginH24),
-                          Center(child: AppLogo()),
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthSuccess) {
+          CustomToast.showSuccessMessage(context, "Login Successful!");
+          HomeRoute().go(context);
+        } else if (state is AuthFailure) {
+          CustomToast.showErrorMessage(context, state.message);
+        }
+      },
+      builder: (context, state) {
+        return SafeScaffold(
+          body: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Form(
+                    key: formKey,
+                    onChanged: verifyValidation,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: Sizes.marginH24),
+                        Center(child: AppLogo()),
 
-                          sectionSpace,
-                          Text("Login", style: TextStyles.f18(context).bold),
+                        sectionSpace,
+                        Text("Login", style: TextStyles.f18(context).bold),
 
-                          sectionSpace,
-                          EmailTextField(controller: emailCtr),
+                        sectionSpace,
+                        EmailTextField(controller: emailCtr),
 
-                          sectionSpace,
-                          PasswordTextField(controller: passwordCtr),
+                        sectionSpace,
+                        PasswordTextField(controller: passwordCtr),
 
-                          Row(
+                        Row(
+                          children: [
+                            Checkbox(value: false, onChanged: (val) {}),
+                            Text("Remember me",
+                                style: TextStyles.f12(context).medium),
+                            Spacer(),
+                            Text(
+                              "Did you Forget password ?",
+                              style: TextStyles.f12(context)
+                                  .medium
+                                  .colorWith(appCommonUIColors(context).blueText),
+                            ).onTap(() {
+                              ForgetPasswordRoute().go(context);
+                            }),
+                          ],
+                        ),
+
+                        sectionSpace,
+                        sectionSpace,
+
+                        ValueListenableBuilder<bool>(
+                          valueListenable: fieldsIsValidNotifier,
+                          builder: (_, fieldsIsValid, __) => AppButton(
+                            isLoading: state is AuthLoading,
+                            disableButton:
+                                state is AuthLoading || !fieldsIsValid,
+                            onPressed: state is AuthLoading
+                                ? null
+                                : () {
+                                    if (formKey.currentState!.validate() &&
+                                        fieldsIsValid) {
+                                      context.read<AuthCubit>().login(
+                                        email: emailCtr.text,
+                                        password: passwordCtr.text,
+                                      );
+                                    }
+                                  },
+                            type: AppButtonType.primary,
+                            child: const Text("Login"),
+                          ),
+                        ),
+
+                        sectionSpace,
+
+                        Row(
+                          children: [
+                            Expanded(child: AppDivider()),
+                            SizedBox(width: Sizes.paddingH12),
+                            Text("OR"),
+                            SizedBox(width: Sizes.paddingH12),
+                            Expanded(child: AppDivider()),
+                          ],
+                        ),
+
+                        sectionSpace,
+                        SocialLoginButton(
+                          providerName: "Google",
+                          providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG,
+                          onPressed: () {},
+                        ),
+
+                        8.height,
+                        SocialLoginButton(
+                          providerName: "Apple",
+                          providerIcon: AppAssets.ASSETS_IMAGES_APPLE_PNG,
+                          onPressed: () {},
+                        ),
+
+                        SizedBox(height: 24),
+
+                        Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Checkbox(value: false, onChanged: (val) {}),
-                              Text("Remember me",
-                                  style: TextStyles.f12(context).medium),
-                              Spacer(),
-                              Text(
-                                "Did you Forget password ?",
-                                style: TextStyles.f12(context)
-                                    .medium
-                                    .colorWith(appCommonUIColors(context).blueText),
-                              ).onTap(() {
-                                ForgetPasswordRoute().go(context);
-                              }),
+                              const Text("Don't have an account? "),
+                              TextButton(
+                                onPressed: () =>
+                                    const RegisterRoute().go(context),
+                                child: const Text('Sign Up'),
+                              ),
                             ],
                           ),
-
-                          sectionSpace,
-                          sectionSpace,
-
-                          ValueListenableBuilder<bool>(
-                            valueListenable: fieldsIsValidNotifier,
-                            builder: (_, fieldsIsValid, __) => AppButton(
-                              isLoading: state is AuthLoading,
-                              disableButton:
-                              state is AuthLoading || !fieldsIsValid,
-                              onPressed: state is AuthLoading
-                                  ? null
-                                  : () {
-                                if (formKey.currentState!.validate() &&
-                                    fieldsIsValid) {
-                                  context.read<AuthCubit>().login(
-                                    email: emailCtr.text,
-                                    password: passwordCtr.text,
-                                  );
-                                }
-                              },
-                              type: AppButtonType.primary,
-                              child: const Text("Login"),
-                            ),
-                          ),
-
-                          sectionSpace,
-
-                          Row(
-                            children: [
-                              Expanded(child: AppDivider()),
-                              SizedBox(width: Sizes.paddingH12),
-                              Text("OR"),
-                              SizedBox(width: Sizes.paddingH12),
-                              Expanded(child: AppDivider()),
-                            ],
-                          ),
-
-                          sectionSpace,
-                          SocialLoginButton(
-                            providerName: "Google",
-                            providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG,
-                            onPressed: () {},
-                          ),
-
-                          8.height,
-                          SocialLoginButton(
-                            providerName: "Apple",
-                            providerIcon: AppAssets.ASSETS_IMAGES_APPLE_PNG,
-                            onPressed: () {},
-                          ),
-
-                          SizedBox(height: 24), // ✅ instead of Spacer
-
-                          Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text("Don't have an account? "),
-                                TextButton(
-                                  onPressed: () =>
-                                      const RegisterRoute().go(context),
-                                  child: const Text('Sign Up'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
