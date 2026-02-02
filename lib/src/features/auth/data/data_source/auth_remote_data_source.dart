@@ -134,11 +134,22 @@ class AuthRemoteDataSource {
   //                    User Actions
   // =====================================================
 
-  Future<void> updateUserCurrency(String currencyCode) async {
-    await mainApiFacade.patch<Map<String, dynamic>>(
-        path: updateCurrencyPath, 
-        data: {'defaultCurrency': currencyCode}
+  Future<UserApp> updateUserCurrency({
+    required String userId,
+    required String currency,
+    required String token,
+  }) async {
+    final response = await mainApiFacade.patch<Map<String, dynamic>>(
+      path: updateCurrencyPath,
+      data: {
+        'userId': userId,
+        'currency': currency,
+        'token': token,
+      },
     );
+    // Response: { success: true, data: { ...user object... }, message: "..." }
+    final data = response.data?['data'] as Map<String, dynamic>;
+    return UserAppMapper.fromMap(data);
   }
 }
 

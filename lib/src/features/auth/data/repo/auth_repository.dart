@@ -27,7 +27,11 @@ abstract class AuthRepository {
   
   Future<void> resetPassword({required String resetToken, required String newPassword});
   
-  Future<void> updateUserCurrency(String currencyCode);
+  Future<UserApp> updateUserCurrency({
+    required String userId,
+    required String currency,
+    required String token,
+  });
   
   Future<void> logout();
 }
@@ -63,8 +67,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> updateUserCurrency(String currencyCode) {
-    return _remoteDataSource.updateUserCurrency(currencyCode);
+  Future<UserApp> updateUserCurrency({
+    required String userId,
+    required String currency,
+    required String token,
+  }) {
+    return _remoteDataSource.updateUserCurrency(userId: userId, currency: currency, token: token);
   }
 
   @override

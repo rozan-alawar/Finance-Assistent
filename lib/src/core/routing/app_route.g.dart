@@ -10,6 +10,7 @@ List<RouteBase> get $appRoutes => [
   $notificationRoute,
   $askAiRoute,
   $selectCurrencyRoute,
+  $addDebtRoute,
   $loginRoute,
   $homeShellRouteData,
   $onboardingRoute,
@@ -78,6 +79,11 @@ mixin $SelectCurrencyRoute on GoRouteData {
           state.uri.queryParameters,
           _$boolConverter,
         ),
+        isSignup: _$convertMapValue(
+          'is-signup',
+          state.uri.queryParameters,
+          _$boolConverter,
+        ),
       );
 
   SelectCurrencyRoute get _self => this as SelectCurrencyRoute;
@@ -90,6 +96,7 @@ mixin $SelectCurrencyRoute on GoRouteData {
         'active-currency-code': _self.activeCurrencyCode,
       if (_self.isOnboarding != null)
         'is-onboarding': _self.isOnboarding!.toString(),
+      if (_self.isSignup != null) 'is-signup': _self.isSignup!.toString(),
     },
   );
 
@@ -125,6 +132,29 @@ bool _$boolConverter(String value) {
     default:
       throw UnsupportedError('Cannot convert "$value" into a bool.');
   }
+}
+
+RouteBase get $addDebtRoute =>
+    GoRouteData.$route(path: '/add-debt', factory: $AddDebtRoute._fromState);
+
+mixin $AddDebtRoute on GoRouteData {
+  static AddDebtRoute _fromState(GoRouterState state) => const AddDebtRoute();
+
+  @override
+  String get location => GoRouteData.$location('/add-debt');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
 }
 
 RouteBase get $loginRoute => GoRouteData.$route(

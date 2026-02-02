@@ -128,6 +128,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             'OTP Verified Successfully',
           );
           const ResetPasswordRoute().go(context);
+        } else if (state is AuthGuest) {
+          if (mounted) {
+            HomeRoute().go(context);
+          }
         } else if (state is PasswordResetLinkSent) {
           CustomToast.showSuccessMessage(context, 'Code sent successfully');
         } else if (state is AuthFailure) {
@@ -138,6 +142,35 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         final sectionSpace = SizedBox(height: Sizes.marginH16);
 
         return SafeScaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    context.read<AuthCubit>().loginAsGuest();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(Sizes.paddingH8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          color: Colors.black.withValues(alpha: 0.16),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.close, color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
+          ),
           body: CustomScrollView(
             slivers: [
               SliverFillRemaining(

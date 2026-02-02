@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/services/local_storage/hive_service.dart';
 import '../../domain/user_app_model.dart';
@@ -6,7 +8,7 @@ import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
-  
+
   // Temporary storage for multi-step flows
   String? _resetEmail;
   String? _resetOtp;
@@ -19,30 +21,25 @@ class AuthCubit extends Cubit<AuthState> {
       'isGuest',
       defaultValue: false,
     );
-     // You might also check for existing token here
-     final token = HiveService.get(HiveService.settingsBoxName, 'token');
+    final token = HiveService.get(HiveService.settingsBoxName, 'token');
 
     if (token != null && token.isNotEmpty && isGuest == false) {
-       // Valid user session
-       final userMap = HiveService.get(HiveService.settingsBoxName, 'user');
-       UserApp? user;
-       if (userMap != null) {
-         try {
-           user = UserApp.fromMap(Map<String, dynamic>.from(userMap));
-         } catch (e) {
-           // Handle parse error or migration issues
-         }
-       }
-       emit(AuthSuccess(user: user));
+      final userMap = HiveService.get(HiveService.settingsBoxName, 'user');
+      UserApp? user;
+      if (userMap != null) {
+        try {
+          user = UserApp.fromMap(Map<String, dynamic>.from(userMap));
+        } catch (e) {
+          log(e.toString());
+        }
+      }
+      emit(AuthSuccess(user: user));
     } else if (isGuest) {
-      // Guest session
       emit(AuthGuest());
     } else {
-      // No session
       emit(AuthInitial());
     }
   }
-
 
   Future<void> register({
     required String name,
@@ -53,14 +50,14 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       final result = await _authRepository.register(
-        email: email, 
-        password: password, 
-        fullName: name, 
-        phone: phone
+        email: email,
+        password: password,
+        fullName: name,
+        phone: phone,
       );
-      
+
       await _saveSession(result.token.token, result.user);
-      
+
       await HiveService.put(
         HiveService.settingsBoxName,
         'currency_selected',
@@ -75,23 +72,30 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login({required String email, required String password}) async {
     emit(AuthLoading());
     try {
-      final result = await _authRepository.login(email: email, password: password);
+      final result = await _authRepository.login(
+        email: email,
+        password: password,
+      );
       await _saveSession(result.token.token, result.user);
       emit(AuthSuccess(user: result.user));
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
   }
-  
+
   // =====================================================
   //                    Social Login
   // =====================================================
-  
-  Future<void> socialLogin({required String token, required String socialType, String? authorizationCode}) async {
+
+  Future<void> socialLogin({
+    required String token,
+    required String socialType,
+    String? authorizationCode,
+  }) async {
     emit(AuthLoading());
     try {
       final result = await _authRepository.verifySocialToken(
-        token: token, 
+        token: token,
         socialType: socialType,
         authorizationCode: authorizationCode,
       );
@@ -131,7 +135,7 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthFailure(e.toString()));
     }
   }
-  
+
   Future<void> resetPassword({required String newPassword}) async {
     if (_resetEmail == null || _resetOtp == null) {
       emit(const AuthFailure("Session expired. Please start over."));
@@ -139,9 +143,11 @@ class AuthCubit extends Cubit<AuthState> {
     }
     emit(AuthLoading());
     try {
-      await _authRepository.resetPassword(resetToken: _resetEmail!, newPassword: newPassword);
+      await _authRepository.resetPassword(
+        resetToken: _resetEmail!,
+        newPassword: newPassword,
+      );
       emit(PasswordResetSuccess());
-      // Cleanup
       _resetEmail = null;
       _resetOtp = null;
     } catch (e) {
@@ -152,17 +158,71 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> loginAsGuest() async {
     emit(AuthLoading());
     try {
-      await HiveService.put(
-        HiveService.settingsBoxName,
-        'isGuest',
-        true,
-      );
+      await HiveService.put(HiveService.settingsBoxName, 'isGuest', true);
       emit(AuthGuest());
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }
   }
-  
+
+  Future<void> logout() async {
+    await HiveService.delete(HiveService.settingsBoxName, 'token');
+    await HiveService.delete(HiveService.settingsBoxName, 'user');
+    await HiveService.put(HiveService.settingsBoxName, 'isGuest', false);
+
+    emit(AuthInitial());
+  }
+
+  Future<void> updateCurrency(String currencyCode) async {
+    final currentState = state;
+
+    // If we are logged in and have a user
+    if (currentState is AuthSuccess && currentState.user != null) {
+      final oldUser = currentState.user!;
+      emit(AuthLoading());
+      try {
+        final token = HiveService.get(HiveService.settingsBoxName, 'token');
+        if (token == null) throw Exception("User token not found");
+
+        final updatedUser = await _authRepository.updateUserCurrency(
+          userId: oldUser.id.toString(),
+          currency: currencyCode,
+          token: token,
+        );
+
+        await _saveSession(token, updatedUser);
+        await HiveService.put(
+          HiveService.settingsBoxName,
+          'currency_selected',
+          true,
+        );
+
+        emit(AuthSuccess(user: updatedUser));
+      } catch (e) {
+        emit(AuthFailure(e.toString()));
+      }
+    } else {
+      // Guest Mode or not logged in
+      await HiveService.put(
+        HiveService.settingsBoxName,
+        'currency_selected',
+        true,
+      );
+      await HiveService.put(
+        HiveService.settingsBoxName,
+        'guest_currency',
+        currencyCode,
+      );
+
+      // If we are guest, re-emit to trigger listeners if necessary,
+      // or just keep current state.
+      // Since AuthGuest doesn't carry data, emitting it again is harmless.
+      if (currentState is AuthGuest) {
+        emit(AuthGuest());
+      }
+    }
+  }
+
   Future<void> _saveSession(String token, UserApp user) async {
     await HiveService.put(HiveService.settingsBoxName, 'token', token);
     await HiveService.put(HiveService.settingsBoxName, 'isGuest', false);

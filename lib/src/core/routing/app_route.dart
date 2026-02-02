@@ -7,6 +7,7 @@ import 'package:finance_assistent/src/features/auth/presentation/screens/otp_ver
 import 'package:finance_assistent/src/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:finance_assistent/src/features/home/presentation/screens/notification_screen.dart';
 import 'package:finance_assistent/src/features/home/presentation/screens/select_currency_screen.dart';
+import 'package:finance_assistent/src/features/debts/presentation/screens/add_debt_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -70,14 +71,42 @@ GoRouter goRouter(AuthCubit authCubit) {
         return const OnboardingRoute().location;
       }
 
-      /// If onboarding is done, never go back to it
+      /// If onboarding is done, redirect to auth screens
       if (onBoardingSeen && isOnboarding) {
-        return const HomeRoute().location;
+        return const LoginRoute().location;
       }
 
       /// If user is logged in, block auth screens
       if (isLoggedIn && (isLogin || isRegister)) {
         return const HomeRoute().location;
+      }
+
+      /// Force currency selection if logged in and not selected (Post-Signup)
+      if (isLoggedIn && !isCurrencySelected) {
+         if (location.startsWith('/select-currency')) return null;
+         return SelectCurrencyRoute(isSignup: true).location;
+      }
+
+      /// If NOT logged in (and not Guest), and trying to access protected routes
+      /// Assuming AuthInitial means not logged in.
+      /// Guest is handled by AuthGuest state.
+      final bool isGuest = authState is AuthGuest;
+      if (!isLoggedIn && !isGuest && onBoardingSeen) {
+        // Allow access to login, register, forgot password, etc.
+        // If the user is on a protected route, redirect to Login.
+        // We need to define what are public routes.
+        // For now, let's just say if we are in AuthInitial, we should probably be at Login 
+        // unless we are already at an auth screen.
+        
+        final bool isAuthRoute = location.startsWith('/auth'); // Assuming auth routes start with /auth
+        // Actually, looking at imports, routes are likely classes.
+        // Let's check if the current location is one of the auth routes.
+        
+        final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
+        
+        if (!isAuthPage) {
+           return const LoginRoute().location;
+        }
       }
       
       /// Force currency selection for new users

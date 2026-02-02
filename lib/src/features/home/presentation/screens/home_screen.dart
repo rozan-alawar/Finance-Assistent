@@ -11,6 +11,10 @@ import 'package:finance_assistent/src/features/home/presentation/components/cust
 import 'package:finance_assistent/src/features/home/presentation/components/home_app_bar.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/payment_due_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/routing/app_route.dart';
@@ -24,15 +28,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  CurrencyModel _selectedCurrency = CurrencyModel(
-    name: "United States _ (US Dollar)",
-    code: "USD",
-    flag: AppAssets.ASSETS_ICONS_US_FLAG_SVG,
-    isAsset: true,
-  );
-
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthCubit>().state;
+    String currencyCode = "USD";
+    String balance = "31,296";
+
+    if (authState is AuthSuccess && authState.user != null) {
+      currencyCode = authState.user!.defaultCurrency;
+      balance = authState.user!.currentBalance;
+    } else {
+       currencyCode = HiveService.get(HiveService.settingsBoxName, 'guest_currency', defaultValue: 'USD');
+    }
+
+    final selectedCurrency = CurrencyModel.getByCode(currencyCode);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(70),
@@ -50,35 +60,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("\$31,2966", style: TextStyles.f24(context).bold),
+                    Text("$balance", style: TextStyles.f24(context).bold),
                     GestureDetector(
-                      onTap: () async {
-                        final result = await SelectCurrencyRoute(
-                          activeCurrencyCode: _selectedCurrency.code,
+                      onTap: () {
+                        SelectCurrencyRoute(
+                          activeCurrencyCode: selectedCurrency.code,
                         ).push(context);
-                        if (result != null && result is CurrencyModel) {
-                          setState(() {
-                            _selectedCurrency = result;
-                          });
-                        }
                       },
                       child: Row(
                         children: [
-                          if (_selectedCurrency.isAsset)
+                          if (selectedCurrency.isAsset)
                             AppAssetsSvg(
-                              _selectedCurrency.flag,
+                              selectedCurrency.flag,
                               width: 20,
                               height: 20,
                             )
                           else
                             Text(
-                              _selectedCurrency.flag,
+                              selectedCurrency.flag,
                               style: TextStyle(fontSize: 20),
                             ),
 
                           SizedBox(width: 4),
                           Text(
-                            _selectedCurrency.code,
+                            selectedCurrency.code,
                             style: TextStyles.f14(context).medium,
                           ),
                           Icon(Icons.keyboard_arrow_down, size: 16),
@@ -108,17 +113,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       final service = [
-                        {"Income", AppAssets.ASSETS_ICONS_REVENUES_SVG},
-                        {"Bills", AppAssets.ASSETS_ICONS_INVOICE_SVG},
-                        {"Debts", AppAssets.ASSETS_ICONS_DEBTS_SVG},
-                        {"Expenses", AppAssets.ASSETS_ICONS_EXPENSES_SVG},
+                        {"label": "Income", "icon": AppAssets.ASSETS_ICONS_REVENUES_SVG, "onTap": null},
+                        {"label": "Bills", "icon": AppAssets.ASSETS_ICONS_INVOICE_SVG, "onTap": null},
+                        {"label": "Debts", "icon": AppAssets.ASSETS_ICONS_DEBTS_SVG, "onTap": () => AddDebtRoute().push(context)},
+                        {"label": "Expenses", "icon": AppAssets.ASSETS_ICONS_EXPENSES_SVG, "onTap": null},
                       ];
-                      return CustomServiceCard(
-                        label: service[index].first,
-                        icon: service[index].last,
-                      ).paddingOnly(
-                        left: index == 0 ? 16 : 0,
-                        right: index == service.length - 1 ? 16 : 0,
+                      return GestureDetector(
+                        onTap: service[index]["onTap"] as VoidCallback?,
+                        child: CustomServiceCard(
+                          label: service[index]["label"] as String,
+                          icon: service[index]["icon"] as String,
+                        ).paddingOnly(
+                          left: index == 0 ? 16 : 0,
+                          right: index == service.length - 1 ? 16 : 0,
+                        ),
                       );
                     },
                     separatorBuilder: (context, index) =>

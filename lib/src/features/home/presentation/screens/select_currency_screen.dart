@@ -9,28 +9,23 @@ import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
 
 import 'package:finance_assistent/src/features/home/data/models/currency_model.dart';
 
 class SelectCurrencyScreen extends StatefulWidget {
   final String? activeCurrencyCode;
   final bool isOnboarding;
-  const SelectCurrencyScreen({super.key, this.activeCurrencyCode, this.isOnboarding = false});
+  final bool isSignup;
+  const SelectCurrencyScreen({super.key, this.activeCurrencyCode, this.isOnboarding = false, this.isSignup = false});
 
   @override
   State<SelectCurrencyScreen> createState() => _SelectCurrencyScreenState();
 }
 
 class _SelectCurrencyScreenState extends State<SelectCurrencyScreen> {
-  final List<CurrencyModel> _allCurrencies = [
-    CurrencyModel(name: "United States _ (US Dollar)", code: "USD", flag: AppAssets.ASSETS_ICONS_US_FLAG_SVG, isAsset: true),
-    CurrencyModel(name: "United Kingdom _(British Pound Sterling)", code: "GBP", flag: "🇬🇧"),
-    CurrencyModel(name: "European Union _ (Euro)", code: "EUR", flag: "🇪🇺"),
-    CurrencyModel(name: "Saudi Arabia _ ( Saudi Riyal)", code: "SAR", flag: "🇸🇦"),
-    CurrencyModel(name: "United Arab Emirates _ ( UAE Dirham)", code: "AED", flag: "🇦🇪"),
-    CurrencyModel(name: "Jordan _ ( Jordanian Dinar)", code: "JOD", flag: "🇯🇴"),
-    CurrencyModel(name: "Japan _ (Japanese Yen)", code: "JPY", flag: "🇯🇵"),
-  ];
+  final List<CurrencyModel> _allCurrencies = CurrencyModel.allCurrencies;
 
   List<CurrencyModel> _filteredCurrencies = [];
   TextEditingController _searchController = TextEditingController();
@@ -152,12 +147,16 @@ class _SelectCurrencyScreenState extends State<SelectCurrencyScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () async {
-                  if (widget.isOnboarding) {
-                    await HiveService.put(
-                      HiveService.settingsBoxName,
-                      'currency_selected',
-                      true,
-                    );
+                  if (_selectedCurrency == null) return;
+                  
+                  await context.read<AuthCubit>().updateCurrency(_selectedCurrency!.code);
+
+                  if (widget.isSignup) {
+                    if (context.mounted) {
+                      await context.read<AuthCubit>().logout();
+                      if (context.mounted) context.go('/login');
+                    }
+                  } else if (widget.isOnboarding) {
                      const HomeRoute().go(context);
                   } else {
                     context.pop(_selectedCurrency);
