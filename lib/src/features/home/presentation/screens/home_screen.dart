@@ -53,22 +53,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text("\$31,2966", style: TextStyles.f24(context).bold),
                     GestureDetector(
                       onTap: () async {
-                         final result = await SelectCurrencyRoute(activeCurrencyCode: _selectedCurrency.code).push(context);
-                         if (result != null && result is CurrencyModel) {
-                           setState(() {
-                             _selectedCurrency = result;
-                           });
-                         }
+                        final result = await SelectCurrencyRoute(
+                          activeCurrencyCode: _selectedCurrency.code,
+                        ).push(context);
+                        if (result != null && result is CurrencyModel) {
+                          setState(() {
+                            _selectedCurrency = result;
+                          });
+                        }
                       },
                       child: Row(
                         children: [
-                         if (_selectedCurrency.isAsset)
-                           AppAssetsSvg(_selectedCurrency.flag, width: 20, height: 20)
-                         else
-                           Text(_selectedCurrency.flag, style: TextStyle(fontSize: 20)),
-                           
+                          if (_selectedCurrency.isAsset)
+                            AppAssetsSvg(
+                              _selectedCurrency.flag,
+                              width: 20,
+                              height: 20,
+                            )
+                          else
+                            Text(
+                              _selectedCurrency.flag,
+                              style: TextStyle(fontSize: 20),
+                            ),
+
                           SizedBox(width: 4),
-                          Text(_selectedCurrency.code, style: TextStyles.f14(context).medium),
+                          Text(
+                            _selectedCurrency.code,
+                            style: TextStyles.f14(context).medium,
+                          ),
                           Icon(Icons.keyboard_arrow_down, size: 16),
                         ],
                       ),
@@ -181,22 +193,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Expanded(
                                   child: Text(
                                     "Smarter budgeting starts with AI insights",
-                                    style: TextStyles.f14(context).normal.colorWith(
-                                      appSwitcherColors(
-                                        context,
-                                      ).neutralColors.shade80,
-                                    ),
+                                    style: TextStyles.f14(context).normal
+                                        .colorWith(
+                                          appSwitcherColors(
+                                            context,
+                                          ).neutralColors.shade80,
+                                        ),
                                     maxLines: 3,
                                   ),
                                 ),
 
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF3F51B5), // Dark Blue
-                                    borderRadius: BorderRadius.circular(20),
+                                GestureDetector(
+                                  onTap: () {
+                                    AskAiRoute().push(context);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF3F51B5), // Dark Blue
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      "Ask AI",
+                                      style: TextStyles.f14(context).medium
+                                          .colorWith(
+                                            appCommonUIColors(context).white,
+                                          ),
+                                    ),
                                   ),
-                               child: Text("Ask AI", style: TextStyles.f14(context).medium.colorWith(appCommonUIColors(context).white),), ),
+                                ),
                               ],
                             ),
                           ],
