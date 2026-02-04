@@ -169,4 +169,12 @@ class AppAssets {
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/images/user_placeholder.png)
   static const String ASSETS_IMAGES_USER_PLACEHOLDER_PNG =
       'assets/images/user_placeholder.png';
+      /// ![preview](assets/icons/rewards.svg)
+  static const String ASSETS_ICONS_REWARDS_SVG = 'assets/icons/rewards.svg';
+
+  /// ![preview](assets/icons/reports.svg)
+  static const String ASSETS_ICONS_REPORTS_SVG = 'assets/icons/reports.svg';
+
+  /// ![preview](assets/icons/virtual_currency.svg)
+  static const String ASSETS_ICONS_VIRTUAL_CURRENCY_SVG = 'assets/icons/virtual_currency.svg';
 }
