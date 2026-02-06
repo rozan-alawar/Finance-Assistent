@@ -169,12 +169,27 @@ class AppAssets {
   /// ![preview](file:///home/mustafa/StudioProjects/Finance-Assistent/assets/images/user_placeholder.png)
   static const String ASSETS_IMAGES_USER_PLACEHOLDER_PNG =
       'assets/images/user_placeholder.png';
-      /// ![preview](assets/icons/rewards.svg)
+
+  /// ![preview](assets/icons/rewards.svg)
   static const String ASSETS_ICONS_REWARDS_SVG = 'assets/icons/rewards.svg';
 
   /// ![preview](assets/icons/reports.svg)
   static const String ASSETS_ICONS_REPORTS_SVG = 'assets/icons/reports.svg';
 
   /// ![preview](assets/icons/virtual_currency.svg)
-  static const String ASSETS_ICONS_VIRTUAL_CURRENCY_SVG = 'assets/icons/virtual_currency.svg';
+  static const String ASSETS_ICONS_VIRTUAL_CURRENCY_SVG =
+      'assets/icons/virtual_currency.svg';
+
+  /// ![preview](assets/icons/paid.svg)
+  static const String ASSETS_ICONS_PAID_SVG = 'assets/icons/paid.svg';
+
+  /// ![preview](assets/icons/total_expense.svg)
+  static const String ASSETS_ICONS_TOTAL_EXPENSE_SVG = 'assets/icons/total_expense.svg';
+
+  /// ![preview](assets/icons/tune.svg)
+  static const String ASSETS_ICONS_TUNE_SVG = 'assets/icons/tune.svg';
+
+  /// ![preview](assets/icons/net_balance.svg)
+  static const String ASSETS_ICONS_BET_BALANCE_SVG =
+      'assets/icons/net_balance.svg';
 }
