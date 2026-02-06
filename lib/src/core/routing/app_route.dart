@@ -57,7 +57,7 @@ GoRouter goRouter(AuthCubit authCubit) {
       final bool isCurrencySelected = HiveService.get(
         HiveService.settingsBoxName,
         'currency_selected',
-        defaultValue: true, // Default true for existing users/guests
+        defaultValue: true,
       );
 
       final String location = state.uri.toString();
@@ -87,20 +87,13 @@ GoRouter goRouter(AuthCubit authCubit) {
          return SelectCurrencyRoute(isSignup: true).location;
       }
 
-      /// If NOT logged in (and not Guest), and trying to access protected routes
-      /// Assuming AuthInitial means not logged in.
-      /// Guest is handled by AuthGuest state.
+
       final bool isGuest = authState is AuthGuest;
       if (!isLoggedIn && !isGuest && onBoardingSeen) {
-        // Allow access to login, register, forgot password, etc.
-        // If the user is on a protected route, redirect to Login.
-        // We need to define what are public routes.
-        // For now, let's just say if we are in AuthInitial, we should probably be at Login 
-        // unless we are already at an auth screen.
+
         
-        final bool isAuthRoute = location.startsWith('/auth'); // Assuming auth routes start with /auth
-        // Actually, looking at imports, routes are likely classes.
-        // Let's check if the current location is one of the auth routes.
+        final bool isAuthRoute = location.startsWith('/auth');
+
         
         final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
         
@@ -117,7 +110,6 @@ GoRouter goRouter(AuthCubit authCubit) {
          }
       }
 
-      /// Guests are allowed everywhere else
       return null;
     },
   );
