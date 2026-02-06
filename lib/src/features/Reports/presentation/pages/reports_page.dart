@@ -105,18 +105,16 @@ class _ReportsPageState extends State<ReportsPage> {
               subtitle: "Total Amount",
               amount: "10",
               percentage: "\$8767.",
-              color:Color.fromARGB(255, 226, 221, 221),
-bgColor: const Color(0xFFE0E0E0), 
+              color: Color.fromARGB(255, 226, 221, 221),
+              bgColor: const Color(0xFFE0E0E0),
             ),
 
-          
             const SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
-
 
   Widget _buildSearchBar() {
     return Row(
@@ -152,15 +150,15 @@ bgColor: const Color(0xFFE0E0E0),
             color: Colors.grey[100],
             shape: BoxShape.circle,
           ),
-          
-          child: Center( 
-    child: SvgPicture.asset(
-      AppAssets.ASSETS_ICONS_TUNE_SVG,
-      color: Colors.blue,
-      width: 24, 
-    ),
-  ),
-        )
+
+          child: Center(
+            child: SvgPicture.asset(
+              AppAssets.ASSETS_ICONS_TUNE_SVG,
+              color: Colors.blue,
+              width: 24,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -182,7 +180,6 @@ bgColor: const Color(0xFFE0E0E0),
             const SizedBox(width: 15),
             Expanded(
               child: _buildStatCard(
-                
                 "Total expense",
                 "\$8,2033",
                 AppAssets.ASSETS_ICONS_TOTAL_EXPENSE_SVG,
@@ -197,25 +194,21 @@ bgColor: const Color(0xFFE0E0E0),
           children: [
             Expanded(
               child: _buildStatCard(
-                
                 "Total balance",
                 "\$234.783",
                 AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
                 Colors.blue[50]!,
                 Colors.blue,
-              
               ),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: _buildStatCard(
-                  
                 "Paid",
                 "\$234.783",
                 AppAssets.ASSETS_ICONS_PAID_SVG,
                 const Color(0xFFE8FEF1),
-    const Color(0xFF00C853),
-            
+                const Color(0xFF00C853),
               ),
             ),
           ],
@@ -376,21 +369,14 @@ bgColor: const Color(0xFFE0E0E0),
   Widget _buildCategoryList() {
     return Column(
       children: [
-        
-              
-            const Divider(),
-            const SizedBox(height: 10),  
+        const Divider(),
+        const SizedBox(height: 10),
         Row(
-
-    
           children: [
             Expanded(
-              
-              child:
-              
-               _buildCategoryItem("Fookkd", "\$758.20", Colors.blue),
+              child: _buildCategoryItem("Fookkd", "\$758.20", Colors.blue),
             ),
-            
+
             Expanded(
               child: _buildCategoryItem(
                 "Housing",
@@ -401,9 +387,9 @@ bgColor: const Color(0xFFE0E0E0),
           ],
         ),
         const SizedBox(height: 10),
-              
-            const Divider(),
-            const SizedBox(height: 10),
+
+        const Divider(),
+        const SizedBox(height: 10),
         Row(
           children: [
             Expanded(
