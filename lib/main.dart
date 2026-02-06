@@ -1,3 +1,5 @@
+
+
 import 'package:finance_assistent/src/core/config/theme/app_theme.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/routing/navigation_service.dart';
@@ -11,14 +13,13 @@ import 'package:finance_assistent/src/core/services/sync/sync_service.dart';
 import 'package:finance_assistent/src/features/profile/presentation/pages/profile_page.dart';
 import 'package:finance_assistent/src/features/profile/presentation/pages/accounting_page.dart';
 import 'package:finance_assistent/src/features/Reports/presentation/pages/reports_page.dart';
-
+import 'package:finance_assistent/src/features/Reports/presentation/pages/no_report.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
   SyncService().init();
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -33,18 +34,23 @@ class MyApp extends StatelessWidget {
       create: (context) => AuthCubit()..checkSession(),
       child: Builder(
         builder: (context) {
-          return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Finance Assistent',
-      theme: AppTheme(themeMode: AppThemeMode.light).getThemeData('ExpoArabic'),
-      routerConfig: goRouter(context.read<AuthCubit>()),
-      builder: (_, child) {
-        return GestureDetector(
-          onTap: NavigationService.removeFocus,
-          child: FToastOverlay(child: child!),
-        );
-      },
-    );
+          // --- تم التعديل هنا لفتح شاشة التعديل مباشرة ---
+          return MaterialApp( // شلنا .router مؤقتاً
+            debugShowCheckedModeBanner: false,
+            title: 'Finance Assistent',
+            // استخدمنا نفس الثيم الخاص بكم
+            theme: AppTheme(themeMode: AppThemeMode.light).getThemeData('ExpoArabic'),
+            
+            // هنا وضعنا الشاشة التي نريد اختبارها
+            home: const NoReportPage(), 
+            
+            builder: (_, child) {
+              return GestureDetector(
+                onTap: NavigationService.removeFocus,
+                child: FToastOverlay(child: child!),
+              );
+            },
+          );
         }
       ),
     );
