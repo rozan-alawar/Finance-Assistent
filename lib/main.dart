@@ -13,6 +13,7 @@ import 'package:finance_assistent/src/features/profile/presentation/pages/accoun
 import 'package:finance_assistent/src/features/Reports/presentation/pages/reports_page.dart';
 import 'package:finance_assistent/src/features/Reports/presentation/pages/empty_report.dart';
 import 'package:finance_assistent/src/features/reminder/presentation/screens/reminder_screen.dart';
+import 'package:finance_assistent/src/features/rewards/presentation/pages/rewards.dart';
 
 
 void main() async {
