@@ -12,6 +12,8 @@ import 'package:finance_assistent/src/features/profile/presentation/pages/profil
 import 'package:finance_assistent/src/features/profile/presentation/pages/accounting_page.dart';
 import 'package:finance_assistent/src/features/Reports/presentation/pages/reports_page.dart';
 import 'package:finance_assistent/src/features/Reports/presentation/pages/empty_report.dart';
+import 'package:finance_assistent/src/features/reminder/presentation/screens/reminder_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,20 +37,18 @@ class MyApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            title: 'Finance Assistent',
-            theme: AppTheme(
-              themeMode: AppThemeMode.light,
-            ).getThemeData('ExpoArabic'),
-            routerConfig: goRouter(context.read<AuthCubit>()),
-            builder: (_, child) {
-              return GestureDetector(
-                onTap: NavigationService.removeFocus,
-                child: FToastOverlay(child: child!),
-              );
-            },
-          );
-        },
+      debugShowCheckedModeBanner: false,
+      title: 'Finance Assistent',
+      theme: AppTheme(themeMode: AppThemeMode.light).getThemeData('ExpoArabic'),
+      routerConfig: goRouter(context.read<AuthCubit>()),
+      builder: (_, child) {
+        return GestureDetector(
+          onTap: NavigationService.removeFocus,
+          child: FToastOverlay(child: child!),
+        );
+      },
+    );
+        }
       ),
     );
   }
