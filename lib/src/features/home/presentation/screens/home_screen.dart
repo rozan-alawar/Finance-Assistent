@@ -12,6 +12,9 @@ import 'package:finance_assistent/src/features/home/presentation/components/home
 import 'package:finance_assistent/src/features/home/presentation/components/payment_due_card.dart';
 import 'package:flutter/material.dart';
 
+import 'package:finance_assistent/src/features/income/presentation/screens/income_overview_screen.dart';
+import 'package:finance_assistent/src/features/debts/presentation/screens/debts_screen.dart';
+
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
@@ -75,7 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               _selectedCurrency.flag,
                               style: TextStyle(fontSize: 20),
                             ),
-
                           SizedBox(width: 4),
                           Text(
                             _selectedCurrency.code,
@@ -106,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView.separated(
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
+                    itemCount: 4,
                     itemBuilder: (context, index) {
                       final service = [
                         {"Income", AppAssets.ASSETS_ICONS_REVENUES_SVG},
@@ -113,9 +116,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         {"Debts", AppAssets.ASSETS_ICONS_DEBTS_SVG},
                         {"Expenses", AppAssets.ASSETS_ICONS_EXPENSES_SVG},
                       ];
-                      return CustomServiceCard(
-                        label: service[index].first,
-                        icon: service[index].last,
+
+                      return GestureDetector(
+                        onTap: () {
+                          if (service[index].first == "Income") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const IncomeOverviewScreen()),
+                            );
+                          } else if (service[index].first == "Debts") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const DebtsScreen()),
+                            );
+                          }
+                        },
+                        child: CustomServiceCard(
+                          label: service[index].first,
+                          icon: service[index].last,
+                        ),
                       ).paddingOnly(
                         left: index == 0 ? 16 : 0,
                         right: index == service.length - 1 ? 16 : 0,
@@ -123,7 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     separatorBuilder: (context, index) =>
                         SizedBox(width: Sizes.paddingH8),
-                    itemCount: 4,
                   ),
                 ),
               ],
@@ -135,7 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Attention Needed", style: TextStyles.f18(context).medium),
-
                 AttentionCard(
                   title: "You've Exceeded Your Budget",
                   progress: 0.8,
@@ -155,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   progress: 0.4,
                   subTitle: "Keep an eye on your spending",
                   icon: AppAssets.ASSETS_ICONS_EXPENSES_LIMIT_SVG,
-                  progressColor: Color(0xFF536DFE), // Blue/Purple
+                  progressColor: Color(0xFF536DFE),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -193,16 +210,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Expanded(
                                   child: Text(
                                     "Smarter budgeting starts with AI insights",
-                                    style: TextStyles.f14(context).normal
-                                        .colorWith(
-                                          appSwitcherColors(
-                                            context,
-                                          ).neutralColors.shade80,
+                                    style: TextStyles.f14(context).normal.colorWith(
+                                          appSwitcherColors(context)
+                                              .neutralColors
+                                              .shade80,
                                         ),
                                     maxLines: 3,
                                   ),
                                 ),
-
                                 GestureDetector(
                                   onTap: () {
                                     AskAiRoute().push(context);
@@ -213,13 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Color(0xFF3F51B5), // Dark Blue
+                                      color: Color(0xFF3F51B5),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
                                       "Ask AI",
-                                      style: TextStyles.f14(context).medium
-                                          .colorWith(
+                                      style: TextStyles.f14(context).medium.colorWith(
                                             appCommonUIColors(context).white,
                                           ),
                                     ),
