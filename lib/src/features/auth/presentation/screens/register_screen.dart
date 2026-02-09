@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
@@ -8,7 +6,6 @@ import 'package:finance_assistent/src/core/view/component/common/text_fields.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
@@ -54,7 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         null;
 
     final isValidPhone =
-        ValidatorFields.phoneValidator(context)?.call(phoneCtr.text) == null;
+        ValidatorFields.phoneValidator(context).call(phoneCtr.text) == null;
 
     fieldsIsValidNotifier.value =
         isNameValid && isEmailValid && isPasswordValid && isValidPhone;
@@ -98,6 +95,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       listener: (context, state) {
         if (state is AuthSuccess) {
           CustomToast.showSuccessMessage(context, "Registration Successful!");
+          if (mounted) {
+            // Navigate to currency selection after successful registration
+            SelectCurrencyRoute(isSignup: true).go(context);
+          }
         } else if (state is AuthGuest) {
           if (mounted) {
             HomeRoute().go(context);

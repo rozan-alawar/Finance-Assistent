@@ -20,13 +20,13 @@ class _ReminderScreenState extends State<ReminderScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: SvgPicture.asset(
+        //     AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
+        //     color: Colors.black,
+        //   ),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: Text(
           "Reminder",
           style: TextStyles.f20(context).bold.copyWith(color: Colors.black),
@@ -69,25 +69,25 @@ class _ReminderScreenState extends State<ReminderScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on),
-            label: "Budget",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: "Reminder",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: 2,
+      //   selectedItemColor: Colors.blue,
+      //   unselectedItemColor: Colors.grey,
+      //   type: BottomNavigationBarType.fixed,
+      //   showUnselectedLabels: true,
+      //   items: const [
+      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.monetization_on),
+      //       label: "Budget",
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.notifications),
+      //       label: "Reminder",
+      //     ),
+      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+      //   ],
+      // ),
     );
   }
 

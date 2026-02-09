@@ -24,9 +24,8 @@ class TokenInterceptor extends QueuedInterceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response?.statusCode == 401) {
-      // Handle logout - maybe dispatch an event or clear session
-      // For now, simpler implementation as we removed the provider
-      HiveService.put(HiveService.settingsBoxName, 'isGuest', true); // or clear token
+
+      HiveService.put(HiveService.settingsBoxName, 'isGuest', true); 
     }
     return handler.next(err);
   }

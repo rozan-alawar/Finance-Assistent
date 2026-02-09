@@ -23,15 +23,15 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const AppAssetsSvg(
-            AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
-            width: 24,
-            height: 24,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const AppAssetsSvg(
+        //     AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
+        //     width: 24,
+        //     height: 24,
+        //     color: Colors.black,
+        //   ),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: Text('My profile', style: TextStyles.f20(context).bold),
         centerTitle: true,
       ),
@@ -170,63 +170,63 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
 
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF3F51B5),
-          unselectedItemColor: Colors.grey,
-          showUnselectedLabels: true,
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: 'Home',
-            ),
-
-            BottomNavigationBarItem(
-              icon: AppAssetsSvg(
-                AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
-                color: _selectedIndex == 1
-                    ? const Color(0xFF3F51B5)
-                    : Colors.grey,
-                height: 24,
-              ),
-              label: 'Budget',
-            ),
-
-            BottomNavigationBarItem(
-              icon: AppAssetsSvg(
-                AppAssets.ASSETS_ICONS_NAV_REMINDER_SVG,
-                color: _selectedIndex == 2
-                    ? const Color(0xFF3F51B5)
-                    : Colors.grey,
-                height: 24,
-              ),
-              label: 'Reminder',
-            ),
-
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
+      // bottomNavigationBar: Container(
+      //   decoration: BoxDecoration(
+      //     boxShadow: [
+      //       BoxShadow(
+      //         color: Colors.grey.withOpacity(0.1),
+      //         spreadRadius: 1,
+      //         blurRadius: 10,
+      //       ),
+      //     ],
+      //   ),
+      //   child: BottomNavigationBar(
+      //     backgroundColor: Colors.white,
+      //     type: BottomNavigationBarType.fixed,
+      //     selectedItemColor: const Color(0xFF3F51B5),
+      //     unselectedItemColor: Colors.grey,
+      //     showUnselectedLabels: true,
+      //     currentIndex: _selectedIndex,
+      //     onTap: (index) {
+      //       setState(() {
+      //         _selectedIndex = index;
+      //       });
+      //     },
+      //     items: [
+      //       const BottomNavigationBarItem(
+      //         icon: Icon(Icons.home_filled),
+      //         label: 'Home',
+      //       ),
+      //
+      //       BottomNavigationBarItem(
+      //         icon: AppAssetsSvg(
+      //           AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
+      //           color: _selectedIndex == 1
+      //               ? const Color(0xFF3F51B5)
+      //               : Colors.grey,
+      //           height: 24,
+      //         ),
+      //         label: 'Budget',
+      //       ),
+      //
+      //       BottomNavigationBarItem(
+      //         icon: AppAssetsSvg(
+      //           AppAssets.ASSETS_ICONS_NAV_REMINDER_SVG,
+      //           color: _selectedIndex == 2
+      //               ? const Color(0xFF3F51B5)
+      //               : Colors.grey,
+      //           height: 24,
+      //         ),
+      //         label: 'Reminder',
+      //       ),
+      //
+      //       const BottomNavigationBarItem(
+      //         icon: Icon(Icons.person),
+      //         label: 'Profile',
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 

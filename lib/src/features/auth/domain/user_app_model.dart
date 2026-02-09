@@ -1,5 +1,5 @@
 class UserApp {
-  final int id;
+  final String id;
   final String fullName;
   final String email;
   final String role;
@@ -26,14 +26,15 @@ class UserApp {
   });
 
   factory UserApp.fromMap(Map<String, dynamic> map) {
+    final defaultCurrencyValue = map['defaultCurrency'] ?? map['defaultCurrencyId'];
     return UserApp(
-      id: map['id'] is int ? map['id'] : int.parse(map['id'].toString()),
+      id: map['id'].toString(),
       fullName: map['fullName'] as String,
       email: map['email'] as String,
       role: map['role'] as String,
       status: map['status'] as String,
-      defaultCurrency: map['defaultCurrency'] as String,
-      currentBalance: map['currentBalance'] as String,
+      defaultCurrency: defaultCurrencyValue?.toString() ?? '',
+      currentBalance: map['currentBalance']?.toString() ?? '0',
       avatarAssetId: map['avatarAssetId'] as String?,
       points: map['points'] as String?,
       provider: map['provider'] as String?,

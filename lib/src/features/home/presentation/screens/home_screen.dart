@@ -1,9 +1,7 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
-import 'package:finance_assistent/src/core/utils/extensions/num_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
-import 'package:finance_assistent/src/core/view/component/base/button.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/features/home/data/models/currency_model.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/attention_card.dart';
@@ -32,16 +30,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
     String currencyCode = "USD";
-    String balance = "31,296";
+    String balance = "0";
 
     if (authState is AuthSuccess && authState.user != null) {
-      currencyCode = authState.user!.defaultCurrency;
+      currencyCode = HiveService.get(
+        HiveService.settingsBoxName,
+        'currency_code',
+        defaultValue: authState.user!.defaultCurrency,
+      );
       balance = authState.user!.currentBalance;
     } else {
        currencyCode = HiveService.get(HiveService.settingsBoxName, 'guest_currency', defaultValue: 'USD');
     }
 
-    final selectedCurrency = CurrencyModel.getByCode(currencyCode);
+    CurrencyModel? selectedCurrency;
+    for (final currency in CurrencyModel.allCurrencies) {
+      if (currency.code == currencyCode) {
+        selectedCurrency = currency;
+        break;
+      }
+    }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -60,15 +68,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("$balance", style: TextStyles.f24(context).bold),
-                    GestureDetector(
-                      onTap: () {
-                        SelectCurrencyRoute(
-                          activeCurrencyCode: selectedCurrency.code,
-                        ).push(context);
-                      },
-                      child: Row(
-                        children: [
+                    Text(balance, style: TextStyles.f24(context).bold),
+                    Row(
+                      children: [
+                        if (selectedCurrency != null) ...[
                           if (selectedCurrency.isAsset)
                             AppAssetsSvg(
                               selectedCurrency.flag,
@@ -80,15 +83,18 @@ class _HomeScreenState extends State<HomeScreen> {
                               selectedCurrency.flag,
                               style: TextStyle(fontSize: 20),
                             ),
-
                           SizedBox(width: 4),
                           Text(
                             selectedCurrency.code,
                             style: TextStyles.f14(context).medium,
                           ),
-                          Icon(Icons.keyboard_arrow_down, size: 16),
+                        ] else ...[
+                          Text(
+                            currencyCode,
+                            style: TextStyles.f14(context).medium,
+                          ),
                         ],
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -172,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.withValues(alpha: 0.1),
                         spreadRadius: 1,
                         blurRadius: 10,
                         offset: Offset(0, 1),

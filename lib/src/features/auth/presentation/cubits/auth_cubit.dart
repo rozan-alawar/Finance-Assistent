@@ -58,11 +58,6 @@ class AuthCubit extends Cubit<AuthState> {
 
       await _saveSession(result.token.token, result.user);
 
-      await HiveService.put(
-        HiveService.settingsBoxName,
-        'currency_selected',
-        false,
-      );
       emit(AuthSuccess(user: result.user));
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -114,7 +109,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await _authRepository.sendOtp(email: email);
-      _resetEmail = email; // Store for next steps
+      _resetEmail = email; 
       emit(OtpSent());
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -129,7 +124,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await _authRepository.verifyOtp(email: _resetEmail!, otp: code);
-      _resetOtp = code; // Store for reset step
+      _resetOtp = code; 
       emit(OtpVerified());
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -168,64 +163,25 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     await HiveService.delete(HiveService.settingsBoxName, 'token');
     await HiveService.delete(HiveService.settingsBoxName, 'user');
+    await HiveService.delete(HiveService.settingsBoxName, 'currency_code');
+    await HiveService.put(HiveService.settingsBoxName, 'currency_selected', false);
     await HiveService.put(HiveService.settingsBoxName, 'isGuest', false);
 
     emit(AuthInitial());
   }
 
-  Future<void> updateCurrency(String currencyCode) async {
-    final currentState = state;
 
-    // If we are logged in and have a user
-    if (currentState is AuthSuccess && currentState.user != null) {
-      final oldUser = currentState.user!;
-      emit(AuthLoading());
-      try {
-        final token = HiveService.get(HiveService.settingsBoxName, 'token');
-        if (token == null) throw Exception("User token not found");
-
-        final updatedUser = await _authRepository.updateUserCurrency(
-          userId: oldUser.id.toString(),
-          currency: currencyCode,
-          token: token,
-        );
-
-        await _saveSession(token, updatedUser);
-        await HiveService.put(
-          HiveService.settingsBoxName,
-          'currency_selected',
-          true,
-        );
-
-        emit(AuthSuccess(user: updatedUser));
-      } catch (e) {
-        emit(AuthFailure(e.toString()));
-      }
-    } else {
-      // Guest Mode or not logged in
-      await HiveService.put(
-        HiveService.settingsBoxName,
-        'currency_selected',
-        true,
-      );
-      await HiveService.put(
-        HiveService.settingsBoxName,
-        'guest_currency',
-        currencyCode,
-      );
-
-      // If we are guest, re-emit to trigger listeners if necessary,
-      // or just keep current state.
-      // Since AuthGuest doesn't carry data, emitting it again is harmless.
-      if (currentState is AuthGuest) {
-        emit(AuthGuest());
-      }
-    }
-  }
 
   Future<void> _saveSession(String token, UserApp user) async {
     await HiveService.put(HiveService.settingsBoxName, 'token', token);
     await HiveService.put(HiveService.settingsBoxName, 'isGuest', false);
     await HiveService.put(HiveService.settingsBoxName, 'user', user.toMap());
+    if (user.defaultCurrency.isNotEmpty) {
+      await HiveService.put(
+        HiveService.settingsBoxName,
+        'currency_code',
+        user.defaultCurrency,
+      );
+    }
   }
 }

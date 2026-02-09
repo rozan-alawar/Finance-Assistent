@@ -8,7 +8,7 @@ import 'interceptors/language_interceptor.dart';
 import 'interceptors/token_interceptor.dart';
 
 abstract class ApiConfig {
-  static const String baseUrl = 'https://mock.apidog.com/m1/1184063-1178536-default/';
+  static const String baseUrl = 'https://gsg-project-group-5.vercel.app/api/v1';
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 15);

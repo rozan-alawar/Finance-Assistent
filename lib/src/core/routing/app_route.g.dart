@@ -291,9 +291,9 @@ RouteBase get $homeShellRouteData => StatefulShellRouteData.$route(
       ],
     ),
     StatefulShellBranchData.$branch(
-      restorationScopeId: ServiceBranchData.$restorationScopeId,
+      restorationScopeId: BudgetBranchData.$restorationScopeId,
       routes: [
-        GoRouteData.$route(path: '/service', factory: $ServiceRoute._fromState),
+        GoRouteData.$route(path: '/budget', factory: $BudgetRoute._fromState),
       ],
     ),
     StatefulShellBranchData.$branch(
@@ -306,9 +306,9 @@ RouteBase get $homeShellRouteData => StatefulShellRouteData.$route(
       ],
     ),
     StatefulShellBranchData.$branch(
-      restorationScopeId: BudgetBranchData.$restorationScopeId,
+      restorationScopeId: ProfileBranchData.$restorationScopeId,
       routes: [
-        GoRouteData.$route(path: '/budget', factory: $BudgetRoute._fromState),
+        GoRouteData.$route(path: '/profile', factory: $ProfileRoute._fromState),
       ],
     ),
   ],
@@ -339,11 +339,11 @@ mixin $HomeRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $ServiceRoute on GoRouteData {
-  static ServiceRoute _fromState(GoRouterState state) => const ServiceRoute();
+mixin $BudgetRoute on GoRouteData {
+  static BudgetRoute _fromState(GoRouterState state) => const BudgetRoute();
 
   @override
-  String get location => GoRouteData.$location('/service');
+  String get location => GoRouteData.$location('/budget');
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -379,11 +379,11 @@ mixin $ReminderRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $BudgetRoute on GoRouteData {
-  static BudgetRoute _fromState(GoRouterState state) => const BudgetRoute();
+mixin $ProfileRoute on GoRouteData {
+  static ProfileRoute _fromState(GoRouterState state) => const ProfileRoute();
 
   @override
-  String get location => GoRouteData.$location('/budget');
+  String get location => GoRouteData.$location('/profile');
 
   @override
   void go(BuildContext context) => context.go(location);

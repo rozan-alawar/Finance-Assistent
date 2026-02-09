@@ -1,11 +1,11 @@
 part of '../../app_route.dart';
 
-class ServiceRoute extends GoRouteData
-    with $ServiceRoute {
-  const ServiceRoute();
+class ProfileRoute extends GoRouteData
+    with $ProfileRoute {
+  const ProfileRoute();
 
   static const routes = [
-    TypedGoRoute<ServiceRoute>(path: '/service'),
+    TypedGoRoute<ProfileRoute>(path: '/profile'),
   ];
 
   @override
@@ -15,5 +15,5 @@ class ServiceRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const ServiceScreen();
+      const ProfilePage();
 }

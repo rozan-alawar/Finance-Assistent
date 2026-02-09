@@ -27,12 +27,6 @@ abstract class AuthRepository {
   
   Future<void> resetPassword({required String resetToken, required String newPassword});
   
-  Future<UserApp> updateUserCurrency({
-    required String userId,
-    required String currency,
-    required String token,
-  });
-  
   Future<void> logout();
 }
 
@@ -64,15 +58,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> sendOtp({required String email}) {
     return _remoteDataSource.sendOtp(email: email);
-  }
-
-  @override
-  Future<UserApp> updateUserCurrency({
-    required String userId,
-    required String currency,
-    required String token,
-  }) {
-    return _remoteDataSource.updateUserCurrency(userId: userId, currency: currency, token: token);
   }
 
   @override

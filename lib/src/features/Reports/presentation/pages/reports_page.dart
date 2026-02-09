@@ -172,7 +172,8 @@ class _ReportsPageState extends State<ReportsPage> {
               child: _buildStatCard(
                 "Net balance",
                 "\$234.783",
-                AppAssets.ASSETS_ICONS_BET_BALANCE_SVG,
+                // AppAssets.ASSETS_ICONS_BET_BALANCE_SVG,
+                AppAssets.ASSETS_ICONS_NET_BALANCE_SVG,
                 Colors.blue[100]!,
                 Colors.blue,
               ),

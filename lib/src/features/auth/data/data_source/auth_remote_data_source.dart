@@ -14,17 +14,19 @@ class AuthRemoteDataSource {
   const AuthRemoteDataSource(this.mainApiFacade);
   final NetworkService mainApiFacade;
 
-  String get loginPath => '/api/auth/sign-in';
-  String get registerPath => '/api/auth/sign-up';
+  String get loginPath => '/auth/sign-in';
+  String get registerPath => '/auth/sign-up';
   
-  String get verifySocialTokenGooglePath => '/api/auth/oauth/google';
+  String get verifySocialTokenGooglePath => '/auth/google';
   String get verifySocialTokenApplePath => '/api/auth/oauth/apple';
   
-  String get verifyOtpPath => '/api/auth/forget-password/verify';
-  String get resetPasswordPath => '/api/auth/forget-password/reset';
+  String get requestOtpPath => '/auth/password-reset/request';
+  String get verifyOtpPath => '/auth/password-reset/verify';
+  String get resetPasswordPath => '/auth/password-reset/confirm';
 
-  String get updateCurrencyPath => '/api/user/currency';
-  
+  String get updateCurrencyPath => '/user/currency';
+  String get lisCurrenciesPath => '/currencies';
+
   String get checkEmailPath => '/api/auth/check-email';
 
   // =====================================================
@@ -76,7 +78,7 @@ class AuthRemoteDataSource {
     
     final data = socialType == 'apple' 
         ? {'identityToken': token, 'authorizationCode': authorizationCode}
-        : {'token': token}; // Google usually just sends idToken
+        : {'token': token};
 
     final response = await mainApiFacade.post<Map<String, dynamic>>(
       path: path,
@@ -94,15 +96,14 @@ class AuthRemoteDataSource {
       path: checkEmailPath,
       data: {'email': email},
     );
-     // Response: { success: true, data: { exists: true }, ... }
      final data = response.data?['data'] as Map<String, dynamic>;
      return data['exists'] as bool;
   }
 
    Future<void> sendOtp({required String email}) async {
       await mainApiFacade.post<Map<String, dynamic>>(
-      path: checkEmailPath,
-      data: {'email': email}, // Corrected from 'phone' to 'email'
+      path: requestOtpPath,
+      data: {'email': email},
     );
   }
 
@@ -115,7 +116,6 @@ class AuthRemoteDataSource {
       path: verifyOtpPath,
       data: {'email': email, 'code': otp},
     );
-    // Response: { success: true, data: { resetToken: "..." }, ... }
     final data = response.data?['data'] as Map<String, dynamic>;
     return data['resetToken'] as String;
   }
@@ -134,27 +134,10 @@ class AuthRemoteDataSource {
   //                    User Actions
   // =====================================================
 
-  Future<UserApp> updateUserCurrency({
-    required String userId,
-    required String currency,
-    required String token,
-  }) async {
-    final response = await mainApiFacade.patch<Map<String, dynamic>>(
-      path: updateCurrencyPath,
-      data: {
-        'userId': userId,
-        'currency': currency,
-        'token': token,
-      },
-    );
-    // Response: { success: true, data: { ...user object... }, message: "..." }
-    final data = response.data?['data'] as Map<String, dynamic>;
-    return UserAppMapper.fromMap(data);
-  }
+
 }
 
 ({UserApp user, AuthTokens token}) _parseAuthResponse(Map<String, dynamic> response) {
-  // Response structure: { success: true, data: { user: {...}, token: "..." } }
   final data = response['data'] as Map<String, dynamic>;
   final userMap = data['user'] as Map<String, dynamic>;
   final tokenString = data['token'] as String;
