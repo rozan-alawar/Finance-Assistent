@@ -2,6 +2,7 @@ class UserApp {
   final String id;
   final String fullName;
   final String email;
+  final String? phone;
   final String role;
   final String status;
   final String defaultCurrency;
@@ -15,6 +16,7 @@ class UserApp {
     required this.id,
     required this.fullName,
     required this.email,
+    this.phone,
     required this.role,
     required this.status,
     required this.defaultCurrency,
@@ -31,6 +33,7 @@ class UserApp {
       id: map['id'].toString(),
       fullName: map['fullName'] as String,
       email: map['email'] as String,
+      phone: map['phone']?.toString(),
       role: map['role'] as String,
       status: map['status'] as String,
       defaultCurrency: defaultCurrencyValue?.toString() ?? '',
@@ -46,6 +49,7 @@ class UserApp {
       'id': id,
       'fullName': fullName,
       'email': email,
+      'phone': phone,
       'role': role,
       'status': status,
       'defaultCurrency': defaultCurrency,

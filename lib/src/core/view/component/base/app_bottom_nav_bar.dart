@@ -55,11 +55,13 @@ class AppBottomNavBar extends StatelessWidget {
         children: List.generate(items.length, (index) {
           final item = items[index];
           final isSelected = currentIndex == index;
-          return _NavBarItem(
-            icon: isSelected ? item.selectedIcon : item.icon,
-            label: item.label,
-            isSelected: isSelected,
-            onTap: () => onTap(index),
+          return Expanded(
+            child: _NavBarItem(
+              icon: isSelected ? item.selectedIcon : item.icon,
+              label: item.label,
+              isSelected: isSelected,
+              onTap: () => onTap(index),
+            ),
           );
         }),
       ),
@@ -85,10 +87,9 @@ class _NavBarItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 80,
+      child: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             icon,
             SizedBox(height: Sizes.marginV4),
