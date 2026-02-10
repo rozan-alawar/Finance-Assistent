@@ -13,6 +13,8 @@ import 'package:go_router/go_router.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/rate_us_page.dart';
+import '../../features/profile/presentation/pages/rewards_page.dart';
 import '../../features/reminder/presentation/screens/reminder_screen.dart';
 import '../../features/services/presentation/screens/service_screen.dart';
 import '../../features/home_shell/screens/home_shell_screen.dart';

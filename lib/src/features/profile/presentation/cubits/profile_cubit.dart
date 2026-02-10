@@ -17,13 +17,18 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(const ProfileLoading());
     }
     try {
-      final data = await _profileRepository.fetchProfile();
-      emit(ProfileLoaded(data.user));
+      final user = await _profileRepository.fetchProfile();
+      emit(ProfileLoaded(user));
     } catch (e) {
       if (state is ProfileLoaded && !showLoading) {
         return;
       }
       emit(ProfileFailure(e.toString()));
     }
+  }
+
+  Future<void> updateDefaultCurrency({required String currencyId}) async {
+    await _profileRepository.updateDefaultCurrency(currencyId: currencyId);
+    await loadProfile(showLoading: false);
   }
 }

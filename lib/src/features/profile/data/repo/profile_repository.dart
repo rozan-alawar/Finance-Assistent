@@ -1,9 +1,10 @@
-import '../../../auth/domain/auth_tokens.dart';
 import '../data_source/profile_remote_data_source.dart';
 import '../../../auth/domain/user_app_model.dart';
 
 abstract class ProfileRepository {
-  Future<({UserApp user, AuthTokens token})> fetchProfile();
+  Future<UserApp> fetchProfile();
+
+  Future<void> updateDefaultCurrency({required String currencyId});
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -12,7 +13,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
   ProfileRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<({UserApp user, AuthTokens token})> fetchProfile() {
+  Future<UserApp> fetchProfile() {
     return _remoteDataSource.fetchProfile();
+  }
+
+  @override
+  Future<void> updateDefaultCurrency({required String currencyId}) {
+    return _remoteDataSource.updateDefaultCurrency(currencyId: currencyId);
   }
 }

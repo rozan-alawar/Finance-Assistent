@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
@@ -5,13 +6,18 @@ import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
+import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:finance_assistent/src/core/di/dependency_injection.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
+import 'package:finance_assistent/src/features/currency/data/repo/currency_repository.dart';
+import 'package:finance_assistent/src/features/currency/domain/currency.dart';
 import 'package:finance_assistent/src/features/profile/data/repo/profile_repository.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -21,6 +27,149 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  Future<List<Currency>>? _currenciesFuture;
+  List<Currency> _currenciesCache = const [];
+  Currency? _selectedCurrencyOverride;
+
+  @override
+  void initState() {
+    super.initState();
+    _currenciesFuture = sl<CurrencyRepository>().fetchCurrencies().then((list) {
+      _currenciesCache = list;
+      return list;
+    });
+  }
+
+  Currency? _resolveCurrency(String idOrCode) {
+    if (idOrCode.isEmpty || _currenciesCache.isEmpty) return null;
+
+    for (final c in _currenciesCache) {
+      if (c.id == idOrCode) return c;
+    }
+    for (final c in _currenciesCache) {
+      if (c.code == idOrCode) return c;
+    }
+    return null;
+  }
+
+  Future<void> _pickCurrency(BuildContext context, String currentIdOrCode) async {
+    final selected = await showModalBottomSheet<Currency>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: FutureBuilder<List<Currency>>(
+              future: _currenciesFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        snapshot.error.toString(),
+                        style: TextStyles.f14(context).medium,
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final currencies = snapshot.data ?? const <Currency>[];
+                final current =
+                    _selectedCurrencyOverride ?? _resolveCurrency(currentIdOrCode);
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Select Currency',
+                              style: TextStyles.f18(context).bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(sheetContext),
+                            icon: const Icon(Icons.close),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: currencies.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (_, index) {
+                          final c = currencies[index];
+                          final isSelected = current?.id == c.id;
+                          return ListTile(
+                            onTap: () => Navigator.pop(sheetContext, c),
+                            title: Text(
+                              '${c.symbol} (${c.code})',
+                              style: TextStyles.f14(context).medium,
+                            ),
+                            subtitle: Text(
+                              c.name,
+                              style: TextStyles.f12(context)
+                                  .medium
+                                  .colorWith(Colors.grey),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check,
+                                    color: Color(0xFF3F51B5),
+                                  )
+                                : null,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected == null) return;
+    setState(() {
+      _selectedCurrencyOverride = selected;
+    });
+
+    await HiveService.put(
+      HiveService.settingsBoxName,
+      'currency_code',
+      selected.code,
+    );
+    await HiveService.put(
+      HiveService.settingsBoxName,
+      'currency_selected',
+      true,
+    );
+
+    if (!context.mounted) return;
+    try {
+      await context
+          .read<ProfileCubit>()
+          .updateDefaultCurrency(currencyId: selected.id);
+      if (!context.mounted) return;
+      CustomToast.showSuccessMessage(context, 'Currency updated');
+    } catch (e) {
+      if (!context.mounted) return;
+      CustomToast.showErrorMessage(context, e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
@@ -46,10 +195,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return BlocProvider(
-      create: (_) => ProfileCubit(
-        sl<ProfileRepository>(),
-        seedUser: seedUser,
-      )..loadProfile(showLoading: seedUser == null),
+      create: (_) =>
+          ProfileCubit(sl<ProfileRepository>(), seedUser: seedUser)
+            ..loadProfile(showLoading: seedUser == null),
       child: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading || state is ProfileInitial) {
@@ -124,8 +272,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               height: 110,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 3),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 3,
+                                ),
                                 gradient: const LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -170,13 +320,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                         SizedBox(height: Sizes.marginV12),
-                        Text(user.fullName, style: TextStyles.f20(context).bold),
+                        Text(
+                          user.fullName,
+                          style: TextStyles.f20(context).bold,
+                        ),
                         SizedBox(height: Sizes.marginV4),
                         Text(
                           user.email,
-                          style: TextStyles.f14(context)
-                              .medium
-                              .colorWith(Colors.grey),
+                          style: TextStyles.f14(
+                            context,
+                          ).medium.colorWith(Colors.grey),
                         ),
                       ],
                     ),
@@ -231,11 +384,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         iconData: Icons.card_giftcard,
                         title: 'Rewards',
+                        onTap: () {
+                          context.push(RewardsRoute().location);
+                        },
                       ),
                       _buildSecurityItem(
                         context,
                         iconData: Icons.star,
                         title: 'Rate App',
+                        onTap: () {
+                          context.push(RateAppRoute().location);
+                        },
                       ),
                     ],
                   ),
@@ -278,6 +437,7 @@ class _ProfilePageState extends State<ProfilePage> {
     IconData? iconData,
     Widget? trailing,
     bool hasArrow = true,
+    Function? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -325,6 +485,6 @@ class _ProfilePageState extends State<ProfilePage> {
             const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
         ],
       ),
-    );
+    ).onTap(onTap);
   }
 }

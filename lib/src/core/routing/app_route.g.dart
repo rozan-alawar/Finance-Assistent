@@ -11,6 +11,8 @@ List<RouteBase> get $appRoutes => [
   $askAiRoute,
   $selectCurrencyRoute,
   $addDebtRoute,
+  $rateAppRoute,
+  $rewardsRoute,
   $loginRoute,
   $homeShellRouteData,
   $onboardingRoute,
@@ -142,6 +144,52 @@ mixin $AddDebtRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/add-debt');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $rateAppRoute =>
+    GoRouteData.$route(path: '/rate-app', factory: $RateAppRoute._fromState);
+
+mixin $RateAppRoute on GoRouteData {
+  static RateAppRoute _fromState(GoRouterState state) => const RateAppRoute();
+
+  @override
+  String get location => GoRouteData.$location('/rate-app');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $rewardsRoute =>
+    GoRouteData.$route(path: '/rewards', factory: $RewardsRoute._fromState);
+
+mixin $RewardsRoute on GoRouteData {
+  static RewardsRoute _fromState(GoRouterState state) => const RewardsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/rewards');
 
   @override
   void go(BuildContext context) => context.go(location);
