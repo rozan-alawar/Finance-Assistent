@@ -30,10 +30,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           showBackButton
               ? InkWell(
                   onTap: onBackButtonPressed ?? () => context.pop(),
-                  child: Transform.flip(
-                    flipX: Directionality.of(context) == TextDirection.ltr,
-                    child: AppAssetsSvg(AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG),
-                  ),
+                  child: AppAssetsSvg(AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG),
                 )
               : SizedBox.shrink(),
           Expanded(

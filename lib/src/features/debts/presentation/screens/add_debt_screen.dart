@@ -1,3 +1,6 @@
+import 'package:finance_assistent/src/core/gen/app_assets.dart';
+import 'package:finance_assistent/src/core/view/component/base/image.dart';
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/utils/const/sizes.dart';
@@ -20,8 +23,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
+    return SafeScaffold(
       appBar: CustomAppBar(
         title: "Add Debts",
         showBackButton: true,
@@ -43,8 +45,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     textFieldType: TextFieldType.name,
                     hint: "Personal Name",
                     prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: SvgPicture.asset("assets/icons/user.svg", width: 16, height: 16),
+                      padding: const EdgeInsets.all(16.0),
+                      child: AppAssetsSvg(AppAssets.ASSETS_ICONS_USER_SVG, width: 16, height: 16),
                     ),
                   ),
                   SizedBox(height: Sizes.marginV16),
@@ -54,7 +56,10 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     textFieldType: TextFieldType.other,
                     keyboardType: TextInputType.number,
                     hint: "0.00",
-                    prefixIcon: Icon(Icons.attach_money, color: Colors.grey, size: 16),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: AppAssetsSvg(AppAssets.ASSETS_ICONS_USD_ICONE_SVG, width: 16, height: 16),
+                    ),
                   ),
                   SizedBox(height: Sizes.marginV16),
                   Text("Due date", style: TextStyles.f14(context).medium),
@@ -63,8 +68,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     textFieldType: TextFieldType.other,
                     hint: "mm//dd//yyyy",
                     prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Image.asset("images/date.png", width: 16, height: 16),
+                      padding: const EdgeInsets.all(16.0),
+                      child: AppAssetsSvg(AppAssets.ASSETS_ICONS_DATE_IC_SVG, width: 16, height: 16),
                     ),
                   ),
                   SizedBox(height: Sizes.marginV16),

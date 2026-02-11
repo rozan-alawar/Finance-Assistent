@@ -97,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           CustomToast.showSuccessMessage(context, "Registration Successful!");
           if (mounted) {
             // Navigate to currency selection after successful registration
-            SelectCurrencyRoute(isSignup: true).go(context);
+            // SelectCurrencyRoute(isSignup: true).go(context);
           }
         } else if (state is AuthGuest) {
           if (mounted) {

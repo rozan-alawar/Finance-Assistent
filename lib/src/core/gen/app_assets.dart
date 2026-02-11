@@ -23,6 +23,9 @@ class AppAssets {
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/bills.svg)
   static const String ASSETS_ICONS_BILLS_SVG = 'assets/icons/bills.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/date_ic.svg)
+  static const String ASSETS_ICONS_DATE_IC_SVG = 'assets/icons/date_ic.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/debts.svg)
   static const String ASSETS_ICONS_DEBTS_SVG = 'assets/icons/debts.svg';
 
@@ -138,6 +141,9 @@ class AppAssets {
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/rec.svg)
   static const String ASSETS_ICONS_REC_SVG = 'assets/icons/rec.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/recurring.svg)
+  static const String ASSETS_ICONS_RECURRING_SVG = 'assets/icons/recurring.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/reports.svg)
   static const String ASSETS_ICONS_REPORTS_SVG = 'assets/icons/reports.svg';
 
@@ -152,6 +158,9 @@ class AppAssets {
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/salary.svg)
   static const String ASSETS_ICONS_SALARY_SVG = 'assets/icons/salary.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/salary_ic.svg)
+  static const String ASSETS_ICONS_SALARY_IC_SVG = 'assets/icons/salary_ic.svg';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/search.svg)
   static const String ASSETS_ICONS_SEARCH_SVG = 'assets/icons/search.svg';
@@ -169,6 +178,9 @@ class AppAssets {
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/us-flag.svg)
   static const String ASSETS_ICONS_US_FLAG_SVG = 'assets/icons/us-flag.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/usd-icone.svg)
+  static const String ASSETS_ICONS_USD_ICONE_SVG = 'assets/icons/usd-icone.svg';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/user.svg)
   static const String ASSETS_ICONS_USER_SVG = 'assets/icons/user.svg';

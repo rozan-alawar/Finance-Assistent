@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:finance_assistent/src/features/income/presentation/screens/income_overview_screen.dart';
 import 'package:finance_assistent/src/features/debts/presentation/screens/debts_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/routing/app_route.dart';
@@ -117,15 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       return GestureDetector(
                         onTap: () {
                           if (service[index].first == "Income") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const IncomeOverviewScreen()),
-                            );
+                            context.push(IncomeOverviewRoute().location);
                           } else if (service[index].first == "Debts") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const DebtsScreen()),
-                            );
+                            context.push(DebtsRoute().location);
+
                           }
                         },
                         child: CustomServiceCard(

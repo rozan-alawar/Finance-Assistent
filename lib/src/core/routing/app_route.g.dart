@@ -9,8 +9,9 @@ part of 'app_route.dart';
 List<RouteBase> get $appRoutes => [
   $notificationRoute,
   $askAiRoute,
-  $selectCurrencyRoute,
   $addDebtRoute,
+  $incomeOverviewRoute,
+  $debtsRoute,
   $rateAppRoute,
   $rewardsRoute,
   $aboutUsRoute,
@@ -68,40 +69,14 @@ mixin $AskAiRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $selectCurrencyRoute => GoRouteData.$route(
-  path: '/select-currency',
-  factory: $SelectCurrencyRoute._fromState,
-);
+RouteBase get $addDebtRoute =>
+    GoRouteData.$route(path: '/add-debt', factory: $AddDebtRoute._fromState);
 
-mixin $SelectCurrencyRoute on GoRouteData {
-  static SelectCurrencyRoute _fromState(GoRouterState state) =>
-      SelectCurrencyRoute(
-        activeCurrencyCode: state.uri.queryParameters['active-currency-code'],
-        isOnboarding: _$convertMapValue(
-          'is-onboarding',
-          state.uri.queryParameters,
-          _$boolConverter,
-        ),
-        isSignup: _$convertMapValue(
-          'is-signup',
-          state.uri.queryParameters,
-          _$boolConverter,
-        ),
-      );
-
-  SelectCurrencyRoute get _self => this as SelectCurrencyRoute;
+mixin $AddDebtRoute on GoRouteData {
+  static AddDebtRoute _fromState(GoRouterState state) => const AddDebtRoute();
 
   @override
-  String get location => GoRouteData.$location(
-    '/select-currency',
-    queryParams: {
-      if (_self.activeCurrencyCode != null)
-        'active-currency-code': _self.activeCurrencyCode,
-      if (_self.isOnboarding != null)
-        'is-onboarding': _self.isOnboarding!.toString(),
-      if (_self.isSignup != null) 'is-signup': _self.isSignup!.toString(),
-    },
-  );
+  String get location => GoRouteData.$location('/add-debt');
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -117,34 +92,40 @@ mixin $SelectCurrencyRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-T? _$convertMapValue<T>(
-  String key,
-  Map<String, String> map,
-  T? Function(String) converter,
-) {
-  final value = map[key];
-  return value == null ? null : converter(value);
-}
+RouteBase get $incomeOverviewRoute => GoRouteData.$route(
+  path: '/income-overview',
+  factory: $IncomeOverviewRoute._fromState,
+);
 
-bool _$boolConverter(String value) {
-  switch (value) {
-    case 'true':
-      return true;
-    case 'false':
-      return false;
-    default:
-      throw UnsupportedError('Cannot convert "$value" into a bool.');
-  }
-}
-
-RouteBase get $addDebtRoute =>
-    GoRouteData.$route(path: '/add-debt', factory: $AddDebtRoute._fromState);
-
-mixin $AddDebtRoute on GoRouteData {
-  static AddDebtRoute _fromState(GoRouterState state) => const AddDebtRoute();
+mixin $IncomeOverviewRoute on GoRouteData {
+  static IncomeOverviewRoute _fromState(GoRouterState state) =>
+      const IncomeOverviewRoute();
 
   @override
-  String get location => GoRouteData.$location('/add-debt');
+  String get location => GoRouteData.$location('/income-overview');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $debtsRoute =>
+    GoRouteData.$route(path: '/debt-screen', factory: $DebtsRoute._fromState);
+
+mixin $DebtsRoute on GoRouteData {
+  static DebtsRoute _fromState(GoRouterState state) => const DebtsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/debt-screen');
 
   @override
   void go(BuildContext context) => context.go(location);
