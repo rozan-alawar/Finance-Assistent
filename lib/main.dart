@@ -10,14 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:finance_assistent/src/core/services/sync/sync_service.dart';
-import 'package:finance_assistent/src/features/profile/presentation/pages/profile_page.dart';
-import 'package:finance_assistent/src/features/profile/presentation/pages/accounting_page.dart';
-import 'package:finance_assistent/src/features/Reports/presentation/pages/reports_page.dart';
-import 'package:finance_assistent/src/features/Reports/presentation/pages/empty_report.dart';
-import 'package:finance_assistent/src/features/reminder/presentation/screens/reminder_screen.dart';
-import 'package:finance_assistent/src/features/profile/presentation/pages/rewards_page.dart';
-import 'package:finance_assistent/src/features/profile/presentation/pages/about_us_page.dart';
-import 'package:finance_assistent/src/features/profile/presentation/pages/rate_us_page.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();

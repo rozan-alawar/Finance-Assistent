@@ -43,15 +43,12 @@ class _ReportsPageState extends State<ReportsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Search Bar
             _buildSearchBar(),
             const SizedBox(height: 20),
 
-            // 2. Stats Grid (4 Cards)
             _buildStatsGrid(),
             const SizedBox(height: 30),
 
-            // 3. Weekly Expense Header & Tabs
             _buildSectionHeader("Weekly Expense", "View report"),
             Text(
               "From 1 - 6 Apr, 2024",
@@ -61,17 +58,13 @@ class _ReportsPageState extends State<ReportsPage> {
             _buildTimeTabs(),
             const SizedBox(height: 20),
 
-            // 4. Bubble Chart Visualization
             _buildBubbleChart(),
-            // 5. Category List (Legend)
             _buildCategoryList(),
             const SizedBox(height: 30),
 
-            // 6. Donut Chart Section
             Center(child: _buildDonutChart()),
             const SizedBox(height: 30),
 
-            // 7. Bills List
             _buildBillItem(
               title: "Paid",
               subtitle: "7 bills",

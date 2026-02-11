@@ -420,6 +420,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         svgIcon: AppAssets.ASSETS_ICONS_REPORTS_SVG,
                         title: 'Reports',
+                        onTap: () {
+                          context.push(const ReportsRoute().location);
+                        },
                       ),
                       _buildSecurityItem(
                         context,

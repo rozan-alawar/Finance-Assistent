@@ -80,6 +80,7 @@ class AttentionCard extends StatelessWidget {
 
               ],
             ),
+            Spacer(),
             Transform.flip(
               flipX: true,
               child: AppAssetsSvg(

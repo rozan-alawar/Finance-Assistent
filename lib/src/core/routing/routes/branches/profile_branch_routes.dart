@@ -47,3 +47,12 @@ class AboutUsRoute extends GoRouteData with $AboutUsRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const AboutUsPage();
 }
+
+@TypedGoRoute<ReportsRoute>(path: '/reports')
+class ReportsRoute extends GoRouteData with $ReportsRoute {
+  const ReportsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ReportsPage();
+}

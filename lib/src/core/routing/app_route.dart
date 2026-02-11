@@ -16,6 +16,7 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/about_us_page.dart';
 import '../../features/profile/presentation/pages/rate_us_page.dart';
+import '../../features/profile/presentation/pages/reports_page.dart';
 import '../../features/profile/presentation/pages/rewards_page.dart';
 import '../../features/reminder/presentation/screens/reminder_screen.dart';
 import '../../features/home_shell/screens/home_shell_screen.dart';
@@ -25,7 +26,6 @@ import '../../features/ask_ai/presentation/screens/ask_ai_screen.dart';
 import 'util/navigation_transitions.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
 import 'util/go_router_refresh_stream.dart';
 
 part 'routes/branches/home_branch_routes.dart';
@@ -49,9 +49,6 @@ GoRouter goRouter(AuthCubit authCubit) {
     observers: [],
     refreshListenable: GoRouterRefreshStream(authCubit.stream),
     redirect: (context, state) {
-      final authState = authCubit.state;
-      final bool isLoggedIn = authState is AuthSuccess;
-
       final bool onBoardingSeen = HiveService.get(
         HiveService.settingsBoxName,
         'onboarded',
@@ -61,8 +58,6 @@ GoRouter goRouter(AuthCubit authCubit) {
       final String location = state.uri.toString();
 
       final bool isOnboarding = location == const OnboardingRoute().location;
-      final bool isLogin = location == const LoginRoute().location;
-      final bool isRegister = location == const RegisterRoute().location;
 
       /// Force onboarding ONLY if not completed
       if (!onBoardingSeen && !isOnboarding) {
@@ -91,8 +86,6 @@ GoRouter goRouter(AuthCubit authCubit) {
       //     return const HomeRoute().location;
       //   }
       // }
-
-      final bool isGuest = authState is AuthGuest;
       // if (!isLoggedIn && !isGuest && onBoardingSeen) {
       // //   final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
       // //
