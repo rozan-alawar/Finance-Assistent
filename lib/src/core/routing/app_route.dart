@@ -7,10 +7,14 @@ import 'package:finance_assistent/src/features/auth/presentation/screens/otp_ver
 import 'package:finance_assistent/src/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:finance_assistent/src/features/home/presentation/screens/notification_screen.dart';
 import 'package:finance_assistent/src/features/home/presentation/screens/select_currency_screen.dart';
+import 'package:finance_assistent/src/features/debts/presentation/screens/add_debt_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/rate_us_page.dart';
+import '../../features/profile/presentation/pages/rewards_page.dart';
 import '../../features/reminder/presentation/screens/reminder_screen.dart';
 import '../../features/services/presentation/screens/service_screen.dart';
 import '../../features/home_shell/screens/home_shell_screen.dart';
@@ -24,7 +28,7 @@ import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_sta
 import 'util/go_router_refresh_stream.dart';
 
 part 'routes/branches/home_branch_routes.dart';
-part 'routes/branches/service_branch_routes.dart';
+part 'routes/branches/profile_branch_routes.dart';
 part 'routes/branches/budget_branch_routes.dart';
 part 'routes/branches/reminder_branch_routes.dart';
 part 'app_route.g.dart';
@@ -52,13 +56,13 @@ GoRouter goRouter(AuthCubit authCubit) {
         'onboarded',
         defaultValue: false,
       );
-      
+
       final bool isCurrencySelected = HiveService.get(
         HiveService.settingsBoxName,
         'currency_selected',
-        defaultValue: true, // Default true for existing users/guests
+        defaultValue: false,
       );
-
+      
       final String location = state.uri.toString();
 
       final bool isOnboarding = location == const OnboardingRoute().location;
@@ -70,25 +74,43 @@ GoRouter goRouter(AuthCubit authCubit) {
         return const OnboardingRoute().location;
       }
 
-      /// If onboarding is done, never go back to it
+      /// If onboarding is done, redirect to auth screens
       if (onBoardingSeen && isOnboarding) {
         return const HomeRoute().location;
       }
+      //
+      // /// If user is logged in
+      // if (isLoggedIn) {
+      //   // Always allow access to select currency screen
+      //   if (location.startsWith('/select-currency')) {
+      //        return null;
+      //   }
+      //
+      //   // If currency is not selected, force selection screen
+      //   if (!isCurrencySelected) {
+      //      return SelectCurrencyRoute(isSignup: true).location;
+      //   }
+      //
+      //   // If currency is selected, block auth screens
+      //   if (isLogin || isRegister) {
+      //     return const HomeRoute().location;
+      //   }
+      // }
 
-      /// If user is logged in, block auth screens
-      if (isLoggedIn && (isLogin || isRegister)) {
-        return const HomeRoute().location;
-      }
-      
-      /// Force currency selection for new users
-      if (isLoggedIn && !isCurrencySelected) {
-         // Only redirect if not already there to avoid loop
-         if (location != const SelectCurrencyRoute(isOnboarding: true).location) {
-             return const SelectCurrencyRoute(isOnboarding: true).location;
-         }
+      final bool isGuest = authState is AuthGuest;
+      if (!isLoggedIn && !isGuest && onBoardingSeen) {
+
+        
+        final bool isAuthRoute = location.startsWith('/auth');
+
+        
+        final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
+        
+        if (!isAuthPage) {
+           return const LoginRoute().location;
+        }
       }
 
-      /// Guests are allowed everywhere else
       return null;
     },
   );

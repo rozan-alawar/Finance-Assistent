@@ -17,32 +17,66 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isGuest = context.select<AuthCubit, bool>(
-          (cubit) => cubit.state.isGuest,
-    );
+    final authState = context.watch<AuthCubit>().state;
+    final isGuest = authState is AuthGuest;
+    final user = authState is AuthSuccess ? authState.user : null;
 
     return AppBar(
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white,
-                  appSwitcherColors(context).primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          PopupMenuButton<String>(
+            offset: const Offset(0, 50),
+            onSelected: (value) {
+              if (value == 'logout') {
+                context.read<AuthCubit>().logout();
+              } else if (value == 'login') {
+                context.push('/login');
+              }
+            },
+            itemBuilder: (context) => [
+              if (isGuest || authState is AuthInitial)
+                const PopupMenuItem(
+                  value: 'login',
+                  child: Row(
+                    children: [
+                      Icon(Icons.login, color: Colors.blue, size: 20),
+                      SizedBox(width: 8),
+                      Text('Log In', style: TextStyle(color: Colors.blue)),
+                    ],
+                  ),
+                )
+              else
+                const PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.red, size: 20),
+                      SizedBox(width: 8),
+                      Text('Log Out', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+            ],
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white,
+                    appSwitcherColors(context).primaryColor,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                shape: BoxShape.circle,
               ),
-              shape: BoxShape.circle,
-            ),
-            child: AppAssetsImage(
-              AppAssets.ASSETS_IMAGES_AVATAR_PNG,
-              height: 35,
-              width: 30,
-              fit: BoxFit.fill,
+              child: AppAssetsImage(
+                AppAssets.ASSETS_IMAGES_AVATAR_PNG,
+                height: 35,
+                width: 30,
+                fit: BoxFit.fill,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -51,7 +85,10 @@ class HomeAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Hello", style: TextStyles.f14(context).normal),
-              Text("Ghydaa", style: TextStyles.f18(context).medium),
+              Text(
+                isGuest ? "Guest" : (user?.fullName ?? "User"),
+                style: TextStyles.f18(context).medium,
+              ),
             ],
           ),
           const Spacer(),

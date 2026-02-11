@@ -36,12 +36,23 @@ class AskAiRoute extends GoRouteData with $AskAiRoute {
 class SelectCurrencyRoute extends GoRouteData with $SelectCurrencyRoute {
   final String? activeCurrencyCode;
   final bool? isOnboarding;
-  const SelectCurrencyRoute({this.activeCurrencyCode, this.isOnboarding});
+  final bool? isSignup;
+  const SelectCurrencyRoute({this.activeCurrencyCode, this.isOnboarding, this.isSignup});
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       SelectCurrencyScreen(
         activeCurrencyCode: activeCurrencyCode,
         isOnboarding: isOnboarding ?? false,
+        isSignup: isSignup ?? false,
       );
+}
+
+@TypedGoRoute<AddDebtRoute>(path: '/add-debt')
+class AddDebtRoute extends GoRouteData with $AddDebtRoute {
+  const AddDebtRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const AddDebtScreen();
 }

@@ -5,15 +5,18 @@ part of '../app_route.dart';
     TypedStatefulShellBranch<HomeBranchData>(
       routes: HomeRoute.routes,
     ),
-    TypedStatefulShellBranch<ServiceBranchData>(
-      routes: ServiceRoute.routes,
-    ),
-    TypedStatefulShellBranch<ReminderBranchData>(
-      routes: ReminderRoute.routes,
-    ),
     TypedStatefulShellBranch<BudgetBranchData>(
       routes: BudgetRoute.routes,
     ),
+
+    TypedStatefulShellBranch<ReminderBranchData>(
+      routes: ReminderRoute.routes,
+    ),
+
+    TypedStatefulShellBranch<ProfileBranchData>(
+      routes: ProfileRoute.routes,
+    ),
+
   ],
 )
 class HomeShellRouteData extends StatefulShellRouteData {
@@ -40,10 +43,10 @@ class HomeBranchData extends StatefulShellBranchData {
   static const String $restorationScopeId = 'home_branch';
 }
 
-class ServiceBranchData extends StatefulShellBranchData {
-  const ServiceBranchData();
+class ProfileBranchData extends StatefulShellBranchData {
+  const ProfileBranchData();
 
-  static const String $restorationScopeId = 'service_branch';
+  static const String $restorationScopeId = 'profile_branch';
 }
 
 class ReminderBranchData extends StatefulShellBranchData {
