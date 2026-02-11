@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
@@ -19,8 +20,10 @@ import 'package:finance_assistent/src/features/profile/presentation/cubits/profi
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
 import 'package:go_router/go_router.dart';
 
+import '../components/logout_dialog.dart';
+
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -52,8 +55,12 @@ class _ProfilePageState extends State<ProfilePage> {
     return null;
   }
 
-  Future<void> _pickCurrency(BuildContext context, String currentIdOrCode) async {
+  Future<void> _pickCurrency(
+    BuildContext context,
+    String currentIdOrCode,
+  ) async {
     final selected = await showModalBottomSheet<Currency>(
+      backgroundColor: appCommonUIColors(context).white,
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) {
@@ -79,7 +86,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 final currencies = snapshot.data ?? const <Currency>[];
                 final current =
-                    _selectedCurrencyOverride ?? _resolveCurrency(currentIdOrCode);
+                    _selectedCurrencyOverride ??
+                    _resolveCurrency(currentIdOrCode);
 
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -106,8 +114,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: ListView.separated(
                         shrinkWrap: true,
                         itemCount: currencies.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (_, index) {
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 1),
+                        itemBuilder: (context, index) {
                           final c = currencies[index];
                           final isSelected = current?.id == c.id;
                           return ListTile(
@@ -118,9 +127,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             subtitle: Text(
                               c.name,
-                              style: TextStyles.f12(context)
-                                  .medium
-                                  .colorWith(Colors.grey),
+                              style: TextStyles.f12(
+                                context,
+                              ).medium.colorWith(Colors.grey),
                             ),
                             trailing: isSelected
                                 ? const Icon(
@@ -159,15 +168,30 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (!context.mounted) return;
     try {
-      await context
-          .read<ProfileCubit>()
-          .updateDefaultCurrency(currencyId: selected.id);
+      await context.read<ProfileCubit>().updateDefaultCurrency(
+        currencyId: selected.id,
+      );
       if (!context.mounted) return;
       CustomToast.showSuccessMessage(context, 'Currency updated');
     } catch (e) {
       if (!context.mounted) return;
       CustomToast.showErrorMessage(context, e.toString());
     }
+  }
+
+  Future<void> _confirmLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => LogoutDialog(),
+    );
+
+    if (shouldLogout != true) return;
+    if (!mounted) return;
+    await context.read<AuthCubit>().logout();
+    if (!mounted) return;
+    CustomToast.showSuccessMessage(context, 'Logged out');
+    const LoginRoute().go(context);
   }
 
   @override
@@ -365,15 +389,32 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         svgIcon: AppAssets.ASSETS_ICONS_VIRTUAL_CURRENCY_SVG,
                         title: 'Virtual currency',
-                        subtitle: user.defaultCurrency.isNotEmpty
-                            ? user.defaultCurrency
-                            : 'USD',
+                        subtitle: () {
+                          final hiveCurrency = HiveService.get(
+                            HiveService.settingsBoxName,
+                            'currency_code',
+                            defaultValue: '',
+                          ).toString();
+                          final selected =
+                              _selectedCurrencyOverride ??
+                              _resolveCurrency(user.defaultCurrency) ??
+                              _resolveCurrency(hiveCurrency);
+                          if (selected != null) {
+                            return '${selected.symbol} (${selected.code})';
+                          }
+                          return user.defaultCurrency.isNotEmpty
+                              ? user.defaultCurrency
+                              : 'USD';
+                        }(),
                         hasArrow: false,
                         trailing: const Icon(
                           Icons.keyboard_arrow_down,
                           color: Colors.grey,
                           size: 28,
                         ),
+                        onTap: () {
+                          _pickCurrency(context, user.defaultCurrency);
+                        },
                       ),
                       _buildSecurityItem(
                         context,
@@ -394,6 +435,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: 'Rate App',
                         onTap: () {
                           context.push(RateAppRoute().location);
+                        },
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        hasArrow: false,
+                        isLogout: true,
+                        svgIcon: AppAssets.ASSETS_ICONS_LOGOUT_SVG,
+                        title: 'Logout',
+                        onTap: () {
+                          _confirmLogout();
                         },
                       ),
                     ],
@@ -437,25 +488,32 @@ class _ProfilePageState extends State<ProfilePage> {
     IconData? iconData,
     Widget? trailing,
     bool hasArrow = true,
+    bool isLogout = false,
     Function? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFE8EAF6),
-              shape: BoxShape.circle,
-            ),
+          isLogout
+              ? AppAssetsSvg(svgIcon!, width: 50, height: 50)
+              : Container(
+                  width: 50,
+                  height: 50,
+                  padding: const EdgeInsets.all(12),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8EAF6),
+                    shape: BoxShape.circle,
+                  ),
 
-            child: svgIcon != null
-                ? AppAssetsSvg(svgIcon, color: const Color(0xFF3F51B5))
-                : Icon(iconData, color: const Color(0xFF3F51B5), size: 24),
-          ),
+                  child: svgIcon != null
+                      ? AppAssetsSvg(svgIcon, color: const Color(0xFF3F51B5))
+                      : Icon(
+                          iconData,
+                          color: const Color(0xFF3F51B5),
+                          size: 24,
+                        ),
+                ),
           const SizedBox(width: 15),
           Expanded(
             child: Column(

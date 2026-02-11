@@ -1,12 +1,11 @@
+import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 
 class RewardsPage extends StatefulWidget {
-  const RewardsPage({Key? key}) : super(key: key);
+  const RewardsPage({super.key});
 
   @override
   State<RewardsPage> createState() => _RewardsPageState();
@@ -15,8 +14,10 @@ class RewardsPage extends StatefulWidget {
 class _RewardsPageState extends State<RewardsPage> {
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -38,7 +39,7 @@ class _RewardsPageState extends State<RewardsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(topPadding: topPadding),
 
             const SizedBox(height: 20),
 
@@ -47,7 +48,7 @@ class _RewardsPageState extends State<RewardsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Featured Rewards", style: TextStyles.f18(context).bold),
+                  Text("Featured Rewarda", style: TextStyles.f18(context).bold),
                   const SizedBox(height: 15),
 
                   _buildRewardCard(
@@ -111,71 +112,122 @@ class _RewardsPageState extends State<RewardsPage> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader({required double topPadding}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 100, bottom: 30),
+      padding: EdgeInsets.only(
+        top: topPadding + kToolbarHeight + 16,
+        bottom: 24,
+      ),
       decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFF0F5), Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFFFF2F8),
+            Color(0xFFF3EEFF),
+          ],
         ),
       ),
-      child: Column(
+      child: Stack(
         children: [
-          Stack(
-            alignment: Alignment.topCenter,
+          ..._buildConfetti(),
+          Column(
             children: [
-              Container(
-                margin: const EdgeInsets.only(top: 15),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 4),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.pink.withOpacity(0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 15),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const CircleAvatar(
-                  radius: 40,
-                  backgroundImage: NetworkImage(
-                    "https://i.pravatar.cc/150?img=32",
+                    child: CircleAvatar(
+                      radius: 44,
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: const AssetImage(
+                        AppAssets.ASSETS_IMAGES_AVATAR_PNG,
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: -30,
+                    child: AppAssetsSvg(
+                      AppAssets.ASSETS_ICONS_REWW_SVG,
+                      color: Colors.amber.shade600,
+                    ),
+                  ),
+                ],
               ),
-
-              const Positioned(
-                top: 0,
-                child: Icon(Icons.emoji_events, color: Colors.amber, size: 30),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Text(
-            "Total points",
-            style: TextStyles.f14(context).copyWith(color: Colors.grey),
-          ),
-          const SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.star, color: Colors.amber, size: 24),
-              const SizedBox(width: 5),
+              const SizedBox(height: 14),
               Text(
-                "300 points",
-                style: TextStyles.f24(
-                  context,
-                ).bold.copyWith(color: Colors.black),
+                "Total points",
+                style: TextStyles.f14(context).copyWith(color: Colors.grey),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.star, color: Colors.amber, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    "300 points",
+                    style: TextStyles.f18(context).bold,
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  List<Widget> _buildConfetti() {
+    const color = Color(0xFFF6C445);
+    Widget piece({required double top, required double left, required double size, required double angle}) {
+      return Positioned(
+        top: top,
+        left: left,
+        child: Transform.rotate(
+          angle: angle,
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return [
+      piece(top: 14, left: 24, size: 5, angle: 0.4),
+      piece(top: 26, left: 80, size: 4, angle: 0.9),
+      piece(top: 18, left: 150, size: 5, angle: 0.2),
+      piece(top: 40, left: 210, size: 4, angle: 1.1),
+      piece(top: 24, left: 290, size: 5, angle: 0.6),
+      piece(top: 70, left: 44, size: 4, angle: 1.0),
+      piece(top: 92, left: 110, size: 5, angle: 0.3),
+      piece(top: 78, left: 180, size: 4, angle: 0.8),
+      piece(top: 96, left: 260, size: 5, angle: 0.5),
+      piece(top: 120, left: 24, size: 5, angle: 0.7),
+      piece(top: 138, left: 92, size: 4, angle: 0.2),
+      piece(top: 132, left: 230, size: 5, angle: 1.0),
+      piece(top: 150, left: 302, size: 4, angle: 0.6),
+    ];
   }
 
   Widget _buildRewardCard({
@@ -194,7 +246,7 @@ class _RewardsPageState extends State<RewardsPage> {
         border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -282,12 +334,14 @@ class _RewardsPageState extends State<RewardsPage> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
               color: Colors.white,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(iconData, color: Colors.grey, size: 20),
+            child: Icon(iconData, color: Colors.grey.shade700, size: 20),
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -309,7 +363,7 @@ class _RewardsPageState extends State<RewardsPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFE8EAF6),
+              color: const Color(0xFFE9EDFF),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(

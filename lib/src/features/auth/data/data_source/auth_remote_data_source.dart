@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -117,16 +115,33 @@ class AuthRemoteDataSource {
       data: {'email': email, 'code': otp},
     );
     final data = response.data?['data'] as Map<String, dynamic>;
-    return data['resetToken'] as String;
+    final token = (data['token'] ?? data['resetToken']) as String?;
+    if (token == null || token.isEmpty) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        type: DioExceptionType.badResponse,
+        error: 'Missing reset token in response',
+      );
+    }
+    return token;
   }
   
    Future<void> resetPassword({
     required String resetToken,
     required String newPassword,
   }) async {
-    await mainApiFacade.post<Map<String, dynamic>>(
+    await mainApiFacade.patch<Map<String, dynamic>>(
       path: resetPasswordPath,
-      data: {'resetToken': resetToken, 'newPassword': newPassword},
+      data: {
+        'newPassword': newPassword,
+        'password': newPassword,
+        'resetToken': resetToken,
+        'token': resetToken,
+      },
+      options: Options(
+        headers: {'Authorization': 'Bearer $resetToken'},
+      ),
     );
   }
 

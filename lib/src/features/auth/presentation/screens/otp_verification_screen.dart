@@ -16,7 +16,6 @@ import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_sta
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pinput/pinput.dart';
 
 import '../../../../core/routing/app_route.dart';
 
@@ -69,7 +68,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     if (timerNotifier.value == 0) {
       context.read<AuthCubit>().sendOtp(email: email);
       startTimer();
-      CustomToast.showSuccessMessage(context, 'Code sent successfully');
     }
   }
 
@@ -132,7 +130,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           if (mounted) {
             HomeRoute().go(context);
           }
-        } else if (state is PasswordResetLinkSent) {
+        } else if (state is OtpSent) {
           CustomToast.showSuccessMessage(context, 'Code sent successfully');
         } else if (state is AuthFailure) {
           CustomToast.showErrorMessage(context, state.message);

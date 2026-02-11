@@ -1,4 +1,5 @@
 
+import 'dart:developer' as developer;
 import 'dart:math';
 
 import 'package:dio/dio.dart';
@@ -10,6 +11,9 @@ import 'package:finance_assistent/src/features/auth/data/data_source/auth_remote
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  const runIntegrationTests =
+      bool.fromEnvironment('RUN_INTEGRATION_TESTS', defaultValue: false);
+
   group('Auth Integration Test', () {
     late AuthRemoteDataSource authDataSource;
     late NetworkService networkService;
@@ -33,7 +37,7 @@ void main() {
     final name = 'Test User';
 
     test('Register flow', () async {
-      print('Attempting to register with email: $email');
+      developer.log('Attempting to register with email: $email');
       try {
         final result = await authDataSource.register(
           email: email,
@@ -46,15 +50,15 @@ void main() {
         expect(result.token.token, isNotEmpty);
         // Mock server might return random user data, so we don't strictly check for email equality
         // expect(result.user.email, equals(email)); 
-        print('Registration successful. Returned user: ${result.user.email}');
+        developer.log('Registration successful. Returned user: ${result.user.email}');
       } catch (e) {
-        print('Registration failed: $e');
+        developer.log('Registration failed: $e');
         rethrow;
       }
     });
 
     test('Login flow', () async {
-      print('Attempting to login with email: $email');
+      developer.log('Attempting to login with email: $email');
       try {
         final result = await authDataSource.login(
           email: email,
@@ -66,9 +70,9 @@ void main() {
         expect(result.token.token, isNotEmpty);
         // Mock server might return random user data
         // expect(result.user.email, equals(email));
-        print('Login successful. Returned user: ${result.user.email}');
+        developer.log('Login successful. Returned user: ${result.user.email}');
       } catch (e) {
-        print('Login failed: $e');
+        developer.log('Login failed: $e');
         rethrow;
       }
     });
@@ -88,5 +92,5 @@ void main() {
     //     // But we want to test if the endpoint is reachable
     //   }
     // });
-  });
+  }, skip: !runIntegrationTests);
 }

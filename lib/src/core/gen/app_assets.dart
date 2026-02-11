@@ -4,6 +4,9 @@
 class AppAssets {
   const AppAssets._();
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/USD.svg)
+  static const String ASSETS_ICONS_USD_SVG = 'assets/icons/USD.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/apple.svg)
   static const String ASSETS_ICONS_APPLE_SVG = 'assets/icons/apple.svg';
 
@@ -64,6 +67,9 @@ class AppAssets {
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/lock.svg)
   static const String ASSETS_ICONS_LOCK_SVG = 'assets/icons/lock.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/logout.svg)
+  static const String ASSETS_ICONS_LOGOUT_SVG = 'assets/icons/logout.svg';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/mic.svg)
   static const String ASSETS_ICONS_MIC_SVG = 'assets/icons/mic.svg';
@@ -129,6 +135,9 @@ class AppAssets {
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/phone.svg)
   static const String ASSETS_ICONS_PHONE_SVG = 'assets/icons/phone.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/rec.svg)
+  static const String ASSETS_ICONS_REC_SVG = 'assets/icons/rec.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/reports.svg)
   static const String ASSETS_ICONS_REPORTS_SVG = 'assets/icons/reports.svg';
 
@@ -137,6 +146,12 @@ class AppAssets {
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/rewards.svg)
   static const String ASSETS_ICONS_REWARDS_SVG = 'assets/icons/rewards.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/reww.svg)
+  static const String ASSETS_ICONS_REWW_SVG = 'assets/icons/reww.svg';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/salary.svg)
+  static const String ASSETS_ICONS_SALARY_SVG = 'assets/icons/salary.svg';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/search.svg)
   static const String ASSETS_ICONS_SEARCH_SVG = 'assets/icons/search.svg';
@@ -173,6 +188,9 @@ class AppAssets {
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/bg.png)
   static const String ASSETS_IMAGES_BG_PNG = 'assets/images/bg.png';
+
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/date.png)
+  static const String ASSETS_IMAGES_DATE_PNG = 'assets/images/date.png';
 
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/images/google.png)
   static const String ASSETS_IMAGES_GOOGLE_PNG = 'assets/images/google.png';

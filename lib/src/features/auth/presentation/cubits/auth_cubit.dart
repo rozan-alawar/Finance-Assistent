@@ -123,8 +123,11 @@ class AuthCubit extends Cubit<AuthState> {
     }
     emit(AuthLoading());
     try {
-      await _authRepository.verifyOtp(email: _resetEmail!, otp: code);
-      _resetOtp = code; 
+      final resetToken = await _authRepository.verifyOtp(
+        email: _resetEmail!,
+        otp: code,
+      );
+      _resetOtp = resetToken;
       emit(OtpVerified());
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -139,7 +142,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await _authRepository.resetPassword(
-        resetToken: _resetEmail!,
+        resetToken: _resetOtp!,
         newPassword: newPassword,
       );
       emit(PasswordResetSuccess());
@@ -161,11 +164,19 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> logout() async {
+    final onboarded = HiveService.get(
+      HiveService.settingsBoxName,
+      'onboarded',
+      defaultValue: false,
+    );
+
     await HiveService.delete(HiveService.settingsBoxName, 'token');
-    await HiveService.delete(HiveService.settingsBoxName, 'user');
-    await HiveService.delete(HiveService.settingsBoxName, 'currency_code');
-    await HiveService.put(HiveService.settingsBoxName, 'currency_selected', false);
-    await HiveService.put(HiveService.settingsBoxName, 'isGuest', false);
+    await HiveService.clearBox(HiveService.settingsBoxName);
+    await HiveService.clearBox(HiveService.guestBoxName);
+
+    if (onboarded == true) {
+      await HiveService.put(HiveService.settingsBoxName, 'onboarded', true);
+    }
 
     emit(AuthInitial());
   }

@@ -13,10 +13,10 @@ import 'package:go_router/go_router.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/about_us_page.dart';
 import '../../features/profile/presentation/pages/rate_us_page.dart';
 import '../../features/profile/presentation/pages/rewards_page.dart';
 import '../../features/reminder/presentation/screens/reminder_screen.dart';
-import '../../features/services/presentation/screens/service_screen.dart';
 import '../../features/home_shell/screens/home_shell_screen.dart';
 import '../../features/budget/presentation/screens/budget_screen.dart';
 import '../../features/ask_ai/presentation/screens/ask_ai_screen.dart';
@@ -56,12 +56,6 @@ GoRouter goRouter(AuthCubit authCubit) {
         'onboarded',
         defaultValue: false,
       );
-
-      final bool isCurrencySelected = HiveService.get(
-        HiveService.settingsBoxName,
-        'currency_selected',
-        defaultValue: false,
-      );
       
       final String location = state.uri.toString();
 
@@ -98,18 +92,13 @@ GoRouter goRouter(AuthCubit authCubit) {
       // }
 
       final bool isGuest = authState is AuthGuest;
-      if (!isLoggedIn && !isGuest && onBoardingSeen) {
-
-        
-        final bool isAuthRoute = location.startsWith('/auth');
-
-        
-        final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
-        
-        if (!isAuthPage) {
-           return const LoginRoute().location;
-        }
-      }
+      // if (!isLoggedIn && !isGuest && onBoardingSeen) {
+      // //   final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
+      // //
+      // //   if (!isAuthPage) {
+      // //      return const LoginRoute().location;
+      // //   }
+      // }
 
       return null;
     },

@@ -38,3 +38,12 @@ class RewardsRoute extends GoRouteData with $RewardsRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const RewardsPage();
 }
+
+@TypedGoRoute<AboutUsRoute>(path: '/about-us')
+class AboutUsRoute extends GoRouteData with $AboutUsRoute {
+  const AboutUsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const AboutUsPage();
+}

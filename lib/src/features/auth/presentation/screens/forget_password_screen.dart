@@ -1,6 +1,5 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
-import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/const/validator_fields.dart';
@@ -60,15 +59,12 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is PasswordResetLinkSent) {
-          CustomToast.showSuccessMessage(
-            context,
-            'Reset link sent to your email',
-          );
-          context.push(OtpVerificationRoute().location,
-              extra: {
-                'email': emailCtr.text.trim(),
-              },
+        if (state is OtpSent) {
+          if (!mounted) return;
+          CustomToast.showSuccessMessage(context, 'Code was sent to email');
+          context.push(
+            const OtpVerificationRoute().location,
+            extra: {'email': emailCtr.text.trim()},
           );
         } else if (state is AuthGuest) {
           if (mounted) {
