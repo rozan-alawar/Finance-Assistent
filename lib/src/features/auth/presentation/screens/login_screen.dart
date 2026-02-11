@@ -77,9 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final sectionSpace = SizedBox(height: Sizes.marginH16);
 
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: BlocConsumer<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
+        // Use the global AuthCubit from main.dart instead of creating a new local one
         listener: (context, state) {
           if (state is AuthSuccess) {
             CustomToast.showSuccessMessage(context, "Login Successful!");
@@ -210,7 +209,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         },
-      ),
     );
   }
 }

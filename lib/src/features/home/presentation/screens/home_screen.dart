@@ -13,8 +13,13 @@ import 'package:finance_assistent/src/features/home/presentation/components/paym
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
+import '../../../auth/presentation/cubits/auth_cubit.dart';
+import '../../../auth/presentation/cubits/auth_state.dart';
+import '../../../services/bill/di/bill_injection.dart';
+import '../../../services/expense/di/expense_injection.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +35,34 @@ class _HomeScreenState extends State<HomeScreen> {
     flag: AppAssets.ASSETS_ICONS_US_FLAG_SVG,
     isAsset: true,
   );
+
+  void _onServiceTap(BuildContext context, String serviceName) {
+    // Check if user is logged in
+    final authState = context.read<AuthCubit>().state;
+    final isLoggedIn = authState is AuthSuccess;
+
+    if (!isLoggedIn) {
+      // User not logged in, redirect to login
+      const LoginRoute().push(context);
+      return;
+    }
+
+    // User is logged in, navigate to the service
+    switch (serviceName) {
+      case "Bills":
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BillInjection()),
+        );
+        break;
+      case "Expenses":
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ExpenseInjection()),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       return CustomServiceCard(
                         label: service[index].first,
                         icon: service[index].last,
+                        onTap: () =>
+                            _onServiceTap(context, service[index].first),
                       ).paddingOnly(
                         left: index == 0 ? 16 : 0,
                         right: index == service.length - 1 ? 16 : 0,
