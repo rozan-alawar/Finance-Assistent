@@ -12,43 +12,48 @@ class BudgetCubit extends Cubit<BudgetState> {
   final String increaseArrowIcon = AppAssets.ASSETS_ICONS_INCREASE_ARROW_SVG;
   final String decreaseArrowIcon = AppAssets.ASSETS_ICONS_DECREASE_ARROW_SVG;
 
-  List<GridItemModel> get gridItems => [
-    GridItemModel(
-      title: 'Balance',
-      amount: 10967.0,
-      percentage: 8.2,
-      icon: receiveMoneyIcon,
-      iconColor: Color(0xFFFF7292),
-      backgoundColor: const Color(0xFFFDF5F7),
-      arrow: increaseArrowIcon,
-    ),
-    GridItemModel(
-      title: 'Revenues',
-      amount: 1700.0,
-      percentage: -2.5,
-      icon: receiveMoneyIcon,
-      iconColor: Color(0xFF6133BD),
+  // Cache gridItems to avoid recreation on every access
+  List<GridItemModel>? _cachedGridItems;
 
-      backgoundColor: const Color(0xFFEBE5F7),
-      arrow: decreaseArrowIcon,
-    ),
-    GridItemModel(
-      title: 'Expenses',
-      amount: 2558.0,
-      percentage: 2.0,
-      icon: sendModeyIcon,
-      iconColor: Color(0xFF16C087),
-      backgoundColor: const Color(0xFFDCFCE7),
-      arrow: increaseArrowIcon,
-    ),
-    GridItemModel(
-      title: 'Total Debt',
-      amount: 12450,
-      percentage: 2.5,
-      icon: AppAssets.ASSETS_ICONS_DEBTS_SVG,
-      iconColor: Color(0xFF686FFF),
-      backgoundColor: const Color(0xFFEFF1FF),
-      arrow: increaseArrowIcon,
-    ),
-  ];
+  List<GridItemModel> get gridItems {
+    _cachedGridItems ??= [
+      GridItemModel(
+        title: 'Balance',
+        amount: 10967.0,
+        percentage: 8.2,
+        icon: receiveMoneyIcon,
+        iconColor: const Color(0xFFFF7292),
+        backgoundColor: const Color(0xFFFDF5F7),
+        arrow: increaseArrowIcon,
+      ),
+      GridItemModel(
+        title: 'Revenues',
+        amount: 1700.0,
+        percentage: -2.5,
+        icon: receiveMoneyIcon,
+        iconColor: const Color(0xFF6133BD),
+        backgoundColor: const Color(0xFFEBE5F7),
+        arrow: decreaseArrowIcon,
+      ),
+      GridItemModel(
+        title: 'Expenses',
+        amount: 2558.0,
+        percentage: 2.0,
+        icon: sendModeyIcon,
+        iconColor: const Color(0xFF16C087),
+        backgoundColor: const Color(0xFFDCFCE7),
+        arrow: increaseArrowIcon,
+      ),
+      GridItemModel(
+        title: 'Total Debt',
+        amount: 12450,
+        percentage: 2.5,
+        icon: AppAssets.ASSETS_ICONS_DEBTS_SVG,
+        iconColor: const Color(0xFF686FFF),
+        backgoundColor: const Color(0xFFEFF1FF),
+        arrow: increaseArrowIcon,
+      ),
+    ];
+    return _cachedGridItems!;
+  }
 }

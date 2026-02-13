@@ -31,13 +31,13 @@ class SearchBox extends StatelessWidget {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.redAccent, width: 2),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.redAccent, width: 2),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
         ),
-        prefixIcon: Padding(
+        prefixIcon: const Padding(
           padding: EdgeInsets.only(
             top: Sizes.paddingV12,
             bottom: Sizes.paddingV12,
