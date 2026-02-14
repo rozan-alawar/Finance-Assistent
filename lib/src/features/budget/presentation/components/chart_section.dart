@@ -13,13 +13,16 @@ class ChartSection extends StatefulWidget {
 }
 
 class _ChartSectionState extends State<ChartSection>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
 
   final DateTime _currentDay = DateTime.now();
   final DateTime _currentWeek = DateTime.now();
   final DateTime _currentMonth = DateTime.now();
   final DateTime _currentYear = DateTime.now();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -40,7 +43,9 @@ class _ChartSectionState extends State<ChartSection>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    return RepaintBoundary(
+      child: Column(
       children: [
         TabBar(
           controller: _tabController,
@@ -69,8 +74,8 @@ class _ChartSectionState extends State<ChartSection>
             ],
           ),
         ),
-        Divider(color: ColorPalette.dividerGrey3, thickness: 0.5),
-        ChartResults(
+        const Divider(color: ColorPalette.dividerGrey3, thickness: 0.5),
+        const ChartResults(
           title1: "Food",
           amonut1: 758.50,
           color1: Color(0xFF686FFF),
@@ -78,13 +83,13 @@ class _ChartSectionState extends State<ChartSection>
           amonut2: 758.50,
           color2: Color(0xFFFFA9DC),
         ),
-        Divider(
+        const Divider(
           color: ColorPalette.dividerGrey3,
           thickness: 0.5,
           indent: 30,
           endIndent: 30,
         ),
-        ChartResults(
+        const ChartResults(
           title1: "Transport",
           amonut1: 758.50,
           color1: Color(0xFFFFBDBC),
@@ -92,12 +97,13 @@ class _ChartSectionState extends State<ChartSection>
           amonut2: 758.50,
           color2: Color(0xFF5792FF),
         ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildChartView(BuildContext context, String mode, DateTime dateTime) {
-    return PercentageScatterChart();
+    return const PercentageScatterChart();
   }
 }
 
@@ -140,7 +146,7 @@ class ChartResults extends StatelessWidget {
             ),
           ],
         ),
-        Spacer(),
+        const Spacer(),
         CircleAvatar(backgroundColor: color2, radius: 4),
         const SizedBox(width: Sizes.paddingH8),
         Column(
@@ -160,7 +166,7 @@ class ChartResults extends StatelessWidget {
         ),
         title2.contains("Health")
             ? const SizedBox(width: Sizes.paddingH8)
-            : SizedBox(),
+            : const SizedBox(),
       ],
     );
   }
