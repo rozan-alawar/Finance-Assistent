@@ -6,28 +6,44 @@ import '../../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../../core/config/theme/styles/styles.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../../../core/view/component/base/custom_app_bar.dart';
+import '../../data/data_sources/bill_local_data_source.dart';
 import '../../data/data_sources/bill_remote_data_source.dart';
 import '../../data/repositories/bill_repository_impl.dart';
 import '../../domain/entities/bill_status.dart';
 import '../bloc/bill_cubit.dart';
 import '../bloc/bill_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddIndividualBillScreen extends StatelessWidget {
   final BillCubit billCubit;
 
-  const AddIndividualBillScreen({
-    super.key,
-    required this.billCubit,
-  });
+  const AddIndividualBillScreen({super.key, required this.billCubit});
 
   @override
   Widget build(BuildContext context) {
-    final remoteDataSource = BillRemoteDataSourceImpl(dio: ApiClient.dio);
-    final repository = BillRepositoryImpl(remoteDataSource: remoteDataSource);
+    return FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return BlocProvider(
-      create: (_) => AddIndividualBillCubit(repository: repository),
-      child: _AddIndividualBillContent(billCubit: billCubit),
+        final remoteDataSource = BillRemoteDataSourceImpl(dio: ApiClient.dio);
+        final localDataSource = BillLocalDataSourceImpl(
+          sharedPreferences: snapshot.data!,
+        );
+        final repository = BillRepositoryImpl(
+          remoteDataSource: remoteDataSource,
+          localDataSource: localDataSource,
+        );
+
+        return BlocProvider(
+          create: (_) => AddIndividualBillCubit(repository: repository),
+          child: _AddIndividualBillContent(billCubit: billCubit),
+        );
+      },
     );
   }
 }
@@ -64,9 +80,9 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
       body: BlocConsumer<AddIndividualBillCubit, AddIndividualBillState>(
         listener: (context, state) {
           if (state.error != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error!)));
           }
         },
         builder: (context, state) {
@@ -137,10 +153,9 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
   Widget _buildLabel(BuildContext context, String label) {
     return Text(
       label,
-      style: TextStyles.f14(context).copyWith(
-        color: const Color(0xFF2D3142),
-        fontWeight: FontWeight.w500,
-      ),
+      style: TextStyles.f14(
+        context,
+      ).copyWith(color: const Color(0xFF2D3142), fontWeight: FontWeight.w500),
     );
   }
 
@@ -166,16 +181,16 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
         style: TextStyles.f14(context),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyles.f14(context).copyWith(
-            color: ColorPalette.gray50,
-          ),
+          hintStyle: TextStyles.f14(
+            context,
+          ).copyWith(color: ColorPalette.gray50),
           prefixIcon: prefixIcon != null
               ? Icon(prefixIcon, color: ColorPalette.gray50, size: 20)
               : null,
           prefixText: prefixText,
-          prefixStyle: TextStyles.f14(context).copyWith(
-            color: ColorPalette.gray50,
-          ),
+          prefixStyle: TextStyles.f14(
+            context,
+          ).copyWith(color: ColorPalette.gray50),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -195,15 +210,17 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
         _StatusRadio(
           label: 'Paid',
           isSelected: state.status == BillStatus.paid,
-          onTap: () =>
-              context.read<AddIndividualBillCubit>().updateStatus(BillStatus.paid),
+          onTap: () => context.read<AddIndividualBillCubit>().updateStatus(
+            BillStatus.paid,
+          ),
         ),
         const SizedBox(width: 32),
         _StatusRadio(
           label: 'Unpaid',
           isSelected: state.status == BillStatus.unpaid,
-          onTap: () =>
-              context.read<AddIndividualBillCubit>().updateStatus(BillStatus.unpaid),
+          onTap: () => context.read<AddIndividualBillCubit>().updateStatus(
+            BillStatus.unpaid,
+          ),
         ),
       ],
     );
@@ -297,15 +314,15 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
               children: [
                 Text(
                   'Reminder',
-                  style: TextStyles.f14(context).copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyles.f14(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(
                   'Get notified before due date',
-                  style: TextStyles.f12(context).copyWith(
-                    color: ColorPalette.gray50,
-                  ),
+                  style: TextStyles.f12(
+                    context,
+                  ).copyWith(color: ColorPalette.gray50),
                 ),
               ],
             ),
@@ -489,4 +506,3 @@ class _FrequencyRadio extends StatelessWidget {
     );
   }
 }
-

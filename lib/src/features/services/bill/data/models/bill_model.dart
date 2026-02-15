@@ -3,7 +3,15 @@ import '../../domain/entities/bill_status.dart';
 import 'participant_model.dart';
 
 /// Bill model for API serialization
+/// API uses `type` ("individual"/"group") instead of `isGroupBill`
+/// Amounts can be strings from the API
 class BillModel extends BillEntity {
+  final String? description;
+  final String? currencyId;
+  final String? assetId;
+  final String? title;
+  final String? amountTotal;
+
   const BillModel({
     required super.id,
     required super.name,
@@ -16,45 +24,79 @@ class BillModel extends BillEntity {
     super.reminderFrequency,
     super.createdAt,
     super.updatedAt,
+    this.description,
+    this.currencyId,
+    this.assetId,
+    this.title,
+    this.amountTotal,
   });
 
-  /// Create BillModel from JSON
+  /// Create BillModel from API JSON response
+  /// Handles both list items and detail responses
   factory BillModel.fromJson(Map<String, dynamic> json) {
+    // Handle wrapped response: { "data": { ... } }
+    final data = json.containsKey('data') && json['data'] is Map<String, dynamic>
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
+    // Determine if group bill from `type` field
+    final type = data['type'] as String? ?? 'individual';
+    final isGroup = type.toLowerCase() == 'group' ||
+        data['isGroupBill'] == true ||
+        data['isGroup'] == true;
+
     return BillModel(
-      id: json['id'] as String? ?? json['_id'] as String? ?? '',
-      name: json['name'] as String? ?? json['billName'] as String? ?? '',
-      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : DateTime.now(),
-      status: BillStatus.fromId(json['status'] as String? ?? 'unpaid'),
-      isGroupBill: json['isGroupBill'] as bool? ?? json['isGroup'] as bool? ?? false,
-      invoiceNumber: json['invoiceNumber'] as String?,
-      reminderEnabled: json['reminderEnabled'] as bool? ?? json['reminder'] as bool? ?? false,
+      id: (data['id'] ?? data['_id'] ?? '').toString(),
+      name: data['name'] as String? ?? data['title'] as String? ?? '',
+      amount: _parseDouble(data['amount'] ?? data['amountTotal']),
+      dueDate: _parseDate(data['dueDate'] ?? data['date']),
+      status: BillStatus.fromId(data['status'] as String? ?? 'unpaid'),
+      isGroupBill: isGroup,
+      invoiceNumber: data['invoiceNumber'] as String?,
+      reminderEnabled: data['reminderEnabled'] as bool? ?? false,
       reminderFrequency: ReminderFrequency.fromId(
-        json['reminderFrequency'] as String? ?? 'none',
+        data['reminderFrequency'] as String? ?? 'none',
       ),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+      createdAt: data['createdAt'] != null
+          ? DateTime.tryParse(data['createdAt'] as String)
           : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      updatedAt: data['updatedAt'] != null
+          ? DateTime.tryParse(data['updatedAt'] as String)
           : null,
+      description: data['description'] as String?,
+      currencyId: data['currencyId'] as String?,
+      assetId: data['assetId'] as String?,
+      title: data['title'] as String?,
+      amountTotal: data['amountTotal']?.toString(),
     );
   }
 
-  /// Convert to JSON for API
+  /// Convert to JSON for POST /api/v1/bills (create bill)
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'amount': amount,
-      'dueDate': dueDate.toIso8601String(),
-      'status': status.id,
-      'isGroupBill': isGroupBill,
-      if (invoiceNumber != null) 'invoiceNumber': invoiceNumber,
-      'reminderEnabled': reminderEnabled,
-      'reminderFrequency': reminderFrequency.id,
+      'date': dueDate.toIso8601String().split('T')[0], // "2023-11-20"
+      'type': isGroupBill ? 'group' : 'individual',
+      if (description != null && description!.isNotEmpty)
+        'description': description,
+      if (currencyId != null && currencyId!.isNotEmpty)
+        'currencyId': currencyId,
+      if (assetId != null && assetId!.isNotEmpty) 'assetId': assetId,
+    };
+  }
+
+  /// Convert to JSON for PUT /api/v1/bills/{id} (update bill)
+  Map<String, dynamic> toUpdateJson() {
+    return {
+      'name': name,
+      'amount': amount,
+      'date': dueDate.toIso8601String().split('T')[0],
+      if (description != null && description!.isNotEmpty)
+        'description': description,
+      if (currencyId != null && currencyId!.isNotEmpty)
+        'currencyId': currencyId,
+      if (assetId != null && assetId!.isNotEmpty) 'assetId': assetId,
     };
   }
 
@@ -74,10 +116,27 @@ class BillModel extends BillEntity {
       updatedAt: entity.updatedAt,
     );
   }
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    return DateTime.now();
+  }
 }
 
 /// Group Bill model for API serialization
 class GroupBillModel extends GroupBillEntity {
+  final String? description;
+  final String? currencyId;
+  final String? assetId;
+
   const GroupBillModel({
     required super.id,
     required super.name,
@@ -94,60 +153,68 @@ class GroupBillModel extends GroupBillEntity {
     super.splitMethod,
     super.userShare,
     super.contributionPercentage,
+    this.description,
+    this.currencyId,
+    this.assetId,
   });
 
   /// Create GroupBillModel from JSON
   factory GroupBillModel.fromJson(Map<String, dynamic> json) {
-    final participantsList = json['participants'] as List<dynamic>? ?? [];
-    
+    // Handle wrapped response
+    final data = json.containsKey('data') && json['data'] is Map<String, dynamic>
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
+    final participantsList = data['participants'] as List<dynamic>? ?? [];
+
     return GroupBillModel(
-      id: json['id'] as String? ?? json['_id'] as String? ?? '',
-      name: json['name'] as String? ?? json['billName'] as String? ?? '',
-      amount: (json['amount'] as num?)?.toDouble() ?? 
-              (json['totalAmount'] as num?)?.toDouble() ?? 0.0,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : DateTime.now(),
-      status: BillStatus.fromId(json['status'] as String? ?? 'unpaid'),
-      invoiceNumber: json['invoiceNumber'] as String?,
-      reminderEnabled: json['reminderEnabled'] as bool? ?? false,
+      id: (data['id'] ?? data['_id'] ?? '').toString(),
+      name: data['name'] as String? ?? data['title'] as String? ?? '',
+      amount: _parseDouble(data['amount'] ?? data['amountTotal'] ?? data['totalAmount']),
+      dueDate: _parseDate(data['dueDate'] ?? data['date']),
+      status: BillStatus.fromId(data['status'] as String? ?? 'unpaid'),
+      invoiceNumber: data['invoiceNumber'] as String?,
+      reminderEnabled: data['reminderEnabled'] as bool? ?? false,
       reminderFrequency: ReminderFrequency.fromId(
-        json['reminderFrequency'] as String? ?? 'none',
+        data['reminderFrequency'] as String? ?? 'none',
       ),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+      createdAt: data['createdAt'] != null
+          ? DateTime.tryParse(data['createdAt'] as String)
           : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      updatedAt: data['updatedAt'] != null
+          ? DateTime.tryParse(data['updatedAt'] as String)
           : null,
-      subtitle: json['subtitle'] as String? ?? json['description'] as String?,
+      subtitle: data['subtitle'] as String? ?? data['description'] as String?,
       participants: participantsList
           .map((p) => ParticipantModel.fromJson(p as Map<String, dynamic>))
           .toList(),
-      splitMethod: SplitMethod.fromId(json['splitMethod'] as String? ?? 'equal'),
-      userShare: (json['userShare'] as num?)?.toDouble() ?? 
-                 (json['myShare'] as num?)?.toDouble() ?? 0.0,
-      contributionPercentage: (json['contributionPercentage'] as num?)?.toDouble() ?? 
-                              (json['contribution'] as num?)?.toDouble() ?? 0.0,
+      splitMethod: SplitMethod.fromId(data['splitMethod'] as String? ?? 'equal'),
+      userShare: _parseDouble(data['userShare'] ?? data['myShare']),
+      contributionPercentage: _parseDouble(
+        data['contributionPercentage'] ?? data['contribution'],
+      ),
+      description: data['description'] as String?,
+      currencyId: data['currencyId'] as String?,
+      assetId: data['assetId'] as String?,
     );
   }
 
-  /// Convert to JSON for API
+  /// Convert to JSON for POST /api/v1/bills (create group bill)
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'amount': amount,
-      'dueDate': dueDate.toIso8601String(),
-      'status': status.id,
-      'isGroupBill': true,
-      if (invoiceNumber != null) 'invoiceNumber': invoiceNumber,
-      'reminderEnabled': reminderEnabled,
-      'reminderFrequency': reminderFrequency.id,
-      if (subtitle != null) 'subtitle': subtitle,
-      'participants': participants
-          .map((p) => ParticipantModel.fromEntity(p).toJson())
-          .toList(),
+      'date': dueDate.toIso8601String().split('T')[0],
+      'type': 'group',
+      if (description != null && description!.isNotEmpty)
+        'description': description,
+      if (currencyId != null && currencyId!.isNotEmpty)
+        'currencyId': currencyId,
+      if (assetId != null && assetId!.isNotEmpty) 'assetId': assetId,
+      if (participants.isNotEmpty)
+        'participants': participants
+            .map((p) => ParticipantModel.fromEntity(p).toJson())
+            .toList(),
       'splitMethod': splitMethod.id,
     };
   }
@@ -172,5 +239,17 @@ class GroupBillModel extends GroupBillEntity {
       contributionPercentage: entity.contributionPercentage,
     );
   }
-}
 
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    return DateTime.now();
+  }
+}

@@ -9,33 +9,39 @@ import '../models/expense_overview_model.dart';
 
 /// Remote data source for expense operations via API
 abstract class ExpenseRemoteDataSource {
-  /// Get expenses overview (total balance, income, expenses, percentage change)
+  /// Get expenses overview (total balance, income, expenses)
   /// GET /api/v1/expenses/overview
   Future<ExpenseOverviewModel> getExpensesOverview({
-    DateTime? startDate,
-    DateTime? endDate,
+    String? period,
+    int? month,
+    String? from,
+    String? to,
   });
 
   /// Get expenses categories breakdown
   /// GET /api/v1/expenses/categories/breakdown
   Future<CategoriesBreakdownResponse> getCategoriesBreakdown({
-    DateTime? startDate,
-    DateTime? endDate,
+    String? period,
+    int? month,
+    String? from,
+    String? to,
   });
 
   /// Get expenses donut chart data
   /// GET /api/v1/expenses/charts/donut
   Future<DonutChartResponse> getDonutChartData({
-    DateTime? startDate,
-    DateTime? endDate,
+    String? period,
+    int? month,
+    String? from,
+    String? to,
   });
 
   /// Get all expenses
   /// GET /api/v1/expenses
   Future<List<ExpenseModel>> getExpenses({
-    DateTime? startDate,
-    DateTime? endDate,
-    String? categoryId,
+    String? from,
+    String? to,
+    String? category,
   });
 
   /// Create a new expense
@@ -53,19 +59,35 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
 
   ExpenseRemoteDataSourceImpl({required this.dio});
 
+  /// Build query params for the expense endpoints
+  Map<String, dynamic> _buildQueryParams({
+    String? period,
+    int? month,
+    String? from,
+    String? to,
+  }) {
+    final queryParams = <String, dynamic>{};
+    if (period != null) queryParams['period'] = period;
+    if (month != null) queryParams['month'] = month;
+    if (from != null) queryParams['from'] = from;
+    if (to != null) queryParams['to'] = to;
+    return queryParams;
+  }
+
   @override
   Future<ExpenseOverviewModel> getExpensesOverview({
-    DateTime? startDate,
-    DateTime? endDate,
+    String? period,
+    int? month,
+    String? from,
+    String? to,
   }) async {
     try {
-      final queryParams = <String, dynamic>{};
-      if (startDate != null) {
-        queryParams['startDate'] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        queryParams['endDate'] = endDate.toIso8601String();
-      }
+      final queryParams = _buildQueryParams(
+        period: period,
+        month: month,
+        from: from,
+        to: to,
+      );
 
       final response = await dio.get(
         ApiEndpoints.expensesOverview,
@@ -82,17 +104,18 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
 
   @override
   Future<CategoriesBreakdownResponse> getCategoriesBreakdown({
-    DateTime? startDate,
-    DateTime? endDate,
+    String? period,
+    int? month,
+    String? from,
+    String? to,
   }) async {
     try {
-      final queryParams = <String, dynamic>{};
-      if (startDate != null) {
-        queryParams['startDate'] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        queryParams['endDate'] = endDate.toIso8601String();
-      }
+      final queryParams = _buildQueryParams(
+        period: period,
+        month: month,
+        from: from,
+        to: to,
+      );
 
       final response = await dio.get(
         ApiEndpoints.expensesCategoriesBreakdown,
@@ -109,24 +132,27 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
 
   @override
   Future<DonutChartResponse> getDonutChartData({
-    DateTime? startDate,
-    DateTime? endDate,
+    String? period,
+    int? month,
+    String? from,
+    String? to,
   }) async {
     try {
-      final queryParams = <String, dynamic>{};
-      if (startDate != null) {
-        queryParams['startDate'] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        queryParams['endDate'] = endDate.toIso8601String();
-      }
+      final queryParams = _buildQueryParams(
+        period: period,
+        month: month,
+        from: from,
+        to: to,
+      );
 
       final response = await dio.get(
         ApiEndpoints.expensesDonutChart,
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
 
-      return DonutChartResponse.fromJson(response.data as Map<String, dynamic>);
+      return DonutChartResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -134,21 +160,15 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
 
   @override
   Future<List<ExpenseModel>> getExpenses({
-    DateTime? startDate,
-    DateTime? endDate,
-    String? categoryId,
+    String? from,
+    String? to,
+    String? category,
   }) async {
     try {
       final queryParams = <String, dynamic>{};
-      if (startDate != null) {
-        queryParams['startDate'] = startDate.toIso8601String();
-      }
-      if (endDate != null) {
-        queryParams['endDate'] = endDate.toIso8601String();
-      }
-      if (categoryId != null) {
-        queryParams['category'] = categoryId;
-      }
+      if (from != null) queryParams['from'] = from;
+      if (to != null) queryParams['to'] = to;
+      if (category != null) queryParams['category'] = category;
 
       final response = await dio.get(
         ApiEndpoints.expenses,
@@ -161,10 +181,9 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
       if (data is List) {
         expensesList = data;
       } else if (data is Map<String, dynamic>) {
-        expensesList =
-            data['expenses'] as List<dynamic>? ??
-            data['data'] as List<dynamic>? ??
-            [];
+        // Handle wrapped: { "data": [...] } or { "expenses": [...] }
+        final rawData = data['data'] ?? data['expenses'] ?? [];
+        expensesList = rawData is List ? rawData : [];
       } else {
         expensesList = [];
       }
@@ -185,7 +204,17 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
         data: expense.toJson(),
       );
 
-      return ExpenseModel.fromJson(response.data as Map<String, dynamic>);
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        // Handle wrapped: { "data": { ... } }
+        if (data.containsKey('data') && data['data'] is Map<String, dynamic>) {
+          return ExpenseModel.fromJson(data['data'] as Map<String, dynamic>);
+        }
+        return ExpenseModel.fromJson(data);
+      }
+
+      // Fallback: return the original expense with generated id
+      return expense;
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -233,14 +262,11 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     if (data == null) return 'Unknown error';
     if (data is String) return data;
     if (data is Map<String, dynamic>) {
-      // Check for top-level message
       if (data['message'] is String) return data['message'] as String;
-      // Check for nested error object: {"error": {"message": "..."}}
       if (data['error'] is Map<String, dynamic>) {
         final error = data['error'] as Map<String, dynamic>;
         return error['message'] as String? ?? 'Unknown error';
       }
-      // Check for error as a plain string
       if (data['error'] is String) return data['error'] as String;
       return 'Unknown error';
     }

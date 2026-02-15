@@ -111,76 +111,18 @@ class CategoryExpenseTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
 
-                  // Expand Arrow
-                  Icon(
-                    isExpanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_right_rounded,
+                  // Forward Arrow (navigates to detail)
+                  const Icon(
+                    Icons.keyboard_arrow_right_rounded,
                     color: ColorPalette.gray50,
                   ),
                 ],
               ),
             ),
           ),
-
-          // Expanded Content - List of expenses
-          if (isExpanded && expenses.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Column(
-                children: [
-                  const Divider(height: 1),
-                  const SizedBox(height: 12),
-                  ...expenses.map((expense) => _ExpenseItem(expense: expense)),
-                ],
-              ),
-            ),
         ],
       ),
     );
   }
 }
 
-class _ExpenseItem extends StatelessWidget {
-  final ExpenseEntity expense;
-
-  const _ExpenseItem({required this.expense});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '${expense.name} (${expense.amount.toStringAsFixed(0)}\$)',
-            style: TextStyles.f14(context).copyWith(color: ColorPalette.gray60),
-          ),
-          Text(
-            _formatDate(expense.date),
-            style: TextStyles.f12(context).copyWith(color: ColorPalette.gray50),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${date.day.toString().padLeft(2, '0')} ${months[date.month - 1]} ${date.year}';
-  }
-}

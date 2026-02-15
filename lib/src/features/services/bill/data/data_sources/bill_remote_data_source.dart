@@ -1,29 +1,27 @@
 import 'package:dio/dio.dart';
 
 import '../../../../../core/network/api_endpoints.dart';
+import '../../domain/entities/bill.dart';
 import '../../domain/entities/bill_status.dart';
 import '../models/bill_model.dart';
 
 /// Remote data source for bill operations via API
 abstract class BillRemoteDataSource {
-  /// Get all bills
-  /// GET /api/v1/bills
-  Future<List<BillModel>> getBills({
-    bool? isGroupBill,
-    String? searchQuery,
-  });
+  /// Get all bills with optional type filter and pagination
+  /// GET /api/v1/bills?type=individual|group&page=1&limit=20
+  Future<List<BillEntity>> getBills({String? type, int? page, int? limit});
 
   /// Get bill by ID
   /// GET /api/v1/bills/{id}
-  Future<BillModel> getBillById(String id);
+  Future<BillEntity> getBillById(String id);
 
   /// Create a new bill
   /// POST /api/v1/bills
-  Future<BillModel> createBill(Map<String, dynamic> billData, {bool isGroup});
+  Future<BillEntity> createBill(Map<String, dynamic> billData);
 
   /// Update a bill
   /// PUT /api/v1/bills/{id}
-  Future<BillModel> updateBill(String id, Map<String, dynamic> billData, {bool isGroup});
+  Future<BillEntity> updateBill(String id, Map<String, dynamic> billData);
 
   /// Delete a bill
   /// DELETE /api/v1/bills/{id}
@@ -31,11 +29,11 @@ abstract class BillRemoteDataSource {
 
   /// Update bill payment status
   /// PATCH /api/v1/bills/{id}/status
-  Future<BillModel> updateBillStatus(String id, BillStatus status);
+  Future<BillEntity> updateBillStatus(String id, BillStatus status);
 
   /// Smart parse bill using AI
   /// POST /api/v1/bills/smart-parse
-  Future<BillModel> smartParseBill(String imageData);
+  Future<BillEntity> smartParseBill(String imageData);
 }
 
 /// Implementation of BillRemoteDataSource using Dio
@@ -45,18 +43,16 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
   BillRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<List<BillModel>> getBills({
-    bool? isGroupBill,
-    String? searchQuery,
+  Future<List<BillEntity>> getBills({
+    String? type,
+    int? page,
+    int? limit,
   }) async {
     try {
       final queryParams = <String, dynamic>{};
-      if (isGroupBill != null) {
-        queryParams['isGroupBill'] = isGroupBill;
-      }
-      if (searchQuery != null && searchQuery.isNotEmpty) {
-        queryParams['search'] = searchQuery;
-      }
+      if (type != null) queryParams['type'] = type;
+      if (page != null) queryParams['page'] = page;
+      if (limit != null) queryParams['limit'] = limit;
 
       final response = await dio.get(
         ApiEndpoints.bills,
@@ -69,19 +65,27 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       if (data is List) {
         billsList = data;
       } else if (data is Map<String, dynamic>) {
-        billsList = data['bills'] as List<dynamic>? ??
-            data['data'] as List<dynamic>? ??
-            [];
+        // Handle wrapped: { "data": { "items": [...], "meta": {...} } }
+        final responseData = data['data'];
+        if (responseData is Map<String, dynamic>) {
+          billsList = responseData['items'] as List<dynamic>? ?? [];
+        } else if (responseData is List) {
+          billsList = responseData;
+        } else {
+          billsList =
+              data['bills'] as List<dynamic>? ??
+              data['items'] as List<dynamic>? ??
+              [];
+        }
       } else {
         billsList = [];
       }
 
       return billsList.map((json) {
         final map = json as Map<String, dynamic>;
-        final isGroup = map['isGroupBill'] as bool? ?? 
-                        map['isGroup'] as bool? ?? false;
-        if (isGroup) {
-          return GroupBillModel.fromJson(map) as BillModel;
+        final billType = map['type'] as String? ?? 'individual';
+        if (billType.toLowerCase() == 'group') {
+          return GroupBillModel.fromJson(map) as GroupBillEntity;
         }
         return BillModel.fromJson(map);
       }).toList();
@@ -91,42 +95,61 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
   }
 
   @override
-  Future<BillModel> getBillById(String id) async {
+  Future<BillEntity> getBillById(String id) async {
     try {
       final response = await dio.get('${ApiEndpoints.bills}/$id');
       final data = response.data as Map<String, dynamic>;
-      
-      final isGroup = data['isGroupBill'] as bool? ?? 
-                      data['isGroup'] as bool? ?? false;
-      if (isGroup) {
-        return GroupBillModel.fromJson(data) as BillModel;
+
+      // Handle wrapped: { "data": { ... } }
+      final billData =
+          data.containsKey('data') && data['data'] is Map<String, dynamic>
+          ? data['data'] as Map<String, dynamic>
+          : data;
+
+      final type = billData['type'] as String? ?? 'individual';
+      if (type.toLowerCase() == 'group') {
+        return GroupBillModel.fromJson(billData);
       }
-      return BillModel.fromJson(data);
+      return BillModel.fromJson(billData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   @override
-  Future<BillModel> createBill(Map<String, dynamic> billData, {bool isGroup = false}) async {
+  Future<BillEntity> createBill(Map<String, dynamic> billData) async {
     try {
-      final response = await dio.post(
-        ApiEndpoints.bills,
-        data: billData,
-      );
+      final response = await dio.post(ApiEndpoints.bills, data: billData);
 
-      final data = response.data as Map<String, dynamic>;
-      if (isGroup) {
-        return GroupBillModel.fromJson(data) as BillModel;
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        // Handle wrapped: { "data": { ... } }
+        final responseData =
+            data.containsKey('data') && data['data'] is Map<String, dynamic>
+            ? data['data'] as Map<String, dynamic>
+            : data;
+
+        final type =
+            responseData['type'] as String? ??
+            billData['type'] as String? ??
+            'individual';
+        if (type.toLowerCase() == 'group') {
+          return GroupBillModel.fromJson(responseData);
+        }
+        return BillModel.fromJson(responseData);
       }
-      return BillModel.fromJson(data);
+
+      return BillModel.fromJson(billData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   @override
-  Future<BillModel> updateBill(String id, Map<String, dynamic> billData, {bool isGroup = false}) async {
+  Future<BillEntity> updateBill(
+    String id,
+    Map<String, dynamic> billData,
+  ) async {
     try {
       final response = await dio.put(
         '${ApiEndpoints.bills}/$id',
@@ -134,10 +157,16 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       );
 
       final data = response.data as Map<String, dynamic>;
-      if (isGroup) {
-        return GroupBillModel.fromJson(data) as BillModel;
+      final responseData =
+          data.containsKey('data') && data['data'] is Map<String, dynamic>
+          ? data['data'] as Map<String, dynamic>
+          : data;
+
+      final type = responseData['type'] as String? ?? 'individual';
+      if (type.toLowerCase() == 'group') {
+        return GroupBillModel.fromJson(responseData);
       }
-      return BillModel.fromJson(data);
+      return BillModel.fromJson(responseData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -153,7 +182,7 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
   }
 
   @override
-  Future<BillModel> updateBillStatus(String id, BillStatus status) async {
+  Future<BillEntity> updateBillStatus(String id, BillStatus status) async {
     try {
       final response = await dio.patch(
         '${ApiEndpoints.bills}/$id/status',
@@ -161,26 +190,38 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       );
 
       final data = response.data as Map<String, dynamic>;
-      final isGroup = data['isGroupBill'] as bool? ?? 
-                      data['isGroup'] as bool? ?? false;
-      if (isGroup) {
-        return GroupBillModel.fromJson(data) as BillModel;
+      final responseData =
+          data.containsKey('data') && data['data'] is Map<String, dynamic>
+          ? data['data'] as Map<String, dynamic>
+          : data;
+
+      final type = responseData['type'] as String? ?? 'individual';
+      if (type.toLowerCase() == 'group') {
+        return GroupBillModel.fromJson(responseData);
       }
-      return BillModel.fromJson(data);
+      return BillModel.fromJson(responseData);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   @override
-  Future<BillModel> smartParseBill(String imageData) async {
+  Future<BillEntity> smartParseBill(String imageData) async {
     try {
       final response = await dio.post(
         ApiEndpoints.billsSmartParse,
         data: {'image': imageData},
       );
 
-      return BillModel.fromJson(response.data as Map<String, dynamic>);
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        final responseData =
+            data.containsKey('data') && data['data'] is Map<String, dynamic>
+            ? data['data'] as Map<String, dynamic>
+            : data;
+        return BillModel.fromJson(responseData);
+      }
+      return BillModel.fromJson(data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -213,18 +254,14 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     if (data == null) return 'Unknown error';
     if (data is String) return data;
     if (data is Map<String, dynamic>) {
-      // Check for top-level message
       if (data['message'] is String) return data['message'] as String;
-      // Check for nested error object: {"error": {"message": "..."}}
       if (data['error'] is Map<String, dynamic>) {
         final error = data['error'] as Map<String, dynamic>;
         return error['message'] as String? ?? 'Unknown error';
       }
-      // Check for error as a plain string
       if (data['error'] is String) return data['error'] as String;
       return 'Unknown error';
     }
     return 'Unknown error';
   }
 }
-

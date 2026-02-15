@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../../core/config/theme/styles/styles.dart';
 import '../../../../../core/view/component/base/custom_app_bar.dart';
+import '../../domain/entities/expense.dart';
 import '../../domain/entities/expense_category.dart';
 import '../bloc/expense_cubit.dart';
 import '../bloc/expense_state.dart';
@@ -13,6 +14,7 @@ import '../widgets/date_filter_tabs.dart';
 import '../widgets/expense_donut_chart.dart';
 import '../widgets/period_navigator.dart';
 import 'add_expense.dart';
+import 'category_detail_screen.dart';
 
 class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
@@ -132,8 +134,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               amount: categoryAmount,
               percentage: percentage,
               expenses: expenses,
-              isExpanded: state.expandedCategory == category,
-              onTap: () => cubit.toggleCategoryExpansion(category),
+              isExpanded: false,
+              onTap: () => _navigateToCategoryDetail(
+                context,
+                category: category,
+                allExpenses: state.expenses,
+                expensesByCategory: state.expensesByCategory,
+              ),
             );
           }),
 
@@ -222,6 +229,23 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         builder: (_) => BlocProvider.value(
           value: context.read<ExpenseCubit>(),
           child: const AddExpenseScreen(),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToCategoryDetail(
+    BuildContext context, {
+    required ExpenseCategory category,
+    required List<ExpenseEntity> allExpenses,
+    required Map<ExpenseCategory, double> expensesByCategory,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CategoryDetailScreen(
+          initialCategory: category,
+          allExpenses: allExpenses,
+          expensesByCategory: expensesByCategory,
         ),
       ),
     );

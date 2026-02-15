@@ -18,24 +18,23 @@ class BillSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48,
       decoration: BoxDecoration(
-        color: ColorPalette.coldGray10.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ColorPalette.coldGray20,
+          color: ColorPalette.gray10,
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Icon(
             Icons.search,
             color: ColorPalette.gray50,
             size: 22,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: controller,
@@ -47,8 +46,7 @@ class BillSearchBar extends StatelessWidget {
                   color: ColorPalette.gray50,
                 ),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
             ),
           ),
@@ -56,7 +54,7 @@ class BillSearchBar extends StatelessWidget {
             onPressed: onFilterTap,
             icon: Icon(
               Icons.tune_rounded,
-              color: ColorPalette.gray50,
+              color: ColorPalette.primary,
               size: 22,
             ),
           ),
@@ -65,4 +63,3 @@ class BillSearchBar extends StatelessWidget {
     );
   }
 }
-

@@ -4,8 +4,11 @@ import 'package:intl/intl.dart';
 
 import '../../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../../core/config/theme/styles/styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../../core/network/api_client.dart';
 import '../../../../../core/view/component/base/custom_app_bar.dart';
+import '../../data/data_sources/bill_local_data_source.dart';
 import '../../data/data_sources/bill_remote_data_source.dart';
 import '../../data/repositories/bill_repository_impl.dart';
 import '../../domain/entities/bill_status.dart';
@@ -23,12 +26,29 @@ class AddGroupBillScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final remoteDataSource = BillRemoteDataSourceImpl(dio: ApiClient.dio);
-    final repository = BillRepositoryImpl(remoteDataSource: remoteDataSource);
+    return FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return BlocProvider(
-      create: (_) => AddGroupBillCubit(repository: repository),
-      child: _AddGroupBillContent(billCubit: billCubit),
+        final remoteDataSource = BillRemoteDataSourceImpl(dio: ApiClient.dio);
+        final localDataSource = BillLocalDataSourceImpl(
+          sharedPreferences: snapshot.data!,
+        );
+        final repository = BillRepositoryImpl(
+          remoteDataSource: remoteDataSource,
+          localDataSource: localDataSource,
+        );
+
+        return BlocProvider(
+          create: (_) => AddGroupBillCubit(repository: repository),
+          child: _AddGroupBillContent(billCubit: billCubit),
+        );
+      },
     );
   }
 }

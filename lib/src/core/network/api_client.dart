@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../services/network/interceptors/token_interceptor.dart';
+
 /// API Client configuration using Dio
 class ApiClient {
   static const String baseUrl = 'https://gsg-project-group-5.vercel.app/api/v1';
@@ -27,26 +29,8 @@ class ApiClient {
       ),
     );
 
-    // Add interceptors for logging and error handling
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          // Add auth token if available
-          // final token = await getAuthToken();
-          // if (token != null) {
-          //   options.headers['Authorization'] = 'Bearer $token';
-          // }
-          return handler.next(options);
-        },
-        onResponse: (response, handler) {
-          return handler.next(response);
-        },
-        onError: (error, handler) {
-          // Handle common errors
-          return handler.next(error);
-        },
-      ),
-    );
+    // Add token interceptor to attach auth token from Hive
+    dio.interceptors.add(TokenInterceptor());
 
     // Add logging in debug mode
     dio.interceptors.add(
@@ -54,15 +38,5 @@ class ApiClient {
     );
 
     return dio;
-  }
-
-  /// Set the auth token for authenticated requests
-  static void setAuthToken(String token) {
-    dio.options.headers['Authorization'] = 'Bearer $token';
-  }
-
-  /// Clear the auth token
-  static void clearAuthToken() {
-    dio.options.headers.remove('Authorization');
   }
 }

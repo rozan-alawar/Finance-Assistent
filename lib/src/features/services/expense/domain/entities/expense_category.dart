@@ -51,9 +51,10 @@ enum ExpenseCategory {
   });
 
   /// Get category from id string (useful for parsing from JSON/storage)
+  /// Handles both lowercase ('food') and uppercase ('FOOD') IDs from API
   static ExpenseCategory fromId(String id) {
     return ExpenseCategory.values.firstWhere(
-      (category) => category.id == id,
+      (category) => category.id.toLowerCase() == id.toLowerCase(),
       orElse: () => ExpenseCategory.others,
     );
   }

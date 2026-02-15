@@ -29,9 +29,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           showBackButton
               ? InkWell(
-                  onTap: onBackButtonPressed ?? () => context.pop(),
+                  onTap: onBackButtonPressed ?? () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      context.pop();
+                    }
+                  },
                   child: Transform.flip(
-                    flipX: Directionality.of(context) == TextDirection.ltr,
+                    flipX: Directionality.of(context) == TextDirection.rtl,
                     child: AppAssetsSvg(AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG),
                   ),
                 )
