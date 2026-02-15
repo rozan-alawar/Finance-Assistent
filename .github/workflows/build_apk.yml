@@ -2,7 +2,8 @@ name: Build Mobile Apps
 
 on:
   push:
-    branches: [main, staging]
+    branches:
+      - ci-branch
   workflow_dispatch:  # manual trigger
 
 # Cancel previous runs if new push comes
