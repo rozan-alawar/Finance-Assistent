@@ -1,15 +1,15 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
-import 'package:finance_assistent/src/core/utils/extensions/num_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
-import 'package:finance_assistent/src/core/view/component/base/button.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/features/home/data/models/currency_model.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/attention_card.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/custom_service_card.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/home_app_bar.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/payment_due_card.dart';
+import 'package:finance_assistent/src/features/services/bill/di/bill_injection.dart';
+import 'package:finance_assistent/src/features/services/expense/di/expense_injection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:finance_assistent/src/features/income/presentation/screens/income_overview_screen.dart';
@@ -38,6 +38,34 @@ class _HomeScreenState extends State<HomeScreen> {
     isAsset: true,
   );
 
+  void _onServiceTap(BuildContext context, String serviceName) {
+    // Check if user is logged in
+    final authState = context.read<AuthCubit>().state;
+    final isLoggedIn = authState is AuthSuccess;
+
+    if (!isLoggedIn) {
+      // User not logged in, redirect to login
+      const LoginRoute().push(context);
+      return;
+    }
+
+    // User is logged in, navigate to the service
+    switch (serviceName) {
+      case "Bills":
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BillInjection()),
+        );
+        break;
+      case "Expenses":
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ExpenseInjection()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
@@ -60,9 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(  isGuest ? "0.00" : (user?.currentBalance ?? "User"), style: TextStyles.f24(context).bold),
+                    Text(
+                      isGuest ? "0.00" : (user?.currentBalance ?? "User"),
+                      style: TextStyles.f24(context).bold,
+                    ),
                     GestureDetector(
-
                       child: Row(
                         children: [
                           if (_selectedCurrency.isAsset)
@@ -117,11 +147,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       return GestureDetector(
                         onTap: () {
+<<<<<<< HEAD
                           if (service[index].first == "Income") {
                             context.push(IncomeOverviewRoute().location);
                           } else if (service[index].first == "Debts") {
                             context.push(DebtsRoute().location);
 
+=======
+                          final name = service[index].first;
+                          if (name == "Income") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const IncomeOverviewScreen(),
+                              ),
+                            );
+                          } else if (name == "Debts") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DebtsScreen(),
+                              ),
+                            );
+                          } else if (name == "Bills" || name == "Expenses") {
+                            _onServiceTap(context, name);
+>>>>>>> origin/feature/services-ui
                           }
                         },
                         child: CustomServiceCard(
@@ -203,10 +254,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Expanded(
                                   child: Text(
                                     "Smarter budgeting starts with AI insights",
-                                    style: TextStyles.f14(context).normal.colorWith(
-                                          appSwitcherColors(context)
-                                              .neutralColors
-                                              .shade80,
+                                    style: TextStyles.f14(context).normal
+                                        .colorWith(
+                                          appSwitcherColors(
+                                            context,
+                                          ).neutralColors.shade80,
                                         ),
                                     maxLines: 3,
                                   ),
@@ -226,7 +278,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     child: Text(
                                       "Ask AI",
-                                      style: TextStyles.f14(context).medium.colorWith(
+                                      style: TextStyles.f14(context).medium
+                                          .colorWith(
                                             appCommonUIColors(context).white,
                                           ),
                                     ),
@@ -248,6 +301,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+<<<<<<< HEAD
 
 
 //اا
+=======
+>>>>>>> origin/feature/services-ui
