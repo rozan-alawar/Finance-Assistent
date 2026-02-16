@@ -1,3 +1,5 @@
+import 'package:finance_assistent/src/core/view/component/base/indicator.dart';
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,13 +40,12 @@ class _BillsScreenState extends State<BillsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorPalette.white,
+    return SafeScaffold(
       appBar: const CustomAppBar(title: 'Bills', showBackButton: true),
       body: BlocBuilder<BillCubit, BillState>(
         builder: (context, state) {
           if (state is BillLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingAppIndicator());
           }
 
           if (state is BillError) {
@@ -56,9 +57,9 @@ class _BillsScreenState extends State<BillsScreen> {
                   const SizedBox(height: 8),
                   Text(
                     state.message,
-                    style: TextStyles.f14(context).copyWith(
-                      color: ColorPalette.gray50,
-                    ),
+                    style: TextStyles.f14(
+                      context,
+                    ).copyWith(color: ColorPalette.gray50),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -96,13 +97,13 @@ class _BillsScreenState extends State<BillsScreen> {
       children: [
         // Search bar
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: BillSearchBar(
             controller: _searchController,
             onChanged: (query) => cubit.searchBills(query),
           ),
         ),
-
+        SizedBox(height: 16),
         // Tab bar
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -114,9 +115,7 @@ class _BillsScreenState extends State<BillsScreen> {
         const Divider(height: 1),
 
         // Bills list
-        Expanded(
-          child: _buildBillsList(context, state),
-        ),
+        Expanded(child: _buildBillsList(context, state)),
       ],
     );
   }
@@ -134,14 +133,14 @@ class _BillsScreenState extends State<BillsScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final bill = bills[index];
-        
+
         if (state.selectedTab == BillTabType.group && bill is GroupBillEntity) {
           return GroupBillCard(
             bill: bill,
             onTap: () => _onBillTap(context, bill),
           );
         }
-        
+
         return IndividualBillCard(
           bill: bill,
           onTap: () => _onBillTap(context, bill),
@@ -167,16 +166,16 @@ class _BillsScreenState extends State<BillsScreen> {
               tab == BillTabType.individual
                   ? 'No individual bills yet'
                   : 'No group bills yet',
-              style: TextStyles.f16(context).copyWith(
-                color: ColorPalette.gray50,
-              ),
+              style: TextStyles.f16(
+                context,
+              ).copyWith(color: ColorPalette.gray50),
             ),
             const SizedBox(height: 8),
             Text(
               'Create your first bill to get started',
-              style: TextStyles.f14(context).copyWith(
-                color: ColorPalette.gray50.withValues(alpha: 0.7),
-              ),
+              style: TextStyles.f14(
+                context,
+              ).copyWith(color: ColorPalette.gray50.withValues(alpha: 0.7)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -213,10 +212,9 @@ class _BillsScreenState extends State<BillsScreen> {
             tab == BillTabType.individual
                 ? 'Create new Individual Bill'
                 : 'Create new Group Bill',
-            style: TextStyles.f16(context).copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyles.f16(
+              context,
+            ).copyWith(color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -230,7 +228,7 @@ class _BillsScreenState extends State<BillsScreen> {
 
   void _navigateToAddBill(BuildContext context, BillTabType tab) {
     final billCubit = context.read<BillCubit>();
-    
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) {
@@ -243,4 +241,3 @@ class _BillsScreenState extends State<BillsScreen> {
     );
   }
 }
-

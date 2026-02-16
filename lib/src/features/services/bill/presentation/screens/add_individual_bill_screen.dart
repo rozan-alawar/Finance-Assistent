@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/view/component/base/indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -26,7 +27,7 @@ class AddIndividualBillScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: LoadingAppIndicator()),
           );
         }
 
@@ -368,9 +369,8 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      child: LoadingAppIndicator(
+                       
                       ),
                     )
                   : Text(

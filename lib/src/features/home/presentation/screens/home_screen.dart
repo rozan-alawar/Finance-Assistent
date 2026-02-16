@@ -11,7 +11,7 @@ import 'package:finance_assistent/src/features/home/presentation/components/paym
 import 'package:finance_assistent/src/features/services/bill/di/bill_injection.dart';
 import 'package:finance_assistent/src/features/services/expense/di/expense_injection.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:developer';
 import 'package:finance_assistent/src/features/income/presentation/screens/income_overview_screen.dart';
 import 'package:finance_assistent/src/features/debts/presentation/screens/debts_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +20,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
+import '../../../../core/view/component/base/login_required_dialog.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
 import '../../../auth/presentation/cubits/auth_state.dart';
 
@@ -41,27 +42,34 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onServiceTap(BuildContext context, String serviceName) {
     // Check if user is logged in
     final authState = context.read<AuthCubit>().state;
+    final isGuest = authState is AuthGuest;
+
     final isLoggedIn = authState is AuthSuccess;
 
     if (!isLoggedIn) {
+      if (isGuest) {
+        showLoginRequiredDialog(
+          context,
+          title: serviceName,
+          message:
+          'Log in to use $serviceName to add and track your balance'
+        );
+        return;
+      }
+
       // User not logged in, redirect to login
-      const LoginRoute().push(context);
+      // const LoginRoute().push(context);
       return;
     }
 
     // User is logged in, navigate to the service
     switch (serviceName) {
+
       case "Bills":
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const BillInjection()),
-        );
+        context.push(BillRoute().location);
         break;
       case "Expenses":
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ExpenseInjection()),
-        );
+        context.push(ExpensesRoute().location);
         break;
     }
   }
@@ -147,32 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       return GestureDetector(
                         onTap: () {
-<<<<<<< HEAD
                           if (service[index].first == "Income") {
                             context.push(IncomeOverviewRoute().location);
                           } else if (service[index].first == "Debts") {
                             context.push(DebtsRoute().location);
-
-=======
-                          final name = service[index].first;
-                          if (name == "Income") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const IncomeOverviewScreen(),
-                              ),
-                            );
-                          } else if (name == "Debts") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DebtsScreen(),
-                              ),
-                            );
-                          } else if (name == "Bills" || name == "Expenses") {
-                            _onServiceTap(context, name);
->>>>>>> origin/feature/services-ui
+                          } else if (service[index].first == "Bills" || service[index].first == "Expenses") {
+                            _onServiceTap(context, service[index].first);
                           }
                         },
                         child: CustomServiceCard(
@@ -301,9 +289,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-<<<<<<< HEAD
 
-
-//اا
-=======
->>>>>>> origin/feature/services-ui

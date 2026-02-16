@@ -5,15 +5,16 @@ flutter_native_splash:
   image: assets/images/splash.png
   image_dark: assets/images/splash.png
   color: "#FFFFFF"
-  color_dark: "#1e1e1e"
+  color_dark: "#FFFFFF"
+
+  fullscreen: true
 
 
   android_12:
     image: assets/images/splash.png
     image_dark: assets/images/splash.png
     color: "#FFFFFF"
-    color_dark: "#1e1e1e"
+    color_dark: "#FFFFFF"
     
-  fullscreen: true
 
 

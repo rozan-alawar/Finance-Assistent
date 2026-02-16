@@ -20,6 +20,7 @@ import 'package:finance_assistent/src/features/profile/presentation/cubits/profi
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/view/component/base/indicator.dart';
 import '../components/logout_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -81,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     );
                   }
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: LoadingAppIndicator());
                 }
 
                 final currencies = snapshot.data ?? const <Currency>[];
@@ -233,7 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 title: Text('My profile', style: TextStyles.f20(context).bold),
                 centerTitle: true,
               ),
-              body: const Center(child: CircularProgressIndicator()),
+              body: const Center(child: LoadingAppIndicator()),
             );
           }
 

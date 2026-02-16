@@ -23,6 +23,8 @@ import '../../features/home_shell/screens/home_shell_screen.dart';
 import '../../features/budget/presentation/screens/budget_screen.dart';
 import '../../features/ask_ai/presentation/screens/ask_ai_screen.dart';
 
+import '../../features/services/bill/di/bill_injection.dart';
+import '../../features/services/expense/di/expense_injection.dart';
 import 'util/navigation_transitions.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';

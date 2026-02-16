@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/network/api_client.dart';
 import '../../../../../core/view/component/base/custom_app_bar.dart';
+import '../../../../../core/view/component/base/indicator.dart';
 import '../../data/data_sources/bill_local_data_source.dart';
 import '../../data/data_sources/bill_remote_data_source.dart';
 import '../../data/repositories/bill_repository_impl.dart';
@@ -31,7 +32,7 @@ class AddGroupBillScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: LoadingAppIndicator()),
           );
         }
 
@@ -839,10 +840,7 @@ class _AddGroupBillContentState extends State<_AddGroupBillContent> {
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
+                      child: LoadingAppIndicator(),
                     )
                   : Text(
                       'Save Bill',

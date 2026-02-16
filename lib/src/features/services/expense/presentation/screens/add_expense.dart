@@ -1,3 +1,6 @@
+import 'package:finance_assistent/src/core/gen/app_assets.dart';
+import 'package:finance_assistent/src/core/view/component/base/image.dart';
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,8 +40,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorPalette.white,
+    return SafeScaffold(
       appBar: const CustomAppBar(title: 'Add Expense', showBackButton: true),
       body: Form(
         key: _formKey,
@@ -88,13 +90,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   decimal: true,
                 ),
                 prefixIcon: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 8),
-                  child: Text(
-                    '\$',
-                    style: TextStyles.f18(
-                      context,
-                    ).copyWith(color: ColorPalette.gray60),
-                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: AppAssetsSvg(AppAssets.ASSETS_ICONS_USD_ICONE_SVG)
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/view/component/base/indicator.dart';
 import '../data/data_sources/bill_local_data_source.dart';
 import '../data/data_sources/bill_remote_data_source.dart';
 import '../data/repositories/bill_repository_impl.dart';
@@ -20,7 +21,7 @@ class BillInjection extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: LoadingAppIndicator()),
           );
         }
 

@@ -59,3 +59,26 @@ class DebtsRoute extends GoRouteData with $DebtsRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const DebtsScreen();
 }
+
+
+
+@TypedGoRoute<BillRoute>(path: '/bill-screen')
+class BillRoute extends GoRouteData with $BillRoute {
+  const BillRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const BillInjection();
+}
+
+
+
+
+@TypedGoRoute<ExpensesRoute>(path: '/expenses-screen')
+class ExpensesRoute extends GoRouteData with $ExpensesRoute {
+  const ExpensesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ExpenseInjection();
+}

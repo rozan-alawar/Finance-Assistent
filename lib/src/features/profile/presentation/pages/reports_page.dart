@@ -1,3 +1,5 @@
+import 'package:finance_assistent/src/core/view/component/base/custom_app_bar.dart';
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
@@ -6,6 +8,8 @@ import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'dart:math';
+
+import '../components/reports_search_bar.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({Key? key}) : super(key: key);
@@ -17,33 +21,14 @@ class ReportsPage extends StatefulWidget {
 class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          "Reports",
-          style: TextStyles.f20(context).bold.copyWith(color: Colors.black),
-        ),
-        centerTitle: true,
-      ),
+    return SafeScaffold(
+      appBar: CustomAppBar(title: "Reports", showBackButton: true),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Sizes.paddingH20,
-          vertical: 20,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: Sizes.paddingH20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSearchBar(),
+            ReportsSearchBar(),
             const SizedBox(height: 20),
 
             _buildStatsGrid(),
@@ -106,53 +91,6 @@ class _ReportsPageState extends State<ReportsPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  AppAssets.ASSETS_ICONS_SEARCH_SVG,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  "Search for service",
-                  style: TextStyles.f14(context).copyWith(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Container(
-          height: 50,
-          width: 50,
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            shape: BoxShape.circle,
-          ),
-
-          child: Center(
-            child: SvgPicture.asset(
-              AppAssets.ASSETS_ICONS_TUNE_SVG,
-              color: Colors.blue,
-              width: 24,
-            ),
-          ),
-        ),
-      ],
     );
   }
 

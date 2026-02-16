@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/view/component/base/indicator.dart';
 import '../data/data_sources/expense_local_data_source.dart';
 import '../data/data_sources/expense_remote_data_source.dart';
 import '../data/repositories/expense_repository_impl.dart';
@@ -19,8 +20,8 @@ class ExpenseInjection extends StatelessWidget {
       future: SharedPreferences.getInstance(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            body: Center(child: LoadingAppIndicator()),
           );
         }
 

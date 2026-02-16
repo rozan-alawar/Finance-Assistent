@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../../core/config/theme/styles/styles.dart';
 import '../../../../../core/view/component/base/custom_app_bar.dart';
+import '../../../../../core/view/component/base/indicator.dart';
 import '../../domain/entities/expense.dart';
 import '../../domain/entities/expense_category.dart';
 import '../bloc/expense_cubit.dart';
@@ -38,7 +39,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       body: BlocBuilder<ExpenseCubit, ExpenseState>(
         builder: (context, state) {
           if (state is ExpenseLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingAppIndicator());
           }
 
           if (state is ExpenseError) {
