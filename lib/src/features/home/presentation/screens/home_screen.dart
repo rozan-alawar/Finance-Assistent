@@ -1,17 +1,17 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
-import 'package:finance_assistent/src/core/utils/extensions/num_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
-import 'package:finance_assistent/src/core/view/component/base/button.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/features/home/data/models/currency_model.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/attention_card.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/custom_service_card.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/home_app_bar.dart';
 import 'package:finance_assistent/src/features/home/presentation/components/payment_due_card.dart';
+import 'package:finance_assistent/src/features/services/bill/di/bill_injection.dart';
+import 'package:finance_assistent/src/features/services/expense/di/expense_injection.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:developer';
 import 'package:finance_assistent/src/features/income/presentation/screens/income_overview_screen.dart';
 import 'package:finance_assistent/src/features/debts/presentation/screens/debts_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +20,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/sizes.dart';
+import '../../../../core/view/component/base/login_required_dialog.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
 import '../../../auth/presentation/cubits/auth_state.dart';
 
@@ -37,6 +38,41 @@ class _HomeScreenState extends State<HomeScreen> {
     flag: AppAssets.ASSETS_ICONS_US_FLAG_SVG,
     isAsset: true,
   );
+
+  void _onServiceTap(BuildContext context, String serviceName) {
+    // Check if user is logged in
+    final authState = context.read<AuthCubit>().state;
+    final isGuest = authState is AuthGuest;
+
+    final isLoggedIn = authState is AuthSuccess;
+
+    if (!isLoggedIn) {
+      if (isGuest) {
+        showLoginRequiredDialog(
+          context,
+          title: serviceName,
+          message:
+          'Log in to use $serviceName to add and track your balance'
+        );
+        return;
+      }
+
+      // User not logged in, redirect to login
+      // const LoginRoute().push(context);
+      return;
+    }
+
+    // User is logged in, navigate to the service
+    switch (serviceName) {
+
+      case "Bills":
+        context.push(BillRoute().location);
+        break;
+      case "Expenses":
+        context.push(ExpensesRoute().location);
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(  isGuest ? "0.00" : (user?.currentBalance ?? "User"), style: TextStyles.f24(context).bold),
+                    Text(
+                      isGuest ? "0.00" : (user?.currentBalance ?? "User"),
+                      style: TextStyles.f24(context).bold,
+                    ),
                     GestureDetector(
-
                       child: Row(
                         children: [
                           if (_selectedCurrency.isAsset)
@@ -121,7 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             context.push(IncomeOverviewRoute().location);
                           } else if (service[index].first == "Debts") {
                             context.push(DebtsRoute().location);
-
+                          } else if (service[index].first == "Bills" || service[index].first == "Expenses") {
+                            _onServiceTap(context, service[index].first);
                           }
                         },
                         child: CustomServiceCard(
@@ -203,10 +242,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Expanded(
                                   child: Text(
                                     "Smarter budgeting starts with AI insights",
-                                    style: TextStyles.f14(context).normal.colorWith(
-                                          appSwitcherColors(context)
-                                              .neutralColors
-                                              .shade80,
+                                    style: TextStyles.f14(context).normal
+                                        .colorWith(
+                                          appSwitcherColors(
+                                            context,
+                                          ).neutralColors.shade80,
                                         ),
                                     maxLines: 3,
                                   ),
@@ -226,7 +266,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     child: Text(
                                       "Ask AI",
-                                      style: TextStyles.f14(context).medium.colorWith(
+                                      style: TextStyles.f14(context).medium
+                                          .colorWith(
                                             appCommonUIColors(context).white,
                                           ),
                                     ),
@@ -248,3 +289,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

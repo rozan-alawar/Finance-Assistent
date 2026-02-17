@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/view/component/base/indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -84,9 +85,8 @@ class AskAiScreen extends StatelessWidget {
                   SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: ColorPalette.primary,
+                    child: LoadingAppIndicator(
+
                     ),
                   ),
                   const SizedBox(width: 8),

@@ -12,6 +12,8 @@ List<RouteBase> get $appRoutes => [
   $addDebtRoute,
   $incomeOverviewRoute,
   $debtsRoute,
+  $billRoute,
+  $expensesRoute,
   $rateAppRoute,
   $rewardsRoute,
   $aboutUsRoute,
@@ -127,6 +129,54 @@ mixin $DebtsRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/debt-screen');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $billRoute =>
+    GoRouteData.$route(path: '/bill-screen', factory: $BillRoute._fromState);
+
+mixin $BillRoute on GoRouteData {
+  static BillRoute _fromState(GoRouterState state) => const BillRoute();
+
+  @override
+  String get location => GoRouteData.$location('/bill-screen');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $expensesRoute => GoRouteData.$route(
+  path: '/expenses-screen',
+  factory: $ExpensesRoute._fromState,
+);
+
+mixin $ExpensesRoute on GoRouteData {
+  static ExpensesRoute _fromState(GoRouterState state) => const ExpensesRoute();
+
+  @override
+  String get location => GoRouteData.$location('/expenses-screen');
 
   @override
   void go(BuildContext context) => context.go(location);

@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/view/component/base/indicator.dart';
 import 'package:finance_assistent/src/features/income/presentation/cubit/income_cubit.dart';
 import 'package:finance_assistent/src/features/income/presentation/cubit/income_state.dart';
 import 'package:finance_assistent/src/features/income/presentation/screens/add_income_screen.dart';
@@ -51,7 +52,7 @@ class IncomeOverviewScreen extends StatelessWidget {
             body: BlocBuilder<IncomeCubit, IncomeState>(
               builder: (context, state) {
                 if (state is IncomeLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: LoadingAppIndicator());
                 } else if (state is IncomeSuccess) {
                   final data = state.data;
 
