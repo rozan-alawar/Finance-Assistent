@@ -169,6 +169,9 @@ class AppAssets {
   static const String ASSETS_ICONS_SUGGESTIONS_SVG =
       'assets/icons/suggestions.svg';
 
+  /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/test.svg)
+  static const String ASSETS_ICONS_TEST_SVG = 'assets/icons/test.svg';
+
   /// ![preview](file:///Users/h/Desktop/Flutter projects.nosync/finance_assistent/assets/icons/total_expense.svg)
   static const String ASSETS_ICONS_TOTAL_EXPENSE_SVG =
       'assets/icons/total_expense.svg';

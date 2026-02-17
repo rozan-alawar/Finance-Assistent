@@ -48,3 +48,12 @@ class ResetPasswordRoute extends GoRouteData with $ResetPasswordRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const ResetPasswordScreen();
 }
+//
+// @TypedGoRoute<OnboardingRoute>(path: '/onboarding')
+// class OnboardingRoute extends GoRouteData with $OnboardingRoute {
+//   const OnboardingRoute();
+//
+//   @override
+//   Widget build(BuildContext context, GoRouterState state) =>
+//       const OnboardingScreen();
+// }
