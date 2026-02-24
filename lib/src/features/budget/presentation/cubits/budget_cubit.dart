@@ -1,5 +1,5 @@
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
-import 'package:finance_assistent/src/features/budget/data/model/grid_item_model.dart';
+import 'package:finance_assistent/src/features/budget/data/models/grid_item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'budget_state.dart';
