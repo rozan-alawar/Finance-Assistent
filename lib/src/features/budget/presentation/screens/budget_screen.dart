@@ -10,6 +10,7 @@ import '../components/budget_table_section.dart';
 import '../components/custom_budget_item.dart';
 import '../components/search_box.dart';
 import '../components/chart_section.dart';
+import '../../../../core/di/dependency_injection.dart';
 import '../cubits/budget_cubit.dart';
 import '../cubits/budget_state.dart';
 
@@ -24,7 +25,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BudgetCubit(),
+      create: (context) => BudgetCubit(sl())..getBudgets(),
       lazy: false, // Create immediately for better initial performance
       child: BlocConsumer<BudgetCubit, BudgetState>(
         listener: (context, state) => {},

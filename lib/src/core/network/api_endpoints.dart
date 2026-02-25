@@ -18,4 +18,5 @@ class ApiEndpoints {
 
   static const String budgets = '/budgets';
   static const String chartData = '/ai/suggest-budget';
+  static const String suggestBudget = '/ai/suggest-budget';
 }

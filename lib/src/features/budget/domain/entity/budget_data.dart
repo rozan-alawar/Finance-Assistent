@@ -23,6 +23,6 @@ class BudgetData {
     this.description,
     this.createdAt,
     this.updatedAt,
-    this.status,
+    this.status = 'paid',
   });
 }

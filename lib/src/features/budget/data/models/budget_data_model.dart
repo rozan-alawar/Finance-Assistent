@@ -11,6 +11,7 @@ class BudgetDataModel {
   String? description;
   String? createdAt;
   String? updatedAt;
+  //String? status;
 
   BudgetDataModel({
     this.id,
@@ -23,6 +24,7 @@ class BudgetDataModel {
     this.description,
     this.createdAt,
     this.updatedAt,
+    // this.status,
   });
 
   BudgetDataModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class BudgetDataModel {
     description = json['description'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    //  status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,6 +53,7 @@ class BudgetDataModel {
     data['description'] = description;
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
+    // data['status'] = status;
     return data;
   }
 
@@ -65,6 +69,7 @@ class BudgetDataModel {
       description: description,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      //   status: status,
     );
   }
 }

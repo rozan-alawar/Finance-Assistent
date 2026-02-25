@@ -2,10 +2,27 @@ import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/features/budget/data/models/grid_item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/entity/budget_data.dart';
+import '../../domain/usecase/get_budget_usecase.dart';
 import 'budget_state.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
-  BudgetCubit() : super(InitialBudgetState());
+  final GetBudgetUsecase getBudgetUsecase;
+
+  BudgetCubit(this.getBudgetUsecase) : super(InitialBudgetState());
+
+  List<BudgetData> allBudgets = [];
+
+  Future<void> getBudgets() async {
+    emit(BudgetLoadingState());
+    try {
+      final result = await getBudgetUsecase();
+      allBudgets = result;
+      emit(BudgetLoadedState(result));
+    } catch (e) {
+      emit(BudgetErrorState(e.toString()));
+    }
+  }
 
   final String sendModeyIcon = AppAssets.ASSETS_ICONS_MONEY_SEND_SVG;
   final String receiveMoneyIcon = AppAssets.ASSETS_ICONS_MONEY_RECIVE_SVG;

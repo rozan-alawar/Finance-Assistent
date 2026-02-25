@@ -4,7 +4,6 @@ import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/routing/navigation_service.dart';
 import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
 import 'package:finance_assistent/src/features/auth/data/repo/auth_repository.dart';
-import 'package:finance_assistent/src/features/budget/domain/usecase/get_budget_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,9 +12,9 @@ import 'package:finance_assistent/src/core/services/local_storage/hive_service.d
 import 'package:finance_assistent/src/core/services/sync/sync_service.dart';
 
 import 'src/core/services/network/main_service/network_service.dart';
-import 'src/features/budget/data/datasource/budget_remote_datasource.dart';
-import 'src/features/budget/data/repo/budget_repository_impl.dart';
-import 'src/features/budget/domain/usecase/get_chart_data_usecase.dart';
+import 'src/features/ask_ai/data/datasource/ai_chat_remote_datasource.dart';
+import 'src/features/ask_ai/data/repo/budget_repository_impl.dart';
+import 'src/features/ask_ai/domain/usecases/get_chart_data_usecase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,8 +76,8 @@ class MyApp extends StatelessWidget {
 
 void testChartData() async {
   final networkService = NetworkService();
-  final datasource = BudgetRemoteDataSourceImpl(networkService);
-  final repo = BudgetRepositoryImpl(datasource);
+  final datasource = AiChatRemoteDataSourceImpl(networkService);
+  final repo = AiChatRepositoryImpl(datasource);
   final usecase = GetChartDataUsecase(repo);
 
   final result = await usecase.call();
