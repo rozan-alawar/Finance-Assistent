@@ -1,7 +1,7 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
+import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
-import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/extensions/num_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
@@ -12,7 +12,9 @@ import 'package:finance_assistent/src/features/auth/presentation/components/soci
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/di/dependency_injection.dart' as di;
 import '../../../../core/services/local_storage/hive_service.dart';
+import '../../../../core/services/social/google_sign_in_service.dart';
 import '../../../../core/utils/const/sizes.dart';
 import '../../../../core/utils/const/validator_fields.dart';
 import '../../../../core/view/component/base/custom_toast.dart';
@@ -272,7 +274,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         SocialLoginButton(
                           providerName: "Google",
                           providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG,
-                          onPressed: () {},
+                          onPressed: () async {
+                            final service = di.sl<GoogleSignInService>();
+                            final result = await service.signInToken();
+                            if (result.token == null || result.token!.isEmpty) {
+                              CustomToast.showErrorMessage(
+                                context,
+                                result.error ?? "Google sign-in failed",
+                              );
+                              return;
+                            }
+                            if (mounted) {
+                              context.read<AuthCubit>().socialLogin(
+                                token: result.token!,
+                                socialType: 'google',
+                              );
+                            }
+                          },
                         ),
 
                         8.height,
