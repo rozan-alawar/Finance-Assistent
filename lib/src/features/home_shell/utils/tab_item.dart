@@ -11,17 +11,17 @@ enum TabItem {
     AppAssets.ASSETS_ICONS_NAV_HOME_SVG,
     AppAssets.ASSETS_ICONS_NAV_HOME_FILLED_SVG,
   ),
-  service(
-    AppAssets.ASSETS_ICONS_NAV_SERVICE_SVG,
-    AppAssets.ASSETS_ICONS_NAV_SERVICE_FILLED_SVG,
+  budget(
+    AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
+    AppAssets.ASSETS_ICONS_NAV_BUDGET_FILLED_SVG,
   ),
   reminder(
     AppAssets.ASSETS_ICONS_NAV_REMINDER_SVG,
     AppAssets.ASSETS_ICONS_NAV_REMINDER_FILLED_SVG,
   ),
-  budget(
-    AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
-    AppAssets.ASSETS_ICONS_NAV_BUDGET_FILLED_SVG,
+  profile(
+    AppAssets.ASSETS_ICONS_NAV_PROFILE_SVG,
+    AppAssets.ASSETS_ICONS_NAV_PROFILE_FILLED_SVG,
   );
 
   const TabItem(this._iconPath, this._selectedIconPath);
@@ -35,9 +35,10 @@ enum TabItem {
   String getTabItemLabel(BuildContext context) {
     return switch (this) {
       TabItem.home => "Home",
-      TabItem.service => "Service",
-      TabItem.reminder => "Reminder",
       TabItem.budget => "Budget",
+      TabItem.reminder => "Reminder",
+      TabItem.profile => "Profile",
+
     };
   }
 

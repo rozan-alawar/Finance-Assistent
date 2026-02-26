@@ -1,7 +1,10 @@
+import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:finance_assistent/src/features/income/data/model/add_income_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/gen/app_assets.dart';
 import '../../../../core/utils/const/sizes.dart';
 import '../../../../core/utils/extensions/widget_ex.dart';
 import '../../../../core/utils/extensions/text_ex.dart';
@@ -10,6 +13,8 @@ import '../../../../core/view/component/base/button.dart';
 import '../../../../core/view/component/base/custom_app_bar.dart';
 import '../../../../core/view/component/base/app_text_field.dart';
 
+import '../../../../core/view/component/base/custom_toast.dart';
+import '../../../../core/view/component/base/image.dart';
 import '../cubit/income_cubit.dart';
 import '../cubit/income_state.dart';
 
@@ -44,24 +49,15 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           return BlocListener<IncomeCubit, IncomeState>(
             listener: (context, state) {
               if (state is AddIncomeSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                CustomToast.showSuccessMessage(context, state.message);
+
                 Navigator.pop(context);
               } else if (state is IncomeError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                CustomToast.showErrorMessage(context, state.message);
+
               }
             },
-            child: Scaffold(
-              backgroundColor: const Color(0xFFF8F9FD),
+            child: SafeScaffold(
               appBar: CustomAppBar(
                 title: "Add Income",
                 showBackButton: true,
@@ -88,8 +84,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             hint: "0.00",
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: SvgPicture.asset(
-                                "icons/USD.svg",
+                              child: AppAssetsSvg(
+                              AppAssets.ASSETS_ICONS_USD_ICONE_SVG,
                                 width: 16,
                                 height: 16,
                               ),
@@ -104,8 +100,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             hint: "Salary",
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: SvgPicture.asset(
-                                "icons/salary.svg",
+                              child: AppAssetsSvg(
+                                AppAssets.ASSETS_ICONS_SALARY_IC_SVG,
                                 width: 16,
                                 height: 16,
                               ),
@@ -122,8 +118,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             onTap: () => _selectDate(context),
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: Image.asset(
-                                "images/date.png",
+                              child: AppAssetsSvg(
+                                AppAssets.ASSETS_ICONS_DATE_IC_SVG,
                                 width: 16,
                                 height: 16,
                               ),
@@ -192,7 +188,11 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         children: [
           Row(
             children: [
-              SvgPicture.asset("icons/rec.svg", width: 18),
+   AppAssetsSvg(
+                AppAssets.ASSETS_ICONS_RECURRING_SVG,
+                width: 16,
+                height: 16,
+              ),
               SizedBox(width: Sizes.paddingH8),
               Text(
                 "Select Recurring",

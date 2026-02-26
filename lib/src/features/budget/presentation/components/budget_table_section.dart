@@ -12,8 +12,11 @@ class BudgetTableSection extends StatefulWidget {
 }
 
 class _BudgetTableSectionState extends State<BudgetTableSection>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -34,36 +37,39 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Budget Table', style: TextStyles.f18(context).medium),
-        TabBar(
-          controller: _tabController,
-          labelColor: ColorPalette.white,
-          unselectedLabelColor: Colors.grey,
-          dividerHeight: 0,
-          indicator: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: ColorPalette.primary,
-            borderRadius: BorderRadius.circular(25),
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    return RepaintBoundary(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Budget Table', style: TextStyles.f18(context).medium),
+          TabBar(
+            controller: _tabController,
+            labelColor: ColorPalette.white,
+            unselectedLabelColor: Colors.grey,
+            dividerHeight: 0,
+            indicator: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: ColorPalette.primary,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            indicatorPadding: const EdgeInsets.all(4),
+            indicatorSize: TabBarIndicatorSize.tab,
+            tabs: const [
+              Tab(text: "All"),
+              Tab(text: "Paid"),
+              Tab(text: "Unpaid"),
+              Tab(text: "Overdue"),
+            ],
           ),
-          indicatorPadding: const EdgeInsets.all(4),
-          indicatorSize: TabBarIndicatorSize.tab,
-          tabs: [
-            Tab(text: "All"),
-            Tab(text: "Paid"),
-            Tab(text: "Unpaid"),
-            Tab(text: "Overdue"),
-          ],
-        ),
 
-        AnimatedSize(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          child: _buildTabContent(),
-        ),
-      ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            child: _buildTabContent(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -95,12 +101,14 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
       physics: const NeverScrollableScrollPhysics(),
       itemCount: count,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) => const BudgetCard(
-        username: 'Zena',
-        dueDate: 'Dec 25, 2026',
-        category: 'Shopping',
-        amount: 250.0,
-        status: 'Paid',
+      itemBuilder: (context, index) => RepaintBoundary(
+        child: const BudgetCard(
+          username: 'Zena',
+          dueDate: 'Dec 25, 2026',
+          category: 'Shopping',
+          amount: 250.0,
+          status: 'Paid',
+        ),
       ),
     );
   }

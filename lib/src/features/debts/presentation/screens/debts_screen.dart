@@ -1,4 +1,5 @@
 import 'package:finance_assistent/src/core/view/component/base/indicator.dart';
+import 'package:finance_assistent/src/features/debts/presentation/components/debts_search_bar.dart';
 import 'package:finance_assistent/src/features/debts/presentation/cubit/debt_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,38 +45,8 @@ class DebtsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: Sizes.marginV12),
 
-                        TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search for Invoices',
-                            hintStyle: TextStyles.f14(context).colorWith(Colors.grey),
-                            filled: true,
-                            fillColor: ColorPalette.fillGrey,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: Sizes.paddingV16,
-                              horizontal: Sizes.paddingH16,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.only(
-                                left: Sizes.paddingH16,
-                                right: Sizes.paddingH8,
-                              ),
-                              child: AppAssetsSvg(
-                                AppAssets.ASSETS_ICONS_SEARCH_SVG,
-                              ),
-                            ),
-                            prefixIconConstraints: const BoxConstraints(minWidth: 40),
-                          ),
-                        ).paddingSymmetric(horizontal: Sizes.screenPaddingH16),
+                        DebtSearchBar().paddingSymmetric(horizontal: Sizes.paddingH16),
 
                         const SizedBox(height: Sizes.marginV20),
 

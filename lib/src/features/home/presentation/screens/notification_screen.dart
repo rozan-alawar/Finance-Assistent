@@ -1,9 +1,11 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
+import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/const/sizes.dart';
 
@@ -19,7 +21,7 @@ class NotificationScreen extends StatelessWidget {
         leading: SvgPicture.asset(
           AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
           fit: BoxFit.scaleDown,
-        ),
+        ).onTap((){context.pop();},),
       ),
       body: CustomScrollView(
         slivers: [

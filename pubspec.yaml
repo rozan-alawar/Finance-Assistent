@@ -33,6 +33,7 @@ dependencies:
   # services
   dio: ^5.8.0+1
   image_picker: ^1.1.2
+  get_it: ^9.2.0
 
   # Assets
   flutter_svg: ^2.0.17
@@ -46,6 +47,10 @@ dependencies:
   hive_flutter: ^1.1.0
   connectivity_plus: ^7.0.0
   flutter_form_builder: ^10.3.0+1
+  fast_immutable_collections: ^11.1.0
+  pretty_dio_logger: ^1.4.0
+  fpdart: ^1.2.0
+
 
 dev_dependencies:
   flutter_test:

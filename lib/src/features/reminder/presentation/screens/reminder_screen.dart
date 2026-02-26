@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
@@ -5,8 +6,12 @@ import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 
+import '../../../../core/config/theme/app_color/color_palette.dart';
+import '../../../../core/view/component/base/app_text_field.dart';
+import '../components/reminder_search_bar.dart';
+
 class ReminderScreen extends StatefulWidget {
-  const ReminderScreen({Key? key}) : super(key: key);
+  const ReminderScreen({super.key});
 
   @override
   State<ReminderScreen> createState() => _ReminderScreenState();
@@ -15,18 +20,10 @@ class ReminderScreen extends StatefulWidget {
 class _ReminderScreenState extends State<ReminderScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return SafeScaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
           "Reminder",
           style: TextStyles.f20(context).bold.copyWith(color: Colors.black),
@@ -40,8 +37,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
         ),
         child: Column(
           children: [
-            _buildSearchBar(),
-            const SizedBox(height: 20),
+            ReminderSearchBar(),            const SizedBox(height: 20),
             _buildReminderCard(
               title: "Water Bill",
               value: "\$2,450.00",
@@ -69,73 +65,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on),
-            label: "Budget",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: "Reminder",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildSearchBar() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  AppAssets.ASSETS_ICONS_SEARCH_SVG,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  "Search for reminder",
-                  style: TextStyles.f14(context).copyWith(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Container(
-          height: 50,
-          width: 50,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: Center(
-            child: SvgPicture.asset(
-              AppAssets.ASSETS_ICONS_TUNE_SVG,
-              color: Colors.blue,
-              width: 24,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -288,7 +218,9 @@ class _ReminderScreenState extends State<ReminderScreen> {
                 ),
                 child: Text(
                   "Pending",
-                  style: TextStyles.f12(context).copyWith(color: const Color.fromARGB(255, 255, 0, 0)),
+                  style: TextStyles.f12(
+                    context,
+                  ).copyWith(color: const Color.fromARGB(255, 255, 0, 0)),
                 ),
               ),
             ],

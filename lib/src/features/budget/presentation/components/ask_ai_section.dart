@@ -15,7 +15,7 @@ class AskAISection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: Sizes.paddingH16,
         vertical: Sizes.paddingV16,
       ),
@@ -25,12 +25,12 @@ class AskAISection extends StatelessWidget {
       ),
       child: Row(
         children: [
-          AppAssetsImage(
+          const AppAssetsImage(
             AppAssets.ASSETS_IMAGES_TEST_PNG,
             width: 30,
             height: 30,
           ),
-          SizedBox(width: Sizes.paddingH16),
+          const SizedBox(width: Sizes.paddingH16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +39,7 @@ class AskAISection extends StatelessWidget {
                   "AI Budget Suggestions",
                   style: TextStyles.f16(context).medium,
                 ),
-                SizedBox(height: Sizes.paddingH2),
+                const SizedBox(height: Sizes.paddingH2),
                 Row(
                   children: [
                     Expanded(
@@ -57,12 +57,12 @@ class AskAISection extends StatelessWidget {
                         AskAiRoute().push(context);
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: Sizes.paddingH20,
                           vertical: Sizes.paddingV8,
                         ),
                         decoration: BoxDecoration(
-                          color: Color(0xFF3F51B5), // Dark Blue
+                          color: const Color(0xFF3F51B5), // Dark Blue
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(

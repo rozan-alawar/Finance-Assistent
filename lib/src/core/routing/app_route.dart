@@ -5,26 +5,33 @@ import 'package:finance_assistent/src/features/auth/presentation/screens/registe
 import 'package:finance_assistent/src/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:finance_assistent/src/features/auth/presentation/screens/otp_verification_screen.dart';
 import 'package:finance_assistent/src/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:finance_assistent/src/features/debts/presentation/screens/debts_screen.dart';
 import 'package:finance_assistent/src/features/home/presentation/screens/notification_screen.dart';
-import 'package:finance_assistent/src/features/home/presentation/screens/select_currency_screen.dart';
+import 'package:finance_assistent/src/features/debts/presentation/screens/add_debt_screen.dart';
+import 'package:finance_assistent/src/features/income/presentation/screens/income_overview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/about_us_page.dart';
+import '../../features/profile/presentation/pages/rate_us_page.dart';
+import '../../features/profile/presentation/pages/reports_page.dart';
+import '../../features/profile/presentation/pages/rewards_page.dart';
 import '../../features/reminder/presentation/screens/reminder_screen.dart';
-import '../../features/services/presentation/screens/service_screen.dart';
 import '../../features/home_shell/screens/home_shell_screen.dart';
 import '../../features/budget/presentation/screens/budget_screen.dart';
 import '../../features/ask_ai/presentation/screens/ask_ai_screen.dart';
 
+import '../../features/services/bill/di/bill_injection.dart';
+import '../../features/services/expense/di/expense_injection.dart';
 import 'util/navigation_transitions.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
 import 'util/go_router_refresh_stream.dart';
 
 part 'routes/branches/home_branch_routes.dart';
-part 'routes/branches/service_branch_routes.dart';
+part 'routes/branches/profile_branch_routes.dart';
 part 'routes/branches/budget_branch_routes.dart';
 part 'routes/branches/reminder_branch_routes.dart';
 part 'app_route.g.dart';
@@ -44,51 +51,51 @@ GoRouter goRouter(AuthCubit authCubit) {
     observers: [],
     refreshListenable: GoRouterRefreshStream(authCubit.stream),
     redirect: (context, state) {
-      final authState = authCubit.state;
-      final bool isLoggedIn = authState is AuthSuccess;
-
       final bool onBoardingSeen = HiveService.get(
         HiveService.settingsBoxName,
         'onboarded',
         defaultValue: false,
       );
       
-      final bool isCurrencySelected = HiveService.get(
-        HiveService.settingsBoxName,
-        'currency_selected',
-        defaultValue: true, // Default true for existing users/guests
-      );
-
       final String location = state.uri.toString();
 
       final bool isOnboarding = location == const OnboardingRoute().location;
-      final bool isLogin = location == const LoginRoute().location;
-      final bool isRegister = location == const RegisterRoute().location;
 
       /// Force onboarding ONLY if not completed
       if (!onBoardingSeen && !isOnboarding) {
         return const OnboardingRoute().location;
       }
 
-      /// If onboarding is done, never go back to it
+      /// If onboarding is done, redirect to auth screens
       if (onBoardingSeen && isOnboarding) {
         return const HomeRoute().location;
       }
+      //
+      // /// If user is logged in
+      // if (isLoggedIn) {
+      //   // Always allow access to select currency screen
+      //   if (location.startsWith('/select-currency')) {
+      //        return null;
+      //   }
+      //
+      //   // If currency is not selected, force selection screen
+      //   if (!isCurrencySelected) {
+      //      return SelectCurrencyRoute(isSignup: true).location;
+      //   }
+      //
+      //   // If currency is selected, block auth screens
+      //   if (isLogin || isRegister) {
+      //     return const HomeRoute().location;
+      //   }
+      // }
+      // if (!isLoggedIn && !isGuest && onBoardingSeen) {
+      // //   final isAuthPage = isLogin || isRegister || location.contains('forget-password') || location.contains('reset-password') || location.contains('otp-verification');
+      // //
+      // //   if (!isAuthPage) {
+      // //      return const LoginRoute().location;
+      // //   }
+      // }
 
-      /// If user is logged in, block auth screens
-      if (isLoggedIn && (isLogin || isRegister)) {
-        return const HomeRoute().location;
-      }
-      
-      /// Force currency selection for new users
-      if (isLoggedIn && !isCurrencySelected) {
-         // Only redirect if not already there to avoid loop
-         if (location != const SelectCurrencyRoute(isOnboarding: true).location) {
-             return const SelectCurrencyRoute(isOnboarding: true).location;
-         }
-      }
-
-      /// Guests are allowed everywhere else
       return null;
     },
   );

@@ -32,16 +32,53 @@ class AskAiRoute extends GoRouteData with $AskAiRoute {
       const AskAiScreen();
 }
 
-@TypedGoRoute<SelectCurrencyRoute>(path: '/select-currency')
-class SelectCurrencyRoute extends GoRouteData with $SelectCurrencyRoute {
-  final String? activeCurrencyCode;
-  final bool? isOnboarding;
-  const SelectCurrencyRoute({this.activeCurrencyCode, this.isOnboarding});
+
+@TypedGoRoute<AddDebtRoute>(path: '/add-debt')
+class AddDebtRoute extends GoRouteData with $AddDebtRoute {
+  const AddDebtRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      SelectCurrencyScreen(
-        activeCurrencyCode: activeCurrencyCode,
-        isOnboarding: isOnboarding ?? false,
-      );
+      const AddDebtScreen();
+}
+
+@TypedGoRoute<IncomeOverviewRoute>(path: '/income-overview')
+class IncomeOverviewRoute extends GoRouteData with $IncomeOverviewRoute {
+  const IncomeOverviewRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const IncomeOverviewScreen();
+}
+
+@TypedGoRoute<DebtsRoute>(path: '/debt-screen')
+class DebtsRoute extends GoRouteData with $DebtsRoute {
+  const DebtsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const DebtsScreen();
+}
+
+
+
+@TypedGoRoute<BillRoute>(path: '/bill-screen')
+class BillRoute extends GoRouteData with $BillRoute {
+  const BillRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const BillInjection();
+}
+
+
+
+
+@TypedGoRoute<ExpensesRoute>(path: '/expenses-screen')
+class ExpensesRoute extends GoRouteData with $ExpensesRoute {
+  const ExpensesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ExpenseInjection();
 }

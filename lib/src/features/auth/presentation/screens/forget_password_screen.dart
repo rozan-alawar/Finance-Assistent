@@ -1,6 +1,5 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
-import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/const/validator_fields.dart';
@@ -58,94 +57,119 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: BlocConsumer<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (state is PasswordResetLinkSent) {
-            CustomToast.showSuccessMessage(
-              context,
-              'Reset link sent to your email',
-            );
-            context.push(OtpVerificationRoute().location,
-              extra: {
-                'email': emailCtr.text.trim(),
-              },
-            );
-          } else if (state is AuthFailure) {
-            CustomToast.showErrorMessage(context, state.message);
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is OtpSent) {
+          if (!mounted) return;
+          CustomToast.showSuccessMessage(context, 'Code was sent to email');
+          context.push(
+            const OtpVerificationRoute().location,
+            extra: {'email': emailCtr.text.trim()},
+          );
+        } else if (state is AuthGuest) {
+          if (mounted) {
+            HomeRoute().go(context);
           }
-        },
-        builder: (context, state) {
-          final sectionSpace = SizedBox(height: Sizes.marginH16);
+        } else if (state is AuthFailure) {
+          CustomToast.showErrorMessage(context, state.message);
+        }
+      },
+      builder: (context, state) {
+        final sectionSpace = SizedBox(height: Sizes.marginH16);
 
-          return SafeScaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: Sizes.marginH24),
-                          Center(child: AppLogo()),
-                          sectionSpace,
+        return SafeScaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    context.read<AuthCubit>().loginAsGuest();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(Sizes.paddingH8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          color: Colors.black.withValues(alpha: 0.16),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.close, color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: Sizes.marginH24),
+                        Center(child: AppLogo()),
+                        sectionSpace,
 
-                          Text(
-                            "Forget password",
-                            style: TextStyles.f18(context).bold,
+                        Text(
+                          "Forget password",
+                          style: TextStyles.f18(context).bold,
+                        ),
+
+                        sectionSpace,
+
+                        Text(
+                          "We will send you a 4-digit verification code. Enter your email address so we can send you the verification code.",
+                          style: TextStyles.f14(context).medium.colorWith(
+                            appSwitcherColors(context).neutralColors.shade80,
                           ),
+                        ),
 
-                          sectionSpace,
+                        sectionSpace,
+                        sectionSpace,
 
-                          Text(
-                            "We will send you a 4-digit verification code. Enter your email address so we can send you the verification code.",
-                            style: TextStyles.f14(context).medium.colorWith(
-                              appSwitcherColors(context).neutralColors.shade80,
-                            ),
+                        EmailTextField(controller: emailCtr),
+
+                        sectionSpace,
+                        sectionSpace,
+
+                        ValueListenableBuilder<bool>(
+                          valueListenable: fieldsIsValidNotifier,
+                          builder: (context, fieldsIsValid, child) => AppButton(
+                            isLoading: state is AuthLoading,
+                            disableButton: state is AuthLoading || !fieldsIsValid,
+                            onPressed: (state is AuthLoading || !fieldsIsValid)
+                                ? null
+                                : () {
+                                    if (formKey.currentState!.validate()) {
+                                      context.read<AuthCubit>().sendOtp(
+                                        email: emailCtr.text.trim(),
+                                      );
+                                    }
+                                  },
+                            type: AppButtonType.primary,
+                            child: Text("Send"),
                           ),
-
-                          sectionSpace,
-                          sectionSpace,
-
-                          EmailTextField(controller: emailCtr),
-
-                          sectionSpace,
-                          sectionSpace,
-
-                          ValueListenableBuilder<bool>(
-                            valueListenable: fieldsIsValidNotifier,
-                            builder: (context, fieldsIsValid, child) => AppButton(
-                              isLoading: state is AuthLoading,
-                              disableButton: state is AuthLoading || !fieldsIsValid,
-                              onPressed: (state is AuthLoading || !fieldsIsValid)
-                                  ? null
-                                  : () {
-                                if (formKey.currentState!.validate()) {
-                                  context.read<AuthCubit>().forgetPassword(
-                                    email: emailCtr.text.trim(),
-                                  );
-                                }
-                              },
-                              type: AppButtonType.primary,
-                              child: Text("Send"),
-                            ),
-                          ),
-
-
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

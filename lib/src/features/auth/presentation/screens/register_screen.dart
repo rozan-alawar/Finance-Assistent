@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
@@ -8,7 +6,6 @@ import 'package:finance_assistent/src/core/view/component/common/text_fields.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
@@ -54,7 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         null;
 
     final isValidPhone =
-        ValidatorFields.phoneValidator(context)?.call(phoneCtr.text) == null;
+        ValidatorFields.phoneValidator(context).call(phoneCtr.text) == null;
 
     fieldsIsValidNotifier.value =
         isNameValid && isEmailValid && isPasswordValid && isValidPhone;
@@ -94,133 +91,168 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: BlocConsumer<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (state is AuthSuccess) {
-            CustomToast.showSuccessMessage(context, "Registration Successful!");
-          } else if (state is AuthFailure) {
-            CustomToast.showErrorMessage(context, state.message);
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthSuccess) {
+          CustomToast.showSuccessMessage(context, "Registration Successful!");
+          if (mounted) {
+            // Navigate to currency selection after successful registration
+            // SelectCurrencyRoute(isSignup: true).go(context);
           }
-        },
-        builder: (context, state) {
-          final sectionSpace = SizedBox(height: Sizes.marginH16);
+        } else if (state is AuthGuest) {
+          if (mounted) {
+            HomeRoute().go(context);
+          }
+        } else if (state is AuthFailure) {
+          CustomToast.showErrorMessage(context, state.message);
+        }
+      },
+      builder: (context, state) {
+        final sectionSpace = SizedBox(height: Sizes.marginH16);
 
-          return SafeScaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SizedBox(height: 20),
-                          const Center(child: AppLogo()),
-                          sectionSpace,
+        return SafeScaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    context.read<AuthCubit>().loginAsGuest();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(Sizes.paddingH8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          color: Colors.black.withValues(alpha: 0.16),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.close, color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 20),
+                        const Center(child: AppLogo()),
+                        sectionSpace,
 
-                          Text("Sign Up", style: TextStyles.f18(context).bold),
-                          sectionSpace,
+                        Text("Sign Up", style: TextStyles.f18(context).bold),
+                        sectionSpace,
 
-                          NameTextField(controller: nameCtr),
-                          sectionSpace,
+                        NameTextField(controller: nameCtr),
+                        sectionSpace,
 
-                          EmailTextField(controller: emailCtr),
-                          sectionSpace,
+                        EmailTextField(controller: emailCtr),
+                        sectionSpace,
 
-                          PhoneTextField(controller: phoneCtr),
-                          sectionSpace,
+                        PhoneTextField(controller: phoneCtr),
+                        sectionSpace,
 
-                          PasswordTextField(controller: passwordCtr),
-                          sectionSpace,
-                          sectionSpace,
+                        PasswordTextField(controller: passwordCtr),
+                        sectionSpace,
+                        sectionSpace,
 
-                          ValueListenableBuilder<bool>(
-                            valueListenable: fieldsIsValidNotifier,
-                            builder: (context, fieldsIsValid, child) =>
-                                AppButton(
-                                  isLoading: state is AuthLoading,
-                                  disableButton:
-                                      state is AuthLoading || !fieldsIsValid,
-                                  onPressed:
-                                      (state is AuthLoading || !fieldsIsValid)
-                                      ? null
-                                      : () {
-                                          if (formKey.currentState!
-                                              .validate()) {
-                                            context.read<AuthCubit>().register(
-                                              name: nameCtr.text.trim(),
-                                              email: emailCtr.text.trim(),
-                                              phone: phoneCtr.text.trim(),
-                                              password: passwordCtr.text,
-                                            );
-                                          }
-                                        },
-                                  type: AppButtonType.primary,
-                                  child: Text(
-                                    'Sign Up',
-                                    style: TextStyles.f16(context).medium
-                                        .colorWith(
-                                          appCommonUIColors(context).white,
-                                        ),
-                                  ),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: fieldsIsValidNotifier,
+                          builder: (context, fieldsIsValid, child) =>
+                              AppButton(
+                                isLoading: state is AuthLoading,
+                                disableButton:
+                                    state is AuthLoading || !fieldsIsValid,
+                                onPressed:
+                                    (state is AuthLoading || !fieldsIsValid)
+                                        ? null
+                                        : () {
+                                            if (formKey.currentState!
+                                                .validate()) {
+                                              context.read<AuthCubit>().register(
+                                                name: nameCtr.text.trim(),
+                                                email: emailCtr.text.trim(),
+                                                phone: phoneCtr.text.trim(),
+                                                password: passwordCtr.text,
+                                              );
+                                            }
+                                          },
+                                type: AppButtonType.primary,
+                                child: Text(
+                                  'Sign Up',
+                                  style: TextStyles.f16(context).medium
+                                      .colorWith(
+                                        appCommonUIColors(context).white,
+                                      ),
                                 ),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          const Row(
-                            children: [
-                              Expanded(child: Divider()),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
-                                child: Text('OR'),
                               ),
-                              Expanded(child: Divider()),
-                            ],
-                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        const Row(
+                          children: [
+                            Expanded(child: Divider()),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text('OR'),
+                            ),
+                            Expanded(child: Divider()),
+                          ],
+                        ),
 
 
-                          sectionSpace,
+                        sectionSpace,
 
-                          SocialLoginButton(
-                            providerName: "Google",
-                            providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG,
-                            onPressed: () {},
-                          ),
+                        SocialLoginButton(
+                          providerName: "Google",
+                          providerIcon: AppAssets.ASSETS_IMAGES_GOOGLE_PNG,
+                          onPressed: () {},
+                        ),
 
-                          8.height,
-                          SocialLoginButton(
-                            providerName: "Apple",
-                            providerIcon: AppAssets.ASSETS_IMAGES_APPLE_PNG,
-                            onPressed: () {},
-                          ),
+                        8.height,
+                        SocialLoginButton(
+                          providerName: "Apple",
+                          providerIcon: AppAssets.ASSETS_IMAGES_APPLE_PNG,
+                          onPressed: () {},
+                        ),
 
-                          const Spacer(),
+                        sectionSpace,
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("Already have an account? "),
-                              TextButton(
-                                onPressed: () => context.pop(),
-                                child: const Text('Login'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account? "),
+                            TextButton(
+                              onPressed: () => context.pop(),
+                              child: const Text('Login'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

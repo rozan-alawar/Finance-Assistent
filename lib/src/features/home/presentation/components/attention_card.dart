@@ -73,13 +73,14 @@ class AttentionCard extends StatelessWidget {
                     context,
                   ).neutralColors.shade60,
                   progressColor:
-                      progressColor ?? appSwitcherColors(context).primaryColor,
+                  progressColor ?? appSwitcherColors(context).primaryColor,
                   width: MediaQuery.of(context).size.width/1.7,
                 ),
 
 
               ],
             ),
+            Spacer(),
             Transform.flip(
               flipX: true,
               child: AppAssetsSvg(

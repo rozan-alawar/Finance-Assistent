@@ -20,29 +20,37 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? action;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: Sizes.paddingV16,
-        horizontal: Sizes.paddingH16,
-      ),
-      child: Row(
-        children: [
-          showBackButton
-              ? InkWell(
-                  onTap: onBackButtonPressed ?? () => context.pop(),
-                  child: Transform.flip(
-                    flipX: Directionality.of(context) == TextDirection.ltr,
-                    child: AppAssetsSvg(AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG),
-                  ),
-                )
-              : SizedBox.shrink(),
-          Expanded(
-            child: Center(
-              child: Text(title, style: TextStyles.f16(context).semiBold),
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: Sizes.paddingV16,
+          horizontal: Sizes.paddingH16,
+        ),
+        child: Row(
+          children: [
+            showBackButton
+                ? InkWell(
+                    onTap: onBackButtonPressed ?? () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
+                        context.pop();
+                      }
+                    },
+                    child: Transform.flip(
+                      flipX: Directionality.of(context) == TextDirection.rtl,
+                      child: AppAssetsSvg(AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG),
+                    ),
+                  )
+                : SizedBox.shrink(),
+            Expanded(
+              child: Center(
+                child: Text(title, style: TextStyles.f16(context).semiBold),
+              ),
             ),
-          ),
-          if (action != null) action!,
-        ],
+            if (action != null) action!,
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
+import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
@@ -5,227 +7,458 @@ import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
+import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:finance_assistent/src/core/di/dependency_injection.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
+import 'package:finance_assistent/src/features/currency/data/repo/currency_repository.dart';
+import 'package:finance_assistent/src/features/currency/domain/currency.dart';
+import 'package:finance_assistent/src/features/profile/data/repo/profile_repository.dart';
+import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_cubit.dart';
+import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/view/component/base/indicator.dart';
+import '../components/logout_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  int _selectedIndex = 3;
+  Future<List<Currency>>? _currenciesFuture;
+  List<Currency> _currenciesCache = const [];
+  Currency? _selectedCurrencyOverride;
+
+  @override
+  void initState() {
+    super.initState();
+    _currenciesFuture = sl<CurrencyRepository>().fetchCurrencies().then((list) {
+      _currenciesCache = list;
+      return list;
+    });
+  }
+
+  Currency? _resolveCurrency(String idOrCode) {
+    if (idOrCode.isEmpty || _currenciesCache.isEmpty) return null;
+
+    for (final c in _currenciesCache) {
+      if (c.id == idOrCode) return c;
+    }
+    for (final c in _currenciesCache) {
+      if (c.code == idOrCode) return c;
+    }
+    return null;
+  }
+
+  Future<void> _pickCurrency(
+    BuildContext context,
+    String currentIdOrCode,
+  ) async {
+    final selected = await showModalBottomSheet<Currency>(
+      backgroundColor: appCommonUIColors(context).white,
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: FutureBuilder<List<Currency>>(
+              future: _currenciesFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        snapshot.error.toString(),
+                        style: TextStyles.f14(context).medium,
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
+                  return const Center(child: LoadingAppIndicator());
+                }
+
+                final currencies = snapshot.data ?? const <Currency>[];
+                final current =
+                    _selectedCurrencyOverride ??
+                    _resolveCurrency(currentIdOrCode);
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Select Currency',
+                              style: TextStyles.f18(context).bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(sheetContext),
+                            icon: const Icon(Icons.close),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: currencies.length,
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final c = currencies[index];
+                          final isSelected = current?.id == c.id;
+                          return ListTile(
+                            onTap: () => Navigator.pop(sheetContext, c),
+                            title: Text(
+                              '${c.symbol} (${c.code})',
+                              style: TextStyles.f14(context).medium,
+                            ),
+                            subtitle: Text(
+                              c.name,
+                              style: TextStyles.f12(
+                                context,
+                              ).medium.colorWith(Colors.grey),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check,
+                                    color: Color(0xFF3F51B5),
+                                  )
+                                : null,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected == null) return;
+    setState(() {
+      _selectedCurrencyOverride = selected;
+    });
+
+    await HiveService.put(
+      HiveService.settingsBoxName,
+      'currency_code',
+      selected.code,
+    );
+    await HiveService.put(
+      HiveService.settingsBoxName,
+      'currency_selected',
+      true,
+    );
+
+    if (!context.mounted) return;
+    try {
+      await context.read<ProfileCubit>().updateDefaultCurrency(
+        currencyId: selected.id,
+      );
+      if (!context.mounted) return;
+      CustomToast.showSuccessMessage(context, 'Currency updated');
+    } catch (e) {
+      if (!context.mounted) return;
+      CustomToast.showErrorMessage(context, e.toString());
+    }
+  }
+
+  Future<void> _confirmLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => LogoutDialog(),
+    );
+
+    if (shouldLogout != true) return;
+    if (!mounted) return;
+    await context.read<AuthCubit>().logout();
+    if (!mounted) return;
+    CustomToast.showSuccessMessage(context, 'Logged out');
+    const LoginRoute().go(context);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const AppAssetsSvg(
-            AppAssets.ASSETS_ICONS_ARROW_LEFT_SVG,
-            width: 24,
-            height: 24,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
+    final authState = context.watch<AuthCubit>().state;
+    final isAuthenticated = authState is AuthSuccess;
+    final seedUser = authState is AuthSuccess ? authState.user : null;
+
+    if (!isAuthenticated) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text('My profile', style: TextStyles.f20(context).bold),
+          centerTitle: true,
         ),
-        title: Text('My profile', style: TextStyles.f20(context).bold),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: Sizes.marginV20),
-            Center(
-              child: Column(
-                children: [
-                  Stack(
+        body: Center(
+          child: Text(
+            'Please log in to view your profile.',
+            style: TextStyles.f16(context).medium,
+          ),
+        ),
+      );
+    }
+
+    return BlocProvider(
+      create: (_) =>
+          ProfileCubit(sl<ProfileRepository>(), seedUser: seedUser)
+            ..loadProfile(showLoading: seedUser == null),
+      child: BlocBuilder<ProfileCubit, ProfileState>(
+        builder: (context, state) {
+          if (state is ProfileLoading || state is ProfileInitial) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Text('My profile', style: TextStyles.f20(context).bold),
+                centerTitle: true,
+              ),
+              body: const Center(child: LoadingAppIndicator()),
+            );
+          }
+
+          if (state is ProfileFailure) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Text('My profile', style: TextStyles.f20(context).bold),
+                centerTitle: true,
+              ),
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 110,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFE8EAF6),
-                              Color(0xFF5C6BC0),
-                              Color(0xFF3949AB),
-                            ],
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: AppAssetsImage(
-                              AppAssets.ASSETS_IMAGES_AVATAR_PNG,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyles.f14(context).medium,
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF3F51B5),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                          child: const AppAssetsSvg(
-                            AppAssets.ASSETS_ICONS_EDIT_SVG,
-                            width: 12,
-                            height: 12,
-                            color: Colors.white,
-                          ),
-                        ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: () =>
+                            context.read<ProfileCubit>().loadProfile(),
+                        child: const Text('Retry'),
                       ),
                     ],
                   ),
-                  SizedBox(height: Sizes.marginV12),
-                  Text('Ghydaa Ahmed', style: TextStyles.f20(context).bold),
-                  SizedBox(height: Sizes.marginV4),
-                  Text(
-                    'ghydaaahmed@gmail.com',
-                    style: TextStyles.f14(
-                      context,
-                    ).medium.colorWith(Colors.grey),
+                ),
+              ),
+            );
+          }
+
+          final user = (state as ProfileLoaded).user;
+
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text('My profile', style: TextStyles.f20(context).bold),
+              centerTitle: true,
+            ),
+            body: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: Sizes.marginV20),
+                  Center(
+                    child: Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Container(
+                              width: 110,
+                              height: 110,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 3,
+                                ),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xFFE8EAF6),
+                                    Color(0xFF5C6BC0),
+                                    Color(0xFF3949AB),
+                                  ],
+                                ),
+                              ),
+                              child: ClipOval(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: AppAssetsImage(
+                                    AppAssets.ASSETS_IMAGES_AVATAR_PNG,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF3F51B5),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: const AppAssetsSvg(
+                                  AppAssets.ASSETS_ICONS_EDIT_SVG,
+                                  width: 12,
+                                  height: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: Sizes.marginV12),
+                        Text(
+                          user.fullName,
+                          style: TextStyles.f20(context).bold,
+                        ),
+                        SizedBox(height: Sizes.marginV4),
+                        Text(
+                          user.email,
+                          style: TextStyles.f14(
+                            context,
+                          ).medium.colorWith(Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
+                  SizedBox(height: Sizes.marginV32),
+                  Text(
+                    'profile',
+                    style: TextStyles.f18(context).bold,
+                  ).paddingSymmetric(horizontal: Sizes.paddingH20),
+                  SizedBox(height: Sizes.marginV16),
+                  _buildInfoTile(context, 'Full Name', user.fullName),
+                  _buildInfoTile(context, 'Email Address', user.email),
+                  _buildInfoTile(
+                    context,
+                    'Phone Number',
+                    user.phone?.isNotEmpty == true ? user.phone! : '-',
+                  ),
+                  SizedBox(height: Sizes.marginV24),
+                  Text(
+                    'Security',
+                    style: TextStyles.f18(context).bold,
+                  ).paddingSymmetric(horizontal: Sizes.paddingH20),
+                  SizedBox(height: Sizes.marginV12),
+                  Column(
+                    children: [
+                      _buildSecurityItem(
+                        context,
+                        svgIcon: AppAssets.ASSETS_ICONS_LOCK_SVG,
+                        title: 'Change Password',
+                        subtitle: 'Last Change 3 months ago',
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        svgIcon: AppAssets.ASSETS_ICONS_VIRTUAL_CURRENCY_SVG,
+                        title: 'Virtual currency',
+                        subtitle: () {
+                          final hiveCurrency = HiveService.get(
+                            HiveService.settingsBoxName,
+                            'currency_code',
+                            defaultValue: '',
+                          ).toString();
+                          final selected =
+                              _selectedCurrencyOverride ??
+                              _resolveCurrency(user.defaultCurrency) ??
+                              _resolveCurrency(hiveCurrency);
+                          if (selected != null) {
+                            return '${selected.symbol} (${selected.code})';
+                          }
+                          return user.defaultCurrency.isNotEmpty
+                              ? user.defaultCurrency
+                              : 'USD';
+                        }(),
+                        hasArrow: false,
+                        trailing: const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.grey,
+                          size: 28,
+                        ),
+                        onTap: () {
+                          _pickCurrency(context, user.defaultCurrency);
+                        },
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        svgIcon: AppAssets.ASSETS_ICONS_REPORTS_SVG,
+                        title: 'Reports',
+                        onTap: () {
+                          context.push(const ReportsRoute().location);
+                        },
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        iconData: Icons.card_giftcard,
+                        title: 'Rewards',
+                        onTap: () {
+                          context.push(RewardsRoute().location);
+                        },
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        iconData: Icons.star,
+                        title: 'Rate App',
+                        onTap: () {
+                          context.push(RateAppRoute().location);
+                        },
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        hasArrow: false,
+                        isLogout: true,
+                        svgIcon: AppAssets.ASSETS_ICONS_LOGOUT_SVG,
+                        title: 'Logout',
+                        onTap: () {
+                          _confirmLogout();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-
-            SizedBox(height: Sizes.marginV32),
-
-            Text(
-              'profile',
-              style: TextStyles.f18(context).bold,
-            ).paddingSymmetric(horizontal: Sizes.paddingH20),
-
-            SizedBox(height: Sizes.marginV16),
-
-            _buildInfoTile(context, 'Full Name', 'Ghydaa Ahmed'),
-            _buildInfoTile(context, 'Email Address', 'ghydaaahmed@gmail.com'),
-            _buildInfoTile(context, 'Phone Number', '+972598756526'),
-
-            SizedBox(height: Sizes.marginV24),
-
-            Text(
-              'Security',
-              style: TextStyles.f18(context).bold,
-            ).paddingSymmetric(horizontal: Sizes.paddingH20),
-
-            SizedBox(height: Sizes.marginV12),
-
-            Column(
-              children: [
-                _buildSecurityItem(
-                  context,
-                  svgIcon: AppAssets.ASSETS_ICONS_LOCK_SVG,
-                  title: 'Change Password',
-                  subtitle: 'Last Change 3 months ago',
-                ),
-                _buildSecurityItem(
-                  context,
-                  svgIcon: AppAssets.ASSETS_ICONS_VIRTUAL_CURRENCY_SVG,
-                  title: 'Virtual currency',
-                  subtitle: 'USD - US Dollar',
-                  hasArrow: false,
-                  trailing: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.grey,
-                    size: 28,
-                  ),
-                ),
-                _buildSecurityItem(
-                  context,
-                  svgIcon: AppAssets.ASSETS_ICONS_REPORTS_SVG,
-                  title: 'Reports',
-                ),
-                _buildSecurityItem(
-                  context,
-                  iconData: Icons.card_giftcard,
-                  title: 'Rewards',
-                ),
-                _buildSecurityItem(
-                  context,
-                  iconData: Icons.star,
-                  title: 'Rate App',
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF3F51B5),
-          unselectedItemColor: Colors.grey,
-          showUnselectedLabels: true,
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: 'Home',
-            ),
-
-            BottomNavigationBarItem(
-              icon: AppAssetsSvg(
-                AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
-                color: _selectedIndex == 1
-                    ? const Color(0xFF3F51B5)
-                    : Colors.grey,
-                height: 24,
-              ),
-              label: 'Budget',
-            ),
-
-            BottomNavigationBarItem(
-              icon: AppAssetsSvg(
-                AppAssets.ASSETS_ICONS_NAV_REMINDER_SVG,
-                color: _selectedIndex == 2
-                    ? const Color(0xFF3F51B5)
-                    : Colors.grey,
-                height: 24,
-              ),
-              label: 'Reminder',
-            ),
-
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -259,24 +492,32 @@ class _ProfilePageState extends State<ProfilePage> {
     IconData? iconData,
     Widget? trailing,
     bool hasArrow = true,
+    bool isLogout = false,
+    Function? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFE8EAF6),
-              shape: BoxShape.circle,
-            ),
+          isLogout
+              ? AppAssetsSvg(svgIcon!, width: 50, height: 50)
+              : Container(
+                  width: 50,
+                  height: 50,
+                  padding: const EdgeInsets.all(12),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8EAF6),
+                    shape: BoxShape.circle,
+                  ),
 
-            child: svgIcon != null
-                ? AppAssetsSvg(svgIcon, color: const Color(0xFF3F51B5))
-                : Icon(iconData, color: const Color(0xFF3F51B5), size: 24),
-          ),
+                  child: svgIcon != null
+                      ? AppAssetsSvg(svgIcon, color: const Color(0xFF3F51B5))
+                      : Icon(
+                          iconData,
+                          color: const Color(0xFF3F51B5),
+                          size: 24,
+                        ),
+                ),
           const SizedBox(width: 15),
           Expanded(
             child: Column(
@@ -306,6 +547,6 @@ class _ProfilePageState extends State<ProfilePage> {
             const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
         ],
       ),
-    );
+    ).onTap(onTap);
   }
 }
