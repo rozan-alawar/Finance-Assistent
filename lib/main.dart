@@ -15,6 +15,9 @@ import 'src/core/services/network/main_service/network_service.dart';
 import 'src/features/ask_ai/data/datasource/ai_chat_remote_datasource.dart';
 import 'src/features/ask_ai/data/repo/budget_repository_impl.dart';
 import 'src/features/ask_ai/domain/usecases/get_chart_data_usecase.dart';
+import 'src/features/budget/data/datasource/budget_remote_datasource.dart';
+import 'src/features/budget/data/repo/budget_repository_impl.dart';
+import 'src/features/budget/domain/usecase/get_budget_summary_usecase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,9 +79,9 @@ class MyApp extends StatelessWidget {
 
 void testChartData() async {
   final networkService = NetworkService();
-  final datasource = AiChatRemoteDataSourceImpl(networkService);
-  final repo = AiChatRepositoryImpl(datasource);
-  final usecase = GetChartDataUsecase(repo);
+  final datasource = BudgetRemoteDataSourceImpl(networkService);
+  final repo = BudgetRepositoryImpl(datasource);
+  final usecase = GetBudgetSummaryUsecase(repo);
 
   final result = await usecase.call();
   print('*******************************************************');

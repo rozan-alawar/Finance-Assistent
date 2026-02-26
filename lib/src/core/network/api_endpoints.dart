@@ -16,7 +16,8 @@ class ApiEndpoints {
   static const String bills = '/bills';
   static const String billsSmartParse = '/bills/smart-parse';
 
+  // Budget & AI endpoints
   static const String budgets = '/budgets';
-  static const String chartData = '/ai/suggest-budget';
+  static const String budgetSummary = '/budgets/summary';
   static const String suggestBudget = '/ai/suggest-budget';
 }

@@ -1,7 +1,7 @@
 import '../entity/budget_data.dart';
-import '../entity/chart_data.dart';
+import '../entity/budget_summary.dart';
 
 abstract class BudgetRepository {
   Future<List<BudgetData>> getBudgets();
-  Future<List<ChartData>> getChartData();
+  Future<BudgetSummary> getSummary();
 }

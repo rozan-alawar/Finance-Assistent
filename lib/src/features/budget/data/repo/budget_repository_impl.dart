@@ -1,5 +1,6 @@
+import 'package:finance_assistent/src/features/budget/domain/entity/budget_summary.dart';
+
 import '../../domain/entity/budget_data.dart';
-import '../../domain/entity/chart_data.dart';
 import '../../domain/repo/budget_repository.dart';
 import '../datasource/budget_remote_datasource.dart';
 
@@ -15,8 +16,8 @@ class BudgetRepositoryImpl implements BudgetRepository {
   }
 
   @override
-  Future<List<ChartData>> getChartData() async {
-    final models = await remoteDatasource.getChartData();
-    return models.map((e) => e.toEntity()).toList();
+  Future<BudgetSummary> getSummary() async {
+    final models = await remoteDatasource.getSummary();
+    return models.toEntity();
   }
 }

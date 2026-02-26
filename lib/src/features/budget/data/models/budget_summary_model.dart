@@ -1,15 +1,15 @@
-import 'budget_chart_data_model.dart';
+import 'summary_data_model.dart';
 
-class BudgetChartModel {
+class BudgetSummaryModel {
   bool? success;
-  BudgetChartDataModel? data;
+  SummaryDataModel? data;
 
-  BudgetChartModel({this.success, this.data});
+  BudgetSummaryModel({this.success, this.data});
 
-  BudgetChartModel.fromJson(Map<String, dynamic> json) {
+  BudgetSummaryModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null
-        ? BudgetChartDataModel.fromJson(json['data'])
+        ? SummaryDataModel.fromJson(json['data'])
         : null;
   }
 
