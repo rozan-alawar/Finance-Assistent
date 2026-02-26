@@ -44,7 +44,7 @@ class _AccountingPageState extends State<AccountingPage> {
               children: [
                 Container(
                   width: 80,
-                  height: 80,
+                  height: 90,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
@@ -85,9 +85,9 @@ class _AccountingPageState extends State<AccountingPage> {
               ],
             ),
 
-            SizedBox(height: Sizes.marginV32),
+            SizedBox(height: Sizes.marginV18),
             Text('General', style: TextStyles.f18(context).bold),
-            SizedBox(height: Sizes.marginV16),
+            SizedBox(height: Sizes.marginV32),
 
             _buildSettingItem(
               context,
@@ -102,6 +102,7 @@ class _AccountingPageState extends State<AccountingPage> {
                 );
               },
             ),
+              SizedBox(height: Sizes.marginV18),
             _buildSettingItem(
               context,
               svgIcon:
