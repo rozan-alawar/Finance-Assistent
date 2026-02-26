@@ -1,10 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/models/chat_message_model.dart';
+import '../../domain/usecases/get_chart_data_usecase.dart';
 import 'ask_ai_state.dart';
 
 class AskAiCubit extends Cubit<AskAiState> {
-  AskAiCubit() : super(AskAiInitialState());
+  final GetChartDataUsecase getChartDataUsecase;
+
+  AskAiCubit(this.getChartDataUsecase) : super(AskAiInitialState());
 
   Future<void> sendMessage(String message) async {
     if (message.trim().isEmpty) return;
@@ -23,20 +26,42 @@ class AskAiCubit extends Cubit<AskAiState> {
       );
     }
 
-    await Future.delayed(const Duration(seconds: 1));
+    if (message.trim().toLowerCase() == 'make me ai budget suggestion') {
+      try {
+        final chartDataList = await getChartDataUsecase.call();
+        final aiResponse = ChatMessage(
+          message: 'Here is your AI budget suggestion:',
+          isUser: false,
+          chartDataList: chartDataList,
+        );
+        _emitResponse(aiResponse);
+      } catch (e) {
+        final aiResponse = ChatMessage(
+          message: 'Failed to fetch AI budget suggestion: $e',
+          isUser: false,
+        );
+        _emitResponse(aiResponse);
+      }
+    } else {
+      await Future.delayed(const Duration(seconds: 1));
+      final aiResponse = ChatMessage(
+        message: _generateAiResponse(message),
+        isUser: false,
+      );
+      _emitResponse(aiResponse);
+    }
+  }
 
-    final aiResponse = ChatMessage(
-      message: _generateAiResponse(message),
-      isUser: false,
-    );
-
-    final currentState = state as AskAiChatState;
-    emit(
-      currentState.copyWith(
-        messages: [...currentState.messages, aiResponse],
-        isLoading: false,
-      ),
-    );
+  void _emitResponse(ChatMessage aiResponse) {
+    if (state is AskAiChatState) {
+      final currentState = state as AskAiChatState;
+      emit(
+        currentState.copyWith(
+          messages: [...currentState.messages, aiResponse],
+          isLoading: false,
+        ),
+      );
+    }
   }
 
   String _generateAiResponse(String userMessage) {
