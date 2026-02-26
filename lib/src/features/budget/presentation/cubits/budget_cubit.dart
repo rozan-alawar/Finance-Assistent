@@ -3,6 +3,7 @@ import 'package:finance_assistent/src/features/budget/data/models/grid_item_mode
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entity/budget_data.dart';
+import '../../domain/entity/category_chart_date.dart';
 import '../../domain/usecase/get_budget_usecase.dart';
 import 'budget_state.dart';
 
@@ -22,6 +23,56 @@ class BudgetCubit extends Cubit<BudgetState> {
     } catch (e) {
       emit(BudgetErrorState(e.toString()));
     }
+  }
+
+  List<CategoryChartData> get chartData {
+    if (allBudgets.isEmpty) return [];
+
+    double total = 0;
+    Map<String, double> categorySums = {};
+
+    for (var budget in allBudgets) {
+      double amount = double.tryParse(budget.allocatedAmount ?? '0') ?? 0;
+      total += amount;
+      String category = budget.category ?? 'Unknown';
+      categorySums[category] = (categorySums[category] ?? 0) + amount;
+    }
+
+    var sortedCategories = categorySums.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    const List<Color> colors = [
+      Color(0xFF686FFF),
+      Color(0xFFFFA9DC),
+      Color(0xFFFFBDBC),
+      Color(0xFF5792FF),
+    ];
+    const List<Color> bgColors = [
+      Color.fromARGB(255, 242, 242, 255),
+      Color.fromARGB(255, 255, 245, 250),
+      Color.fromARGB(255, 255, 247, 247),
+      Color.fromARGB(255, 242, 247, 255),
+    ];
+
+    List<CategoryChartData> result = [];
+    for (int i = 0; i < sortedCategories.length; i++) {
+      if (i >= 4) break;
+      double amount = sortedCategories[i].value;
+      int pct = total == 0 ? 0 : ((amount / total) * 100).round();
+
+      result.add(
+        CategoryChartData(
+          title: sortedCategories[i].key,
+          amount: amount,
+          percentage: pct,
+          // Cycle through our pre-defined colors for UI consistency
+          color: colors[i % colors.length],
+          textColor: colors[i % colors.length],
+          bgColor: bgColors[i % bgColors.length],
+        ),
+      );
+    }
+    return result;
   }
 
   final String sendModeyIcon = AppAssets.ASSETS_ICONS_MONEY_SEND_SVG;
