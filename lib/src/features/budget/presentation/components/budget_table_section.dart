@@ -100,7 +100,7 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: count,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) => RepaintBoundary(
         child: const BudgetCard(
           username: 'Zena',

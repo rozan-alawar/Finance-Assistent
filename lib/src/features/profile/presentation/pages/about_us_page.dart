@@ -3,7 +3,7 @@ import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 
 class AboutUsPage extends StatelessWidget {
-  const AboutUsPage({Key? key}) : super(key: key);
+  const AboutUsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

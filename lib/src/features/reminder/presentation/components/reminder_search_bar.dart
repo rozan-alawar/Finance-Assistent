@@ -1,4 +1,3 @@
-import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';

@@ -1,5 +1,4 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';

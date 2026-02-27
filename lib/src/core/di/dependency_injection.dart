@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/features/income/data/repo/income_repository.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../features/auth/data/data_source/auth_remote_data_source.dart';
@@ -7,6 +8,7 @@ import '../../features/currency/data/repo/currency_repository.dart';
 import '../../features/home/data/data_source/home_remote_data_source.dart';
 import '../../features/home/data/repo/home_repository.dart';
 import '../../features/home/data/repo/push_token_manager.dart';
+import '../../features/income/data/data_source/income_remote_data_source.dart';
 import '../../features/profile/data/data_source/profile_remote_data_source.dart';
 import '../../features/profile/data/repo/profile_repository.dart';
 import '../services/network/main_service/network_service.dart';
@@ -39,6 +41,9 @@ Future<void> init() async {
   sl.registerLazySingleton<HomeRemoteDataSource>(
     () => HomeRemoteDataSource(sl()),
   );
+  sl.registerLazySingleton<IncomeRemoteDataSource>(
+    () => IncomeRemoteDataSource(sl()),
+  );
 
   // Repositories
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
@@ -49,5 +54,6 @@ Future<void> init() async {
     () => ProfileRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<HomeRepository>(() => HomeRepositoryImpl(sl()));
+  sl.registerLazySingleton<IncomeRepository>(() => IncomeRepositoryImpl(sl()));
   sl.registerLazySingleton<PushTokenManager>(() => PushTokenManager(sl()));
 }

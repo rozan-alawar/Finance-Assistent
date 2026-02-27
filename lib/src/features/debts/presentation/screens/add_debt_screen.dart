@@ -2,7 +2,6 @@ import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/utils/const/sizes.dart';
 import '../../../../core/utils/extensions/widget_ex.dart';
 import '../../../../core/utils/extensions/text_ex.dart';
@@ -57,7 +56,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     keyboardType: TextInputType.number,
                     hint: "0.00",
                     prefixIcon: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16.0),
                       child: AppAssetsSvg(AppAssets.ASSETS_ICONS_USD_ICONE_SVG, width: 16, height: 16),
                     ),
                   ),
@@ -144,7 +143,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
           ),
           Switch(
             value: isReminderEnabled,
-            activeColor: Colors.white,
+            activeThumbColor: Colors.white,
             activeTrackColor: const Color(0xFF3F51B5),
             onChanged: (value) {
               setState(() {

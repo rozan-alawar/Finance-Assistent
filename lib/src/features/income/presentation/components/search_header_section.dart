@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/config/theme/app_color/color_palette.dart';
-import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/gen/app_assets.dart';
-import '../../../../core/utils/const/sizes.dart';
-import '../../../../core/utils/extensions/text_ex.dart';
 import '../../../../core/utils/extensions/widget_ex.dart';
 import '../../../../core/view/component/base/app_text_field.dart';
 import '../../../../core/view/component/base/image.dart';

@@ -244,8 +244,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       AppAssets.ASSETS_ICONS_WARNING_SVG;
                                   final progressRaw = item['progress'];
                                   final progress = () {
-                                    if (progressRaw is num)
+                                    if (progressRaw is num) {
                                       return progressRaw.toDouble();
+                                    }
                                     if (progressRaw is String) {
                                       final v = double.tryParse(progressRaw);
                                       if (v != null) return v;

@@ -22,7 +22,7 @@ class CategorySelector extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 4),
         itemCount: ExpenseCategory.values.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final category = ExpenseCategory.values[index];
           final isSelected = category == selectedCategory;
