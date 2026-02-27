@@ -8,7 +8,15 @@ import '../../../../core/config/theme/styles/styles.dart';
 
 class DebtListItem extends StatelessWidget {
   final DebtModel model;
-  const DebtListItem({required this.model, super.key});
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
+
+  const DebtListItem({
+    required this.model, 
+    required this.onDelete, 
+    required this.onEdit, 
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +58,7 @@ class DebtListItem extends StatelessWidget {
                 ),
                 child: Text(
                   initials,
-                  style: TextStyles.f14(
-                    context,
-                  ).semiBold.colorWith(statusColor),
+                  style: TextStyles.f14(context).semiBold.colorWith(statusColor),
                 ),
               ),
               const SizedBox(width: Sizes.marginH12),
@@ -72,20 +78,20 @@ class DebtListItem extends StatelessWidget {
                 context,
                 "assets/icons/delete.svg",
                 appSwitcherColors(context).dangerColor,
-                () {},
+                onDelete,
               ),
               const SizedBox(width: Sizes.marginH8),
               _buildActionButton(
                 context,
                 "assets/icons/edit.svg",
                 appSwitcherColors(context).neutralColors.shade500,
-                () {},
+                onEdit,
               ),
             ],
           ),
           const SizedBox(height: Sizes.marginV12),
           Text(
-            model.description,
+            model.description ?? "",
             style: TextStyles.f14(context).neutral80(context),
           ),
           const SizedBox(height: Sizes.marginV12),
@@ -93,19 +99,15 @@ class DebtListItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("\$${model.amount}", style: TextStyles.f16(context).bold),
-              // --- التعديل هنا فقط ---
               Container(
-                constraints: const BoxConstraints(minWidth: 70), // لتوحيد الحجم
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                constraints: const BoxConstraints(minWidth: 70), 
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(Sizes.radius20),
                   border: Border.all(
-                    color: statusColor.withValues(alpha: 0.3), // إضافة الحواف
+                    color: statusColor.withValues(alpha: 0.3), 
                     width: 1,
                   ),
                 ),
