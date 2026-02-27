@@ -108,7 +108,7 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureItem(
+  Widget _buildFeatureItem( 
     BuildContext context, {
     required String emoji,
     required String title,
