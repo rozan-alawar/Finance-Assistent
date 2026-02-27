@@ -1,3 +1,4 @@
+import 'package:finance_assistent/src/features/budget/domain/entity/ai_chat.dart';
 import 'package:finance_assistent/src/features/budget/domain/entity/budget_summary.dart';
 
 import '../../domain/entity/budget_data.dart';
@@ -19,5 +20,11 @@ class BudgetRepositoryImpl implements BudgetRepository {
   Future<BudgetSummary> getSummary() async {
     final models = await remoteDatasource.getSummary();
     return models.toEntity();
+  }
+
+  @override
+  Future<AiChat> askAI(String message, {String? chatId}) async {
+    final model = await remoteDatasource.askAI(message, chatId: chatId);
+    return model.data!.toEntity();
   }
 }

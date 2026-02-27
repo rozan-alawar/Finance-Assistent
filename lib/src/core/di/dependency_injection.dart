@@ -12,6 +12,7 @@ import '../../features/profile/data/repo/profile_repository.dart';
 import '../../features/budget/data/datasource/budget_remote_datasource.dart';
 import '../../features/budget/data/repo/budget_repository_impl.dart';
 import '../../features/budget/domain/repo/budget_repository.dart';
+import '../../features/budget/domain/usecase/ask_ai_usecase.dart';
 import '../../features/budget/domain/usecase/get_budget_usecase.dart';
 import '../services/network/main_service/network_service.dart';
 
@@ -54,4 +55,5 @@ Future<void> init() async {
   sl.registerLazySingleton<GetChartDataUsecase>(
     () => GetChartDataUsecase(sl()),
   );
+  sl.registerLazySingleton<AskAIUseCase>(() => AskAIUseCase(sl()));
 }

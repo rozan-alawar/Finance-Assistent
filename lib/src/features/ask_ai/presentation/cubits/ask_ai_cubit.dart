@@ -2,12 +2,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/models/chat_message_model.dart';
 import '../../domain/usecases/get_chart_data_usecase.dart';
+import '../../../budget/domain/usecase/ask_ai_usecase.dart';
 import 'ask_ai_state.dart';
 
 class AskAiCubit extends Cubit<AskAiState> {
   final GetChartDataUsecase getChartDataUsecase;
+  final AskAIUseCase askAIUseCase;
+  String? _chatId;
 
-  AskAiCubit(this.getChartDataUsecase) : super(AskAiInitialState());
+  AskAiCubit(this.getChartDataUsecase, this.askAIUseCase)
+    : super(AskAiInitialState());
 
   Future<void> sendMessage(String message) async {
     if (message.trim().isEmpty) return;
@@ -43,12 +47,23 @@ class AskAiCubit extends Cubit<AskAiState> {
         _emitResponse(aiResponse);
       }
     } else {
-      await Future.delayed(const Duration(seconds: 1));
-      final aiResponse = ChatMessage(
-        message: _generateAiResponse(message),
-        isUser: false,
-      );
-      _emitResponse(aiResponse);
+      try {
+        final aiChat = await askAIUseCase.execute(message, chatId: _chatId);
+        if (_chatId == null && aiChat.chatId != null) {
+          _chatId = aiChat.chatId;
+        }
+        final aiResponse = ChatMessage(
+          message: aiChat.message ?? 'No response',
+          isUser: false,
+        );
+        _emitResponse(aiResponse);
+      } catch (e) {
+        final aiResponse = ChatMessage(
+          message: 'Failed to get AI response.',
+          isUser: false,
+        );
+        _emitResponse(aiResponse);
+      }
     }
   }
 
@@ -62,10 +77,6 @@ class AskAiCubit extends Cubit<AskAiState> {
         ),
       );
     }
-  }
-
-  String _generateAiResponse(String userMessage) {
-    return "Your spending looks generally healthy. You’re saving 27% of your income, which is great. However, dining and entertainment are slightly above average. Cutting back by \$100–\$150 a month could boost your savings.";
   }
 
   void sendSuggestionQuestion(String question) {

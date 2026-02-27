@@ -1,5 +1,6 @@
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/services/network/main_service/network_service.dart';
+import '../models/ai_chat_model.dart';
 import '../models/budget_data_model.dart';
 import '../models/budget_model.dart';
 import '../models/budget_summary_model.dart';
@@ -8,6 +9,7 @@ import '../models/summary_data_model.dart';
 abstract class BudgetRemoteDatasource {
   Future<List<BudgetDataModel>> getBudgets();
   Future<SummaryDataModel> getSummary();
+  Future<AiChatModel> askAI(String message, {String? chatId});
 }
 
 class BudgetRemoteDataSourceImpl implements BudgetRemoteDatasource {
@@ -40,6 +42,21 @@ class BudgetRemoteDataSourceImpl implements BudgetRemoteDatasource {
       return budgetSummaryModel.data!;
     } else {
       throw Exception('Failed to load budgets');
+    }
+  }
+
+  @override
+  Future<AiChatModel> askAI(String message, {String? chatId}) async {
+    final response = await networkService.post<Map<String, dynamic>>(
+      path: ApiEndpoints.aiChat,
+      data: {'message': message, if (chatId != null) 'chatId': chatId},
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final aiChatModel = AiChatModel.fromJson(response.data!);
+      return aiChatModel;
+    } else {
+      throw Exception('Failed to send message');
     }
   }
 }

@@ -20,4 +20,5 @@ class ApiEndpoints {
   static const String budgets = '/budgets';
   static const String budgetSummary = '/budgets/summary';
   static const String suggestBudget = '/ai/suggest-budget';
+  static const String aiChat = '/ai/chat';
 }

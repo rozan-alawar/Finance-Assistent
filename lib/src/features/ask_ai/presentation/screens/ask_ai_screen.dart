@@ -21,7 +21,7 @@ class AskAiScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AskAiCubit(sl()),
+      create: (context) => AskAiCubit(sl(), sl()),
       child: BlocConsumer<AskAiCubit, AskAiState>(
         listener: (context, state) {},
         builder: (context, state) {
