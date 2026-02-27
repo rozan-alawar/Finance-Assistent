@@ -36,4 +36,18 @@ class ProfileCubit extends Cubit<ProfileState> {
     // await _profileRepository.updateDefaultCurrency(currencyId: currencyId);
     await loadProfile(showLoading: false);
   }
+
+  Future<String> changePassword({
+    required String id,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) {
+    return _profileRepository.changePassword(
+      id: id,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword,
+    );
+  }
 }

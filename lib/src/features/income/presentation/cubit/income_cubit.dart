@@ -1,5 +1,6 @@
 import 'package:finance_assistent/src/features/income/data/model/add_income_model.dart';
 import 'package:finance_assistent/src/features/income/data/model/income_breakdown_model.dart';
+import 'package:finance_assistent/src/features/income/data/model/income_chart_data.dart';
 import 'package:finance_assistent/src/features/income/data/model/income_overview_model.dart';
 import 'package:finance_assistent/src/features/income/data/model/income_transaction_model.dart';
 import 'package:finance_assistent/src/features/income/data/repo/income_repository.dart';
@@ -16,27 +17,18 @@ class IncomeCubit extends Cubit<IncomeState> {
   void fetchIncomeOverview() async {
     emit(IncomeLoading());
     try {
-      final _ = await _repository.getSummary();
-      final incomes = await _repository.getIncomes(limit: 10);
+      final summary = await _repository.getSummary();
+      final incomes = await _repository.getIncomes(limit: 50);
 
       // Group incomes by source for breakdown
       final Map<String, double> sourceMap = {};
-      double totalAmount = 0;
+      double breakdownTotalAmount = 0;
 
       for (var income in incomes) {
         sourceMap[income.source] =
             (sourceMap[income.source] ?? 0) + income.amount;
-        totalAmount += income.amount;
+        breakdownTotalAmount += income.amount;
       }
-
-      // Use summary total if available and greater than calculated (in case pagination limits breakdown)
-      // But summary total might be all time, and breakdown might be expected for recent?
-      // For now, let's use the fetched incomes for breakdown to be consistent with what's shown.
-      // Or maybe the summary endpoint provides total for everything.
-      // The breakdown chart usually shows distribution of total income.
-      // If I only fetch 10 items, the breakdown will be biased.
-      // But I don't have an endpoint for breakdown.
-      // I'll use the fetched incomes for now.
 
       final List<Color> colors = [
         const Color(0xFF3447AA),
@@ -55,12 +47,14 @@ class IncomeCubit extends Cubit<IncomeState> {
         return IncomeBreakdown(
           category: e.key,
           amount: e.value,
-          percentage: totalAmount == 0 ? 0 : (e.value / totalAmount) * 100,
+          percentage: breakdownTotalAmount == 0
+              ? 0
+              : (e.value / breakdownTotalAmount) * 100,
           color: color,
         );
       }).toList();
 
-      final recentTransactions = incomes.map((e) {
+      final recentTransactions = incomes.take(10).map((e) {
         return IncomeTransaction(
           title: e.source, // Using source as title
           amount: e.amount,
@@ -69,7 +63,36 @@ class IncomeCubit extends Cubit<IncomeState> {
         );
       }).toList();
 
+      // Chart Data Calculation (Last 7 Days)
+      final now = DateTime.now();
+      final sevenDaysAgo = now.subtract(const Duration(days: 6)); // 7 days including today
+      final Map<String, double> dailyIncome = {};
+
+      // Initialize map for last 7 days
+      for (int i = 0; i < 7; i++) {
+        final date = sevenDaysAgo.add(Duration(days: i));
+        final dayLabel = DateFormat('E').format(date); // Mon, Tue, etc.
+        dailyIncome[dayLabel] = 0;
+      }
+
+      for (var income in incomes) {
+        if (income.incomeDate.isAfter(sevenDaysAgo.subtract(const Duration(days: 1))) &&
+            income.incomeDate.isBefore(now.add(const Duration(days: 1)))) {
+           final dayLabel = DateFormat('E').format(income.incomeDate);
+           if (dailyIncome.containsKey(dayLabel)) {
+             dailyIncome[dayLabel] = (dailyIncome[dayLabel] ?? 0) + income.amount;
+           }
+        }
+      }
+
+      final chartData = dailyIncome.entries.map((e) {
+        return IncomeChartData(label: e.key, amount: e.value);
+      }).toList();
+
+
       final data = IncomeOverviewModel(
+        totalIncome: summary.totalIncome,
+        chartData: chartData,
         breakdownData: breakdownData,
         recentTransactions: recentTransactions,
       );

@@ -22,6 +22,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/view/component/base/indicator.dart';
 import '../components/logout_dialog.dart';
+import 'change_password_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -409,6 +410,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         svgIcon: AppAssets.ASSETS_ICONS_LOCK_SVG,
                         title: 'Change Password',
                         subtitle: 'Last Change 3 months ago',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ChangePasswordPage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildSecurityItem(
                         context,

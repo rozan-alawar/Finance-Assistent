@@ -5,6 +5,12 @@ import '../data_source/profile_remote_data_source.dart';
 
 abstract class ProfileRepository {
   Future<({UserApp user, AuthTokens token})> fetchProfile();
+  Future<String> changePassword({
+    required String id,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  });
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -15,5 +21,20 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<({UserApp user, AuthTokens token})> fetchProfile() {
     return _remoteDataSource.fetchProfile();
+  }
+
+  @override
+  Future<String> changePassword({
+    required String id,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) {
+    return _remoteDataSource.changePassword(
+      id: id,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword,
+    );
   }
 }

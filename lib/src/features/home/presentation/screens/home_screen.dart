@@ -55,11 +55,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // User is logged in, navigate to the service
     switch (serviceName) {
-      case "Bills":
-        context.push(BillRoute().location);
+      case "Income":
+        context.push(IncomeOverviewRoute().location);
         break;
       case "Expenses":
         context.push(ExpensesRoute().location);
+        break;
+      case "Bills":
+        context.push(BillRoute().location);
+        break;
+      case "Debts":
+        context.push(DebtsRoute().location);
         break;
     }
   }
@@ -188,21 +194,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                 return GestureDetector(
                                   onTap: () {
-                                    if (service[index].first == "Income") {
-                                      context.push(
-                                        IncomeOverviewRoute().location,
-                                      );
-                                    } else if (service[index].first ==
-                                        "Debts") {
-                                      context.push(DebtsRoute().location);
-                                    } else if (service[index].first ==
-                                            "Bills" ||
-                                        service[index].first == "Expenses") {
-                                      _onServiceTap(
-                                        context,
-                                        service[index].first,
-                                      );
-                                    }
+                                    // if (service[index].first == "Income") {
+                                    //   context.push(
+                                    //     IncomeOverviewRoute().location,
+                                    //   );
+                                    // } else if (service[index].first ==
+                                    //     "Debts") {
+                                    //   context.push(DebtsRoute().location);
+                                    // } else if (service[index].first ==
+                                    //         "Bills" ||
+                                    //     service[index].first == "Expenses") {
+                                    _onServiceTap(
+                                      context,
+                                      service[index].first,
+                                    );
+                                    // }
                                   },
                                   child: CustomServiceCard(
                                     label: service[index].first,
