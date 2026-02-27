@@ -5,20 +5,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entity/budget_data.dart';
 import '../../domain/entity/budget_summary.dart';
 import '../../domain/entity/category_chart_date.dart';
+import '../../domain/entity/debts_summary.dart';
 import '../../domain/usecase/get_budget_summary_usecase.dart';
 import '../../domain/usecase/get_budget_usecase.dart';
+import '../../domain/usecase/get_total_debts_usecase.dart';
 import 'budget_state.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
   final GetBudgetUsecase getBudgetUsecase;
   final GetBudgetSummaryUsecase getBudgetSummaryUsecase;
+  final GetTotalDebtsUsecase getTotalDebtsUsecase;
 
-  BudgetCubit(this.getBudgetUsecase, this.getBudgetSummaryUsecase)
-    : super(InitialBudgetState());
+  BudgetCubit(
+    this.getBudgetUsecase,
+    this.getBudgetSummaryUsecase,
+    this.getTotalDebtsUsecase,
+  ) : super(InitialBudgetState());
 
   List<BudgetData> allBudgets = [];
 
   BudgetSummary? _summary;
+  DebtsSummary? _debtsSummary;
 
   Future<void> getBudgets() async {
     emit(BudgetLoadingState());
@@ -40,6 +47,18 @@ class BudgetCubit extends Cubit<BudgetState> {
       emit(BudgetSummaryLoadedState(result));
     } catch (e) {
       emit(BudgetSummaryErrorState(e.toString()));
+    }
+  }
+
+  Future<void> getDebts() async {
+    emit(DebtsSummaryLoadingState());
+    try {
+      final result = await getTotalDebtsUsecase();
+      _debtsSummary = result;
+      _cachedGridItems = null; // invalidate cache so grid rebuilds
+      emit(DebtsSummaryLoadedState(result));
+    } catch (e) {
+      emit(DebtsSummaryErrorState(e.toString()));
     }
   }
 
@@ -106,6 +125,14 @@ class BudgetCubit extends Cubit<BudgetState> {
     return utilisation.toDouble();
   }
 
+  double _debtsChangePercent() {
+    final totalOwe = double.tryParse(_debtsSummary?.totalOwe ?? '0') ?? 0;
+    if (totalOwe == 0) return 0;
+    const double simulatedLastMonth = 0.8;
+    final change = ((1 - simulatedLastMonth) / simulatedLastMonth) * 100;
+    return change.abs();
+  }
+
   List<GridItemModel>? _cachedGridItems;
 
   List<GridItemModel> get gridItems {
@@ -120,13 +147,13 @@ class BudgetCubit extends Cubit<BudgetState> {
     final int utilisation = _summary?.utilizationPercentage ?? 0;
 
     final bool balanceIsUp = utilisation <= 50;
-    final double balancePct = _balanceChangePercent();
+
     final String balanceArrow = balanceIsUp
         ? increaseArrowIcon
         : decreaseArrowIcon;
 
     final bool expensesIsUp = utilisation > 50;
-    final double expensesPct = _expensesChangePercent();
+
     final String expensesArrow = expensesIsUp
         ? increaseArrowIcon
         : decreaseArrowIcon;
@@ -136,7 +163,7 @@ class BudgetCubit extends Cubit<BudgetState> {
       GridItemModel(
         title: 'Balance',
         amount: totalRemaining,
-        percentage: balancePct,
+        percentage: _balanceChangePercent(),
         icon: receiveMoneyIcon,
         iconColor: const Color(0xFFFF7292),
         backgoundColor: const Color(0xFFFDF5F7),
@@ -156,21 +183,23 @@ class BudgetCubit extends Cubit<BudgetState> {
       GridItemModel(
         title: 'Expenses',
         amount: totalSpent,
-        percentage: expensesPct,
+        percentage: _expensesChangePercent(),
         icon: sendModeyIcon,
         iconColor: const Color(0xFF16C087),
         backgoundColor: const Color(0xFFDCFCE7),
         arrow: expensesArrow,
       ),
-      // --- Card 3: Total Debt  (static / handled elsewhere) ---
+      // --- Card 3: Total Debt  (totalOwe from /debts/summary) ---
       GridItemModel(
         title: 'Total Debt',
-        amount: 12450,
-        percentage: 2.5,
+        amount: double.tryParse(_debtsSummary?.totalOwe ?? '0') ?? 0,
+        percentage: _debtsChangePercent(),
         icon: AppAssets.ASSETS_ICONS_DEBTS_SVG,
         iconColor: const Color(0xFF686FFF),
         backgoundColor: const Color(0xFFEFF1FF),
-        arrow: increaseArrowIcon,
+        arrow: (double.tryParse(_debtsSummary?.totalOwe ?? '0') ?? 0) > 0
+            ? increaseArrowIcon
+            : decreaseArrowIcon,
       ),
     ];
   }

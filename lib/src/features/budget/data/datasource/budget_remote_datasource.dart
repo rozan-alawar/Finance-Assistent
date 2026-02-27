@@ -4,12 +4,14 @@ import '../models/ai_chat_model.dart';
 import '../models/budget_data_model.dart';
 import '../models/budget_model.dart';
 import '../models/budget_summary_model.dart';
+import '../models/debts_model.dart';
 import '../models/summary_data_model.dart';
 
 abstract class BudgetRemoteDatasource {
   Future<List<BudgetDataModel>> getBudgets();
   Future<SummaryDataModel> getSummary();
   Future<AiChatModel> askAI(String message, {String? chatId});
+  Future<DebtsDataModel> getTotalDebts();
 }
 
 class BudgetRemoteDataSourceImpl implements BudgetRemoteDatasource {
@@ -57,6 +59,20 @@ class BudgetRemoteDataSourceImpl implements BudgetRemoteDatasource {
       return aiChatModel;
     } else {
       throw Exception('Failed to send message');
+    }
+  }
+
+  @override
+  Future<DebtsDataModel> getTotalDebts() async {
+    final response = await networkService.get<Map<String, dynamic>>(
+      path: ApiEndpoints.debtsSummary,
+    );
+
+    if (response.statusCode == 200) {
+      final debtsModel = DebtsModel.fromJson(response.data!);
+      return debtsModel.data!;
+    } else {
+      throw Exception('Failed to get total debts');
     }
   }
 }

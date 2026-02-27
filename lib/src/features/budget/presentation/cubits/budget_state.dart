@@ -1,5 +1,6 @@
 import '../../domain/entity/budget_data.dart';
 import '../../domain/entity/budget_summary.dart';
+import '../../domain/entity/debts_summary.dart';
 
 abstract class BudgetState {}
 
@@ -27,4 +28,16 @@ class BudgetSummaryErrorState extends BudgetState {
 class BudgetErrorState extends BudgetState {
   final String exception;
   BudgetErrorState(this.exception);
+}
+
+class DebtsSummaryLoadingState extends BudgetState {}
+
+class DebtsSummaryLoadedState extends BudgetState {
+  final DebtsSummary debtsSummary;
+  DebtsSummaryLoadedState(this.debtsSummary);
+}
+
+class DebtsSummaryErrorState extends BudgetState {
+  final String exception;
+  DebtsSummaryErrorState(this.exception);
 }

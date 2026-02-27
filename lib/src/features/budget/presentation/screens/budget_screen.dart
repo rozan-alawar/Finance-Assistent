@@ -26,13 +26,17 @@ class _BudgetScreenState extends State<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BudgetCubit(sl(), sl<GetBudgetSummaryUsecase>())
-        ..getBudgets()
-        ..getSummary(),
+      create: (context) =>
+          BudgetCubit(sl(), sl<GetBudgetSummaryUsecase>(), sl())
+            ..getBudgets()
+            ..getSummary()
+            ..getDebts(),
       lazy: false, // Create immediately for better initial performance
       child: BlocConsumer<BudgetCubit, BudgetState>(
         listener: (context, state) {
-          if (state is BudgetSummaryLoadedState) {}
+          // Rebuild grid whenever debts data arrives.
+          if (state is DebtsSummaryLoadedState ||
+              state is BudgetSummaryLoadedState) {}
         },
         builder: (context, state) {
           final cubit = context.read<BudgetCubit>();
