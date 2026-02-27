@@ -13,7 +13,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   final ExpenseLocalDataSource localDataSource;
 
   /// Set to true to use SharedPreferences, false for real API
-  static const bool _useLocalStorage = true;
+  static const bool _useLocalStorage = false;
 
   ExpenseRepositoryImpl({
     required this.remoteDataSource,
@@ -150,11 +150,21 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   @override
   Future<ExpenseEntity> updateExpense(ExpenseEntity expense) async {
     final model = ExpenseModel.fromEntity(expense);
-    return await localDataSource.updateExpense(model);
+    if (_useLocalStorage) {
+      return await localDataSource.updateExpense(model);
+    }
+    final updated = await remoteDataSource.updateExpense(expense.id, model);
+    await localDataSource.updateExpense(updated);
+    return updated;
   }
 
   @override
   Future<void> deleteExpense(String id) async {
+    if (_useLocalStorage) {
+      await localDataSource.deleteExpense(id);
+      return;
+    }
+    await remoteDataSource.deleteExpense(id);
     await localDataSource.deleteExpense(id);
   }
 

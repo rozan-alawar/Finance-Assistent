@@ -9,7 +9,7 @@ class BillRepositoryImpl implements BillRepository {
   final BillLocalDataSource localDataSource;
 
   /// Set to true to use SharedPreferences, false for real API
-  static const bool _useLocalStorage = true;
+  static const bool _useLocalStorage = false;
 
   BillRepositoryImpl({
     required this.remoteDataSource,

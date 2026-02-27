@@ -48,6 +48,14 @@ abstract class ExpenseRemoteDataSource {
   /// POST /api/v1/expenses
   Future<ExpenseModel> createExpense(ExpenseModel expense);
 
+  /// Update an existing expense
+  /// PUT /api/v1/expenses/{id}
+  Future<ExpenseModel> updateExpense(String id, ExpenseModel expense);
+
+  /// Delete an expense
+  /// DELETE /api/v1/expenses/{id}
+  Future<void> deleteExpense(String id);
+
   /// Get all categories
   /// GET /api/v1/categories
   Future<CategoriesResponse> getCategories();
@@ -215,6 +223,36 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
 
       // Fallback: return the original expense with generated id
       return expense;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<ExpenseModel> updateExpense(String id, ExpenseModel expense) async {
+    try {
+      final response = await dio.put(
+        '${ApiEndpoints.expenses}/$id',
+        data: expense.toJson(),
+      );
+
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        if (data.containsKey('data') && data['data'] is Map<String, dynamic>) {
+          return ExpenseModel.fromJson(data['data'] as Map<String, dynamic>);
+        }
+        return ExpenseModel.fromJson(data);
+      }
+      return expense;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<void> deleteExpense(String id) async {
+    try {
+      await dio.delete('${ApiEndpoints.expenses}/$id');
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
