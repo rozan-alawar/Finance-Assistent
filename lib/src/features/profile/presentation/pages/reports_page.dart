@@ -5,14 +5,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
-import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'dart:math';
 
 import '../components/reports_search_bar.dart';
 
 class ReportsPage extends StatefulWidget {
-  const ReportsPage({Key? key}) : super(key: key);
+  const ReportsPage({super.key});
 
   @override
   State<ReportsPage> createState() => _ReportsPageState();

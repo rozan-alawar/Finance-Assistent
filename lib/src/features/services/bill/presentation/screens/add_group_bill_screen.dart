@@ -803,7 +803,7 @@ class _AddGroupBillContentState extends State<_AddGroupBillContent> {
             value: state.reminderEnabled,
             onChanged: (value) =>
                 context.read<AddGroupBillCubit>().toggleReminder(value),
-            activeColor: ColorPalette.primary,
+            activeThumbColor: ColorPalette.primary,
           ),
         ],
       ),

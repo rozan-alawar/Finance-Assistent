@@ -267,7 +267,7 @@ class _ParticipantAvatars extends StatelessWidget {
                       ? Image.network(
                           participant.avatarUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => _InitialsAvatar(
+                          errorBuilder: (_, _, _) => _InitialsAvatar(
                             initials: participant.initials,
                           ),
                         )

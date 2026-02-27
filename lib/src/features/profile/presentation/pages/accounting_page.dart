@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; 
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
-import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
 import 'package:finance_assistent/src/features/profile/presentation/pages/profile_page.dart';
 
 class AccountingPage extends StatefulWidget {
-  const AccountingPage({Key? key}) : super(key: key);
+  const AccountingPage({super.key});
   @override
   State<AccountingPage> createState() => _AccountingPageState();
 }
@@ -209,7 +206,7 @@ class _AccountingPageState extends State<AccountingPage> {
                 child: Switch(
                   value: switchValue,
                   onChanged: onSwitchChanged,
-                  activeColor: Colors.white,
+                  activeThumbColor: Colors.white,
                   activeTrackColor: const Color(0xFF3F51B5),
                 ),
               )

@@ -1,9 +1,14 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/di/dependency_injection.dart' as di;
 import '../../../../core/services/local_storage/hive_service.dart';
-import '../../domain/user_app_model.dart';
+import '../../../../core/services/push/fcm_token_service.dart';
+import '../../../../core/services/social/google_sign_in_service.dart';
+import '../../../home/data/repo/push_token_manager.dart';
 import '../../data/repo/auth_repository.dart';
+import '../../domain/user_app_model.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -57,6 +62,15 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       await _saveSession(result.token.token, result.user);
+      try {
+        final t = await di.sl<FcmTokenService>().getToken();
+        if (t != null && t.isNotEmpty) {
+          await registerPushToken(t);
+          di.sl<FcmTokenService>().onTokenRefresh((newToken) {
+            registerPushToken(newToken);
+          });
+        }
+      } catch (_) {}
 
       emit(AuthSuccess(user: result.user));
     } catch (e) {
@@ -72,6 +86,15 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
       );
       await _saveSession(result.token.token, result.user);
+      try {
+        final t = await di.sl<FcmTokenService>().getToken();
+        if (t != null && t.isNotEmpty) {
+          await registerPushToken(t);
+          di.sl<FcmTokenService>().onTokenRefresh((newToken) {
+            registerPushToken(newToken);
+          });
+        }
+      } catch (_) {}
       emit(AuthSuccess(user: result.user));
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -95,6 +118,15 @@ class AuthCubit extends Cubit<AuthState> {
         authorizationCode: authorizationCode,
       );
       await _saveSession(result.token.token, result.user);
+      try {
+        final t = await di.sl<FcmTokenService>().getToken();
+        if (t != null && t.isNotEmpty) {
+          await registerPushToken(t);
+          di.sl<FcmTokenService>().onTokenRefresh((newToken) {
+            registerPushToken(newToken);
+          });
+        }
+      } catch (_) {}
       emit(AuthSuccess(user: result.user));
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -109,7 +141,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await _authRepository.sendOtp(email: email);
-      _resetEmail = email; 
+      _resetEmail = email;
       emit(OtpSent());
     } catch (e) {
       emit(AuthFailure(e.toString()));
@@ -170,6 +202,11 @@ class AuthCubit extends Cubit<AuthState> {
       defaultValue: false,
     );
 
+    try {
+      await di.sl<GoogleSignInService>().signOut();
+    } catch (_) {}
+
+    await removePushToken();
     await HiveService.delete(HiveService.settingsBoxName, 'token');
     await HiveService.clearBox(HiveService.settingsBoxName);
     await HiveService.clearBox(HiveService.guestBoxName);
@@ -181,7 +218,27 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthInitial());
   }
 
+  Future<void> registerPushToken(String token) async {
+    try {
+      await di.sl<PushTokenManager>().register(token);
+      await HiveService.put(HiveService.settingsBoxName, 'fcm_token', token);
+    } catch (e) {
+      emit(AuthFailure(e.toString()));
+    }
+  }
 
+  Future<void> removePushToken() async {
+    final token = HiveService.get(
+      HiveService.settingsBoxName,
+      'fcm_token',
+      defaultValue: '',
+    );
+    if (token is String && token.isNotEmpty) {
+      try {
+        await di.sl<PushTokenManager>().remove(token);
+      } catch (_) {}
+    }
+  }
 
   Future<void> _saveSession(String token, UserApp user) async {
     await HiveService.put(HiveService.settingsBoxName, 'token', token);

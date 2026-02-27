@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/app_color/extensions_color.dart';
 import '../../../../core/config/theme/styles/styles.dart';
-import '../../../../core/gen/app_assets.dart';
 import '../../../../core/utils/const/sizes.dart';
 import '../../../../core/view/component/base/button.dart';
 import '../../../../core/view/component/base/image.dart';

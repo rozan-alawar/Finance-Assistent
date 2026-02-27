@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
-import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 
 class RateUsPage extends StatefulWidget {
-  const RateUsPage({Key? key}) : super(key: key);
+  const RateUsPage({super.key});
 
   @override
   State<RateUsPage> createState() => _RateUsPageState();

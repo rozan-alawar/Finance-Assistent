@@ -1,27 +1,28 @@
 import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
-import 'package:finance_assistent/src/core/routing/app_route.dart';
-import 'package:flutter/material.dart';
-import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
-import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
-import 'package:finance_assistent/src/core/view/component/base/image.dart';
-import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
-import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:finance_assistent/src/core/di/dependency_injection.dart';
+import 'package:finance_assistent/src/core/gen/app_assets.dart';
+import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
+import 'package:finance_assistent/src/core/utils/const/sizes.dart';
+import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
+import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
+import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
+import 'package:finance_assistent/src/core/view/component/base/image.dart';
+import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
 import 'package:finance_assistent/src/features/currency/data/repo/currency_repository.dart';
 import 'package:finance_assistent/src/features/currency/domain/currency.dart';
-import 'package:finance_assistent/src/features/profile/data/repo/profile_repository.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/view/component/base/indicator.dart';
 import '../components/logout_dialog.dart';
+import 'change_password_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,6 +36,21 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Currency> _currenciesCache = const [];
   Currency? _selectedCurrencyOverride;
 
+  void _ensureProfileLoaded() {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! AuthSuccess) return;
+
+    final profileCubit = context.read<ProfileCubit>();
+    final seedUser = authState.user;
+    if (seedUser != null) {
+      profileCubit.setSeedUser(seedUser);
+    }
+
+    if (profileCubit.state is ProfileInitial) {
+      profileCubit.loadProfile(showLoading: seedUser == null);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
       _currenciesCache = list;
       return list;
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureProfileLoaded());
   }
 
   Currency? _resolveCurrency(String idOrCode) {
@@ -199,7 +217,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
     final isAuthenticated = authState is AuthSuccess;
-    final seedUser = authState is AuthSuccess ? authState.user : null;
 
     if (!isAuthenticated) {
       return Scaffold(
@@ -219,32 +236,24 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    return BlocProvider(
-      create: (_) =>
-          ProfileCubit(sl<ProfileRepository>(), seedUser: seedUser)
-            ..loadProfile(showLoading: seedUser == null),
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (previous, current) =>
+          previous is! AuthSuccess && current is AuthSuccess,
+      listener: (context, state) => _ensureProfileLoaded(),
       child: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading || state is ProfileInitial) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                title: Text('My profile', style: TextStyles.f20(context).bold),
-                centerTitle: true,
-              ),
+            return SafeScaffold(
               body: const Center(child: LoadingAppIndicator()),
             );
           }
 
           if (state is ProfileFailure) {
-            return Scaffold(
-              backgroundColor: Colors.white,
+            return SafeScaffold(
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                title: Text('My profile', style: TextStyles.f20(context).bold),
+                title: Text('My profile', style: TextStyles.f18(context).bold),
                 centerTitle: true,
               ),
               body: Center(
@@ -273,21 +282,19 @@ class _ProfilePageState extends State<ProfilePage> {
 
           final user = (state as ProfileLoaded).user;
 
-          return Scaffold(
-            backgroundColor: Colors.white,
+          return SafeScaffold(
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: Text('My profile', style: TextStyles.f20(context).bold),
               centerTitle: true,
             ),
-            body: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: Sizes.marginV20),
-                  Center(
+            body: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: SizedBox(height: Sizes.marginV20)),
+
+                SliverToBoxAdapter(
+                  child: Center(
                     child: Column(
                       children: [
                         Stack(
@@ -313,7 +320,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               child: ClipOval(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(15.0),
+                                  padding: const EdgeInsets.all(15),
                                   child: AppAssetsImage(
                                     AppAssets.ASSETS_IMAGES_AVATAR_PNG,
                                     fit: BoxFit.contain,
@@ -359,32 +366,57 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: Sizes.marginV32),
-                  Text(
+                ),
+
+                SliverToBoxAdapter(child: SizedBox(height: Sizes.marginV32)),
+
+                SliverToBoxAdapter(
+                  child: Text(
                     'profile',
                     style: TextStyles.f18(context).bold,
                   ).paddingSymmetric(horizontal: Sizes.paddingH20),
-                  SizedBox(height: Sizes.marginV16),
-                  _buildInfoTile(context, 'Full Name', user.fullName),
-                  _buildInfoTile(context, 'Email Address', user.email),
-                  _buildInfoTile(
-                    context,
-                    'Phone Number',
-                    user.phone?.isNotEmpty == true ? user.phone! : '-',
+                ),
+                SliverToBoxAdapter(child: SizedBox(height: Sizes.marginV16)),
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInfoTile(context, 'Full Name', user.fullName),
+                      _buildInfoTile(context, 'Email Address', user.email),
+                      _buildInfoTile(
+                        context,
+                        'Phone Number',
+                        user.phone?.isNotEmpty == true ? user.phone! : '-',
+                      ),
+                    ],
                   ),
-                  SizedBox(height: Sizes.marginV24),
-                  Text(
+                ),
+
+                SliverToBoxAdapter(child: SizedBox(height: Sizes.marginV24)),
+
+                SliverToBoxAdapter(
+                  child: Text(
                     'Security',
                     style: TextStyles.f18(context).bold,
                   ).paddingSymmetric(horizontal: Sizes.paddingH20),
-                  SizedBox(height: Sizes.marginV12),
-                  Column(
+                ),
+                SliverToBoxAdapter(child: SizedBox(height: Sizes.marginV12)),
+
+                SliverToBoxAdapter(
+                  child: Column(
                     children: [
                       _buildSecurityItem(
                         context,
                         svgIcon: AppAssets.ASSETS_ICONS_LOCK_SVG,
                         title: 'Change Password',
                         subtitle: 'Last Change 3 months ago',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ChangePasswordPage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildSecurityItem(
                         context,
@@ -413,33 +445,27 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.grey,
                           size: 28,
                         ),
-                        onTap: () {
-                          _pickCurrency(context, user.defaultCurrency);
-                        },
+                        onTap: () =>
+                            _pickCurrency(context, user.defaultCurrency),
                       ),
                       _buildSecurityItem(
                         context,
                         svgIcon: AppAssets.ASSETS_ICONS_REPORTS_SVG,
                         title: 'Reports',
-                        onTap: () {
-                          context.push(const ReportsRoute().location);
-                        },
+                        onTap: () =>
+                            context.push(const ReportsRoute().location),
                       ),
                       _buildSecurityItem(
                         context,
                         iconData: Icons.card_giftcard,
                         title: 'Rewards',
-                        onTap: () {
-                          context.push(RewardsRoute().location);
-                        },
+                        onTap: () => context.push(RewardsRoute().location),
                       ),
                       _buildSecurityItem(
                         context,
                         iconData: Icons.star,
                         title: 'Rate App',
-                        onTap: () {
-                          context.push(RateAppRoute().location);
-                        },
+                        onTap: () => context.push(RateAppRoute().location),
                       ),
                       _buildSecurityItem(
                         context,
@@ -447,15 +473,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         isLogout: true,
                         svgIcon: AppAssets.ASSETS_ICONS_LOGOUT_SVG,
                         title: 'Logout',
-                        onTap: () {
-                          _confirmLogout();
-                        },
+                        onTap: _confirmLogout,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
+                ),
+
+                SliverToBoxAdapter(child: SizedBox(height: 20)),
+              ],
             ),
           );
         },
@@ -475,7 +500,7 @@ class _ProfilePageState extends State<ProfilePage> {
             value,
             style: const TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               color: Colors.black87,
             ),
           ),

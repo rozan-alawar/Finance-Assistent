@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
-import 'package:fpdart/fpdart.dart';
 
 import '../api_config.dart';
 

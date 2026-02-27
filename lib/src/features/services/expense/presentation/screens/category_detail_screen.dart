@@ -95,7 +95,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _activeCategories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final category = _activeCategories[index];
           final isSelected = category == _selectedCategory;
@@ -227,7 +227,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: expenses.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         return _ExpenseDetailItem(
           expense: expenses[index],
