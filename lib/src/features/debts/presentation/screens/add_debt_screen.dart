@@ -1,16 +1,16 @@
-import 'package:finance_assistent/src/features/debts/data/model/debt_model.dart';
-import 'package:finance_assistent/src/features/debts/presentation/cubit/debt_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../core/config/theme/styles/styles.dart';
+import 'package:finance_assistent/src/features/debts/data/model/debt_model.dart';
+import 'package:finance_assistent/src/features/debts/presentation/cubit/debt_cubit.dart';
 import '../../../../core/utils/const/sizes.dart';
-import '../../../../core/utils/extensions/text_ex.dart';
 import '../../../../core/utils/extensions/widget_ex.dart';
-import '../../../../core/view/component/base/app_text_field.dart';
+import '../../../../core/utils/extensions/text_ex.dart';
+import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/view/component/base/button.dart';
 import '../../../../core/view/component/base/custom_app_bar.dart';
+import '../../../../core/view/component/base/app_text_field.dart';
+
 
 class AddDebtScreen extends StatefulWidget {
   const AddDebtScreen({super.key});
@@ -62,11 +62,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     hint: "Personal Name",
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: SvgPicture.asset(
-                        "assets/icons/user.svg",
-                        width: 16,
-                        height: 16,
-                      ),
+                      child: SvgPicture.asset("assets/icons/user.svg", width: 16, height: 16),
                     ),
                   ),
                   SizedBox(height: Sizes.marginV16),
@@ -77,11 +73,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     textFieldType: TextFieldType.other,
                     keyboardType: TextInputType.number,
                     hint: "0.00",
-                    prefixIcon: const Icon(
-                      Icons.attach_money,
-                      color: Colors.grey,
-                      size: 16,
-                    ),
+                    prefixIcon: const Icon(Icons.attach_money, color: Colors.grey, size: 16),
                   ),
                   SizedBox(height: Sizes.marginV16),
                   Text("Due date", style: TextStyles.f14(context).medium),
@@ -92,26 +84,14 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
                     hint: "yyyy-mm-dd",
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Image.asset(
-                        "assets/images/date.png",
-                        width: 16,
-                        height: 16,
-                      ),
+                      child: Image.asset("assets/images/date.png", width: 16, height: 16),
                     ),
                   ),
                   SizedBox(height: Sizes.marginV16),
                   Row(
                     children: [
-                      Text(
-                        "Description ",
-                        style: TextStyles.f14(context).medium,
-                      ),
-                      Text(
-                        "(Optional)",
-                        style: TextStyles.f14(
-                          context,
-                        ).normal.colorWith(Colors.grey.shade400),
-                      ),
+                      Text("Description ", style: TextStyles.f14(context).medium),
+                      Text("(Optional)", style: TextStyles.f14(context).normal.colorWith(Colors.grey.shade400)),
                     ],
                   ),
                   SizedBox(height: Sizes.marginV8),
@@ -130,51 +110,33 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
           ),
           AppButton(
             type: AppButtonType.primary,
-            onPressed: isSaving
-                ? null
-                : () async {
-                    setState(() => isSaving = true);
-                    final debt = DebtModel(
-                      id: "",
-                      name: nameController.text,
-                      amount: amountController.text,
-                      date: dateController.text,
-                      status: "UNPAID",
-                      description: descController.text,
-                    );
+            onPressed: isSaving ? null : () async {
+              setState(() => isSaving = true);
+              final debt = DebtModel(
+                id: "",
+                name: nameController.text,
+                amount: amountController.text,
+                date: dateController.text,
+                status: "UNPAID",
+                description: descController.text,
+              );
 
-                    final success = await context.read<DebtCubit>().addDebt(
-                      debt,
-                    );
+              final success = await context.read<DebtCubit>().addDebt(debt);
 
-                    if (mounted) {
-                      setState(() => isSaving = false);
-                      if (success) {
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Error: Check fields or Token"),
-                          ),
-                        );
-                      }
-                    }
-                  },
-            child: isSaving
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(
-                    "Save Debt",
-                    style: TextStyles.f14(
-                      context,
-                    ).medium.colorWith(Colors.white),
-                  ),
+              if (mounted) {
+                setState(() => isSaving = false);
+                if (success) {
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Error: Check fields or Token")),
+                  );
+                }
+              }
+            },
+            child: isSaving 
+              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+              : Text("Save Debt", style: TextStyles.f14(context).medium.colorWith(Colors.white)),
           ).paddingAll(Sizes.screenPaddingH16),
         ],
       ),
@@ -197,9 +159,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              isReminderEnabled
-                  ? Icons.notifications_active
-                  : Icons.notifications_none,
+              isReminderEnabled ? Icons.notifications_active : Icons.notifications_none,
               color: const Color(0xFF3F51B5),
               size: 24,
             ),
@@ -219,7 +179,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
           ),
           Switch(
             value: isReminderEnabled,
-            activeThumbColor: Colors.white,
+            activeColor: Colors.white,
             activeTrackColor: const Color(0xFF3F51B5),
             onChanged: (value) {
               setState(() {

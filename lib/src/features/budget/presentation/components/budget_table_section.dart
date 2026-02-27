@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entity/budget_data.dart';
+import '../cubits/budget_cubit.dart';
+import '../cubits/budget_state.dart';
 import '../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import 'budget_card.dart';
@@ -66,30 +70,57 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
           AnimatedSize(
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeInOut,
-            child: _buildTabContent(),
+            child: BlocBuilder<BudgetCubit, BudgetState>(
+              builder: (context, state) {
+                if (state is BudgetLoadingState) {
+                  return const Padding(
+                    padding: EdgeInsets.all(50.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else if (state is BudgetErrorState) {
+                  return Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Center(child: Text(state.exception)),
+                  );
+                } else if (state is BudgetLoadedState) {
+                  return _buildTabContent(state.budgets);
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTabContent() {
+  Widget _buildTabContent(List<BudgetData> allBudgets) {
+    List<BudgetData> filtered = [];
     switch (_tabController.index) {
       case 0:
-        return _budgetList(count: 2);
+        filtered = allBudgets;
+        break;
       case 1:
-        return _budgetList(count: 1);
+        filtered = allBudgets
+            .where((b) => b.status?.toLowerCase() == 'paid')
+            .toList();
+        break;
       case 2:
-        return _budgetList(count: 3);
+        filtered = allBudgets
+            .where((b) => b.status?.toLowerCase() == 'unpaid')
+            .toList();
+        break;
       case 3:
-        return _budgetList(count: 0);
-      default:
-        return const SizedBox.shrink();
+        filtered = allBudgets
+            .where((b) => b.status?.toLowerCase() == 'overdue')
+            .toList();
+        break;
     }
+    return _budgetList(filtered);
   }
 
-  Widget _budgetList({required int count}) {
-    if (count == 0) {
+  Widget _budgetList(List<BudgetData> budgets) {
+    if (budgets.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(100),
         child: Center(child: Text('No budgets found here.')),
@@ -99,17 +130,20 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: count,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
-      itemBuilder: (context, index) => RepaintBoundary(
-        child: const BudgetCard(
-          username: 'Zena',
-          dueDate: 'Dec 25, 2026',
-          category: 'Shopping',
-          amount: 250.0,
-          status: 'Paid',
-        ),
-      ),
+      itemCount: budgets.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final budget = budgets[index];
+        return RepaintBoundary(
+          child: BudgetCard(
+            username: budget.category ?? 'Unknown',
+            dueDate: budget.endDate ?? 'Unknown',
+            category: budget.category ?? 'Unknown',
+            amount: double.tryParse(budget.allocatedAmount ?? '0') ?? 0.0,
+            status: budget.status ?? 'Unknown',
+          ),
+        );
+      },
     );
   }
 }

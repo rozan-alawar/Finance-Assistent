@@ -10,6 +10,10 @@ import '../components/chat_bubble.dart';
 import '../components/send_message_box.dart';
 import '../cubits/ask_ai_cubit.dart';
 import '../cubits/ask_ai_state.dart';
+import '../../../../core/di/dependency_injection.dart';
+import '../../../income/presentation/components/income_breakdown_section.dart';
+import '../../../income/data/model/income_breakdown_model.dart';
+import '../../domain/entities/chart_data.dart';
 
 class AskAiScreen extends StatelessWidget {
   const AskAiScreen({super.key});
@@ -17,7 +21,7 @@ class AskAiScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AskAiCubit(),
+      create: (context) => AskAiCubit(sl(), sl()),
       child: BlocConsumer<AskAiCubit, AskAiState>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -72,7 +76,46 @@ class AskAiScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: message.isUser
                       ? ChatBubble(size: Size.zero, message: message.message)
-                      : ChatBubbleAi(size: Size.zero, message: message.message),
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ChatBubbleAi(
+                              size: Size.zero,
+                              message: message.message,
+                            ),
+                            if (message.chartDataList != null &&
+                                message.chartDataList!.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 24,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF7F7F7),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  clipBehavior: Clip.none,
+                                  child: IncomeBreakdownSection(
+                                    title: 'Suggested Budget 🤖',
+                                    breakdownData: _convertToIncomeBreakdown(
+                                      message.chartDataList!,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                 );
               },
             ),
@@ -82,13 +125,7 @@ class AskAiScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: LoadingAppIndicator(
-
-                    ),
-                  ),
+                  SizedBox(width: 20, height: 20, child: LoadingAppIndicator()),
                   const SizedBox(width: 8),
                   Text(
                     'AI is typing...',
@@ -161,6 +198,30 @@ class AskAiScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<IncomeBreakdown> _convertToIncomeBreakdown(
+    List<ChartData> chartDataList,
+  ) {
+    const colors = [
+      ColorPalette.primary,
+      Color(0xFFFF9BA1),
+      Color(0xFFFBEAEB),
+      Color.fromARGB(255, 252, 225, 113),
+      ColorPalette.magenta30,
+      Color.fromARGB(255, 250, 115, 120),
+    ];
+
+    return chartDataList.asMap().entries.map((entry) {
+      final index = entry.key;
+      final data = entry.value;
+      return IncomeBreakdown(
+        category: data.category ?? 'Unknown',
+        amount: (data.amount ?? 0).toDouble(),
+        percentage: (data.percentage ?? 0).toDouble(),
+        color: colors[index % colors.length],
+      );
+    }).toList();
   }
 }
 

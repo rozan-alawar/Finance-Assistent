@@ -30,12 +30,12 @@ class DebtModel {
     return {
       "personalName": name,
       "direction": "I_OWE",
-      "amount": amount,
+      "amount": amount, 
       "dueDate": date,
       "description": description.isEmpty ? "No description" : description,
       "reminderEnabled": false,
       "remindAt": null,
-      "assetId": null,
+      "assetId": null 
     };
   }
 }

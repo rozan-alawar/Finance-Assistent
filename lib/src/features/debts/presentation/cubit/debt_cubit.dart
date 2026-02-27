@@ -15,12 +15,7 @@ class DebtLoaded extends DebtState {
   final Map<String, dynamic> summary;
   final String searchQuery;
 
-  DebtLoaded(
-    this.debts,
-    this.selectedFilter,
-    this.summary, {
-    this.searchQuery = "",
-  });
+  DebtLoaded(this.debts, this.selectedFilter, this.summary, {this.searchQuery = ""});
 }
 
 class DebtDetailLoaded extends DebtState {
@@ -37,8 +32,7 @@ class DebtCubit extends Cubit<DebtState> {
   DebtCubit() : super(DebtInitial());
 
   final String _baseUrl = "https://gsg-project-group-5.vercel.app/api/v1/debts";
-  final String _token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJlN2VlOS1kNzVkLTQ4ZjItYWNkYS1kMGI0NjJiYjc0MzUiLCJyb2xlIjoiVVNFUiIsImVtYWlsIjoibW9hbWVuQGV4YW1wbGUuY29tIiwiZnVsbE5hbWUiOiJNb2FtZW4gQWwtWWF6b3VyaSIsInByb3ZpZGVyIjoiTE9DQUwiLCJzdGF0dXMiOiJBQ1RJVkUiLCJpYXQiOjE3NzE3MDE3NTB9.8qNAs0nG18m9SEVDKH_ky3E77MWoMYkxv9AymONK93Y";
+  final String _token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJlN2VlOS1kNzVkLTQ4ZjItYWNkYS1kMGI0NjJiYjc0MzUiLCJyb2xlIjoiVVNFUiIsImVtYWlsIjoibW9hbWVuQGV4YW1wbGUuY29tIiwiZnVsbE5hbWUiOiJNb2FtZW4gQWwtWWF6b3VyaSIsInByb3ZpZGVyIjoiTE9DQUwiLCJzdGF0dXMiOiJBQ1RJVkUiLCJpYXQiOjE3NzE3MDE3NTB9.8qNAs0nG18m9SEVDKH_ky3E77MWoMYkxv9AymONK93Y";
 
   List<DebtModel> _allDebts = [];
   Map<String, dynamic> _summaryData = {
@@ -62,7 +56,7 @@ class DebtCubit extends Cubit<DebtState> {
         final Map<String, dynamic> data = jsonDecode(response.body);
         final List<dynamic> list = data['data'];
         _allDebts = list.map((e) => DebtModel.fromJson(e)).toList();
-
+        
         _calculateSummary(_allDebts);
         _applyFilters(filter, query);
       } else {
@@ -75,28 +69,21 @@ class DebtCubit extends Cubit<DebtState> {
 
   void _applyFilters(String filter, String query) {
     List<DebtModel> filteredList = _allDebts;
-
+    
     if (filter != "All") {
       String normalizedFilter = filter.replaceAll(" ", "").toUpperCase();
-      filteredList = filteredList
-          .where(
-            (d) =>
-                d.status.toUpperCase().replaceAll(" ", "") == normalizedFilter,
-          )
-          .toList();
+      filteredList = filteredList.where((d) => 
+        d.status.toUpperCase().replaceAll(" ", "") == normalizedFilter
+      ).toList();
     }
-
+    
     if (query.isNotEmpty) {
-      filteredList = filteredList
-          .where(
-            (d) =>
-                d.name.toLowerCase().contains(query.toLowerCase()) ||
-                (d.description.toLowerCase().contains(query.toLowerCase()) ??
-                    false),
-          )
-          .toList();
+      filteredList = filteredList.where((d) => 
+        d.name.toLowerCase().contains(query.toLowerCase()) || 
+        (d.description?.toLowerCase().contains(query.toLowerCase()) ?? false)
+      ).toList();
     }
-
+    
     emit(DebtLoaded(filteredList, filter, _summaryData, searchQuery: query));
   }
 
@@ -109,9 +96,9 @@ class DebtCubit extends Cubit<DebtState> {
     for (var debt in debts) {
       double amountValue = double.tryParse(debt.amount.toString()) ?? 0;
       total += amountValue;
-
+      
       String status = debt.status.toUpperCase().replaceAll(" ", "");
-
+      
       if (status == "PAID") {
         paid += amountValue;
       } else if (status == "OVERDUE") {

@@ -1,11 +1,10 @@
-import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
+import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart'; 
 import 'package:finance_assistent/src/features/debts/data/model/debt_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/utils/const/sizes.dart';
 import '../../../../core/utils/extensions/text_ex.dart';
+import '../../../../core/config/theme/styles/styles.dart';
 
 class DebtListItem extends StatelessWidget {
   final DebtModel model;
@@ -13,9 +12,9 @@ class DebtListItem extends StatelessWidget {
   final VoidCallback onEdit;
 
   const DebtListItem({
-    required this.model,
-    required this.onDelete,
-    required this.onEdit,
+    required this.model, 
+    required this.onDelete, 
+    required this.onEdit, 
     super.key,
   });
 
@@ -59,9 +58,7 @@ class DebtListItem extends StatelessWidget {
                 ),
                 child: Text(
                   initials,
-                  style: TextStyles.f14(
-                    context,
-                  ).semiBold.colorWith(statusColor),
+                  style: TextStyles.f14(context).semiBold.colorWith(statusColor),
                 ),
               ),
               const SizedBox(width: Sizes.marginH12),
@@ -103,22 +100,19 @@ class DebtListItem extends StatelessWidget {
             children: [
               Text("\$${model.amount}", style: TextStyles.f16(context).bold),
               Container(
-                constraints: const BoxConstraints(minWidth: 70),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                constraints: const BoxConstraints(minWidth: 70), 
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(Sizes.radius20),
                   border: Border.all(
-                    color: statusColor.withValues(alpha: 0.3),
+                    color: statusColor.withValues(alpha: 0.3), 
                     width: 1,
                   ),
                 ),
                 child: Text(
-                  model.status,
+                  model.status, 
                   style: TextStyles.f14(context).bold.colorWith(statusColor),
                 ),
               ),

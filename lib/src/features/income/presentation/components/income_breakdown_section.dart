@@ -5,8 +5,13 @@ import 'package:finance_assistent/src/features/income/data/model/income_breakdow
 
 class IncomeBreakdownSection extends StatelessWidget {
   final List<IncomeBreakdown> breakdownData;
+  final String title;
 
-  const IncomeBreakdownSection({super.key, required this.breakdownData});
+  const IncomeBreakdownSection({
+    super.key,
+    required this.breakdownData,
+    this.title = 'Income Breakdown',
+  });
 
   String _formatNumber(double number) {
     final formatter = NumberFormat('#,###');
@@ -21,8 +26,8 @@ class IncomeBreakdownSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Income Breakdown",
+        Text(
+          title,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

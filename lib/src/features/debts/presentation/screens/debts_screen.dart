@@ -42,9 +42,9 @@ class DebtsScreen extends StatelessWidget {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () => context.read<DebtCubit>().fetchDebts(
-                        filter: state.selectedFilter,
-                        query: state.searchQuery,
-                      ),
+                            filter: state.selectedFilter,
+                            query: state.searchQuery,
+                          ),
                       child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
@@ -52,16 +52,13 @@ class DebtsScreen extends StatelessWidget {
                           children: [
                             const SizedBox(height: Sizes.marginV12),
                             TextField(
-                              onChanged: (value) =>
-                                  context.read<DebtCubit>().fetchDebts(
+                              onChanged: (value) => context.read<DebtCubit>().fetchDebts(
                                     filter: state.selectedFilter,
                                     query: value,
                                   ),
                               decoration: InputDecoration(
                                 hintText: 'Search for Invoices',
-                                hintStyle: TextStyles.f14(
-                                  context,
-                                ).colorWith(Colors.grey),
+                                hintStyle: TextStyles.f14(context).colorWith(Colors.grey),
                                 filled: true,
                                 fillColor: ColorPalette.fillGrey,
                                 contentPadding: const EdgeInsets.symmetric(
@@ -77,30 +74,19 @@ class DebtsScreen extends StatelessWidget {
                                   borderSide: BorderSide.none,
                                 ),
                                 prefixIcon: Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 16,
-                                    right: 8,
-                                  ),
-                                  child: AppAssetsSvg(
-                                    AppAssets.ASSETS_ICONS_SEARCH_SVG,
-                                  ),
+                                  padding: const EdgeInsets.only(left: 16, right: 8),
+                                  child: AppAssetsSvg(AppAssets.ASSETS_ICONS_SEARCH_SVG),
                                 ),
-                                prefixIconConstraints: const BoxConstraints(
-                                  minWidth: 40,
-                                ),
+                                prefixIconConstraints: const BoxConstraints(minWidth: 40),
                               ),
-                            ).paddingSymmetric(
-                              horizontal: Sizes.screenPaddingH16,
-                            ),
+                            ).paddingSymmetric(horizontal: Sizes.screenPaddingH16),
                             const SizedBox(height: Sizes.marginV20),
                             _buildSummaryGrid(context, state.summary),
                             const SizedBox(height: Sizes.marginV24),
                             Text(
                               "Recent Debts",
                               style: TextStyles.f16(context).bold,
-                            ).paddingSymmetric(
-                              horizontal: Sizes.screenPaddingH16,
-                            ),
+                            ).paddingSymmetric(horizontal: Sizes.screenPaddingH16),
                             const SizedBox(height: Sizes.marginV12),
                             _buildFilterRow(
                               context,
@@ -117,8 +103,7 @@ class DebtsScreen extends StatelessWidget {
                                   ).paddingOnly(top: 40)
                                 : ListView.builder(
                                     shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
+                                    physics: const NeverScrollableScrollPhysics(),
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: Sizes.screenPaddingH16,
                                     ),
@@ -129,13 +114,8 @@ class DebtsScreen extends StatelessWidget {
 
                                       return DebtListItem(
                                         model: debt,
-                                        onDelete: () =>
-                                            cubit.deleteDebt(debt.id),
-                                        onEdit: () => _showUpdateStatusDialog(
-                                          context,
-                                          cubit,
-                                          debt,
-                                        ),
+                                        onDelete: () => cubit.deleteDebt(debt.id),
+                                        onEdit: () => _showUpdateStatusDialog(context, cubit, debt),
                                       );
                                     },
                                   ),
@@ -177,11 +157,7 @@ class DebtsScreen extends StatelessWidget {
     );
   }
 
-  void _showUpdateStatusDialog(
-    BuildContext context,
-    DebtCubit cubit,
-    dynamic debt,
-  ) {
+  void _showUpdateStatusDialog(BuildContext context, DebtCubit cubit, dynamic debt) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -241,11 +217,7 @@ class DebtsScreen extends StatelessWidget {
     ).paddingSymmetric(horizontal: Sizes.screenPaddingH16);
   }
 
-  Widget _buildFilterRow(
-    BuildContext context,
-    String selectedFilter,
-    String currentQuery,
-  ) {
+  Widget _buildFilterRow(BuildContext context, String selectedFilter, String currentQuery) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -253,9 +225,9 @@ class DebtsScreen extends StatelessWidget {
           bool isSelected = label == selectedFilter;
           return GestureDetector(
             onTap: () => context.read<DebtCubit>().fetchDebts(
-              filter: label,
-              query: currentQuery,
-            ),
+                  filter: label,
+                  query: currentQuery,
+                ),
             child: _buildFilterWidget(context, label, isSelected: isSelected),
           );
         }).toList(),
@@ -263,11 +235,7 @@ class DebtsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterWidget(
-    BuildContext context,
-    String label, {
-    bool isSelected = false,
-  }) {
+  Widget _buildFilterWidget(BuildContext context, String label, {bool isSelected = false}) {
     final switcher = appSwitcherColors(context);
     final common = appCommonUIColors(context);
     return Container(
@@ -282,9 +250,9 @@ class DebtsScreen extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyles.f12(
-          context,
-        ).semiBold.colorWith(isSelected ? Colors.white : Colors.grey.shade600),
+        style: TextStyles.f12(context).semiBold.colorWith(
+              isSelected ? Colors.white : Colors.grey.shade600,
+            ),
       ),
     );
   }
