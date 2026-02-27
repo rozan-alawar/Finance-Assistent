@@ -15,7 +15,6 @@ class ReportsError extends ReportsState {
   ReportsError(this.message);
 }
 
-// 2. الكيوبت (Cubit)
 class ReportsCubit extends Cubit<ReportsState> {
   final ReportsRemoteDataSource dataSource;
 
