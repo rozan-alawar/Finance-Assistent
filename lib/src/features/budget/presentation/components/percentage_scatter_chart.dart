@@ -11,8 +11,8 @@ class PercentageScatterChart extends StatelessWidget {
 
   const PercentageScatterChart({super.key, required this.data});
 
-  static const minRadius = 10.0;
-  static const maxRadius = 100.0;
+  static const minRadius = 15.0;
+  static const maxRadius = 75.0;
 
   List<Offset> get generatedPositions => List.generate(data.length, (index) {
     final angle = (index / data.length) * 2 * pi;
