@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart'; 
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
-import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
-import 'package:finance_assistent/src/features/profile/presentation/pages/profile_page.dart';
+import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
+import 'package:finance_assistent/src/core/routing/app_route.dart';
+import 'package:go_router/go_router.dart';
+import '../components/logout_dialog.dart';
 
 class AccountingPage extends StatefulWidget {
   const AccountingPage({Key? key}) : super(key: key);
@@ -15,9 +21,50 @@ class AccountingPage extends StatefulWidget {
 }
 
 class _AccountingPageState extends State<AccountingPage> {
-  bool _isDarkMode = true;
+  bool _isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeMode();
+  }
+
+  // التعديل 3: دالة لجلب حالة الوضع الليلي المحفوظة مسبقاً
+  Future<void> _loadThemeMode() async {
+    final isDark = HiveService.get(
+      HiveService.settingsBoxName,
+      'is_dark_mode',
+      defaultValue: false,
+    ) as bool;
+    setState(() {
+      _isDarkMode = isDark;
+    });
+  }
+
+  // التعديل 2: دالة تسجيل الخروج فعلية
+  Future<void> _confirmLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => LogoutDialog(),
+    );
+
+    if (shouldLogout != true) return;
+    if (!mounted) return;
+    
+    await context.read<AuthCubit>().logout();
+    
+    if (!mounted) return;
+    CustomToast.showSuccessMessage(context, 'Logged out successfully');
+    const LoginRoute().go(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // التعديل 1: جلب بيانات المستخدم الحالي من الـ AuthCubit
+    final authState = context.watch<AuthCubit>().state;
+    final user = authState is AuthSuccess ? authState.user : null;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -69,18 +116,29 @@ class _AccountingPageState extends State<AccountingPage> {
                   ),
                 ),
                 const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Ghydaa Ahmed', style: TextStyles.f18(context).bold),
-                    const SizedBox(height: 4),
-                    Text(
-                      'ghydaaahmed@gmail.com',
-                      style: TextStyles.f12(
-                        context,
-                      ).medium.copyWith(color: Colors.grey),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // عرض اسم المستخدم الحقيقي
+                      Text(
+                        user?.fullName ?? 'Guest User', 
+                        style: TextStyles.f18(context).bold,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      // عرض إيميل المستخدم الحقيقي
+                      Text(
+                        user?.email ?? '',
+                        style: TextStyles.f12(
+                          context,
+                        ).medium.copyWith(color: Colors.grey),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -96,10 +154,9 @@ class _AccountingPageState extends State<AccountingPage> {
               bgColor: const Color(0xFFFCE4EC),
               title: 'profile',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
+                // التعديل 4: استخدام go_router إذا كانت معرفة، أو نبقيها هكذا
+                context.push(const ProfileRoute().location); 
+                // تأكد أن ProfileRoute معرفة لديك في الـ app_routes
               },
             ),
               SizedBox(height: Sizes.marginV18),
@@ -138,10 +195,16 @@ class _AccountingPageState extends State<AccountingPage> {
               title: 'Dark Mode',
               isSwitch: true,
               switchValue: _isDarkMode,
-              onSwitchChanged: (value) {
+              onSwitchChanged: (value) async {
                 setState(() {
                   _isDarkMode = value;
                 });
+                // حفظ حالة الوضع الليلي في الذاكرة المحلية
+                await HiveService.put(
+                  HiveService.settingsBoxName,
+                  'is_dark_mode',
+                  value,
+                );
               },
             ),
 
@@ -152,6 +215,7 @@ class _AccountingPageState extends State<AccountingPage> {
               bgColor: const Color(0xFFFFEBEE),
               title: 'Log Out',
               hasArrow: false,
+              onTap: _confirmLogout, // ربط دالة تسجيل الخروج بالزر
             ),
 
             const SizedBox(height: 30),
@@ -160,6 +224,8 @@ class _AccountingPageState extends State<AccountingPage> {
       ),
     );
   }
+  
+  // دالة _buildSettingItem تبقى كما هي بدون تغيير...
   Widget _buildSettingItem(
     BuildContext context, {
     IconData? icon,

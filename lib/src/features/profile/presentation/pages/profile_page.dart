@@ -19,7 +19,7 @@ import 'package:finance_assistent/src/features/profile/data/repo/profile_reposit
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:finance_assistent/src/features/profile/presentation/pages/accounting_page.dart';
 import '../../../../core/view/component/base/indicator.dart';
 import '../components/logout_dialog.dart';
 
@@ -324,7 +324,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: Container(
+  child: GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AccountingPage(),
+        ),
+      );
+      
+    },
+    child: Container(
                                 padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF3F51B5),
@@ -341,7 +351,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: Colors.white,
                                 ),
                               ),
-                            ),
+                            ),),
                           ],
                         ),
                         SizedBox(height: Sizes.marginV12),
