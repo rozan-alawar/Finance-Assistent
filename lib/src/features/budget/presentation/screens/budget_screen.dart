@@ -13,6 +13,7 @@ import '../components/chart_section.dart';
 import '../../../../core/di/dependency_injection.dart';
 import '../cubits/budget_cubit.dart';
 import '../cubits/budget_state.dart';
+import '../../domain/usecase/get_budget_summary_usecase.dart';
 
 class BudgetScreen extends StatefulWidget {
   const BudgetScreen({super.key});
@@ -25,10 +26,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BudgetCubit(sl())..getBudgets(),
+      create: (context) => BudgetCubit(sl(), sl<GetBudgetSummaryUsecase>())
+        ..getBudgets()
+        ..getSummary(),
       lazy: false, // Create immediately for better initial performance
       child: BlocConsumer<BudgetCubit, BudgetState>(
-        listener: (context, state) => {},
+        listener: (context, state) {
+          if (state is BudgetSummaryLoadedState) {}
+        },
         builder: (context, state) {
           final cubit = context.read<BudgetCubit>();
           final gridItems = cubit.gridItems;

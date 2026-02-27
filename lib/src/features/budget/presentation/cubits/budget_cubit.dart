@@ -3,16 +3,22 @@ import 'package:finance_assistent/src/features/budget/data/models/grid_item_mode
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entity/budget_data.dart';
+import '../../domain/entity/budget_summary.dart';
 import '../../domain/entity/category_chart_date.dart';
+import '../../domain/usecase/get_budget_summary_usecase.dart';
 import '../../domain/usecase/get_budget_usecase.dart';
 import 'budget_state.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
   final GetBudgetUsecase getBudgetUsecase;
+  final GetBudgetSummaryUsecase getBudgetSummaryUsecase;
 
-  BudgetCubit(this.getBudgetUsecase) : super(InitialBudgetState());
+  BudgetCubit(this.getBudgetUsecase, this.getBudgetSummaryUsecase)
+    : super(InitialBudgetState());
 
   List<BudgetData> allBudgets = [];
+
+  BudgetSummary? _summary;
 
   Future<void> getBudgets() async {
     emit(BudgetLoadingState());
@@ -22,6 +28,18 @@ class BudgetCubit extends Cubit<BudgetState> {
       emit(BudgetLoadedState(result));
     } catch (e) {
       emit(BudgetErrorState(e.toString()));
+    }
+  }
+
+  Future<void> getSummary() async {
+    emit(BudgetSummaryLoadingState());
+    try {
+      final result = await getBudgetSummaryUsecase();
+      _summary = result;
+      _cachedGridItems = null;
+      emit(BudgetSummaryLoadedState(result));
+    } catch (e) {
+      emit(BudgetSummaryErrorState(e.toString()));
     }
   }
 
@@ -56,7 +74,6 @@ class BudgetCubit extends Cubit<BudgetState> {
 
     List<CategoryChartData> result = [];
     for (int i = 0; i < sortedCategories.length; i++) {
-      if (i >= 4) break;
       double amount = sortedCategories[i].value;
       int pct = total == 0 ? 0 : ((amount / total) * 100).round();
 
@@ -65,7 +82,6 @@ class BudgetCubit extends Cubit<BudgetState> {
           title: sortedCategories[i].key,
           amount: amount,
           percentage: pct,
-          // Cycle through our pre-defined colors for UI consistency
           color: colors[i % colors.length],
           textColor: colors[i % colors.length],
           bgColor: bgColors[i % bgColors.length],
@@ -80,38 +96,73 @@ class BudgetCubit extends Cubit<BudgetState> {
   final String increaseArrowIcon = AppAssets.ASSETS_ICONS_INCREASE_ARROW_SVG;
   final String decreaseArrowIcon = AppAssets.ASSETS_ICONS_DECREASE_ARROW_SVG;
 
-  // Cache gridItems to avoid recreation on every access
+  double _balanceChangePercent() {
+    final utilisation = _summary?.utilizationPercentage ?? 0;
+    return (utilisation - 50).abs().toDouble();
+  }
+
+  double _expensesChangePercent() {
+    final utilisation = _summary?.utilizationPercentage ?? 0;
+    return utilisation.toDouble();
+  }
+
   List<GridItemModel>? _cachedGridItems;
 
   List<GridItemModel> get gridItems {
-    _cachedGridItems ??= [
+    _cachedGridItems ??= _buildGridItems();
+    return _cachedGridItems!;
+  }
+
+  List<GridItemModel> _buildGridItems() {
+    final totalRemaining = (_summary?.totalRemaining ?? 0).toDouble();
+    final totalSpent = (_summary?.totalSpent ?? 0).toDouble();
+
+    final int utilisation = _summary?.utilizationPercentage ?? 0;
+
+    final bool balanceIsUp = utilisation <= 50;
+    final double balancePct = _balanceChangePercent();
+    final String balanceArrow = balanceIsUp
+        ? increaseArrowIcon
+        : decreaseArrowIcon;
+
+    final bool expensesIsUp = utilisation > 50;
+    final double expensesPct = _expensesChangePercent();
+    final String expensesArrow = expensesIsUp
+        ? increaseArrowIcon
+        : decreaseArrowIcon;
+
+    return [
+      // --- Card 0: Balance  (totalRemaining from /budgets/summary) ---
       GridItemModel(
         title: 'Balance',
-        amount: 10967.0,
-        percentage: 8.2,
+        amount: totalRemaining,
+        percentage: balancePct,
         icon: receiveMoneyIcon,
         iconColor: const Color(0xFFFF7292),
         backgoundColor: const Color(0xFFFDF5F7),
-        arrow: increaseArrowIcon,
+        arrow: balanceArrow,
       ),
+      // --- Card 1: Revenues  (static / handled elsewhere) ---
       GridItemModel(
         title: 'Revenues',
         amount: 1700.0,
-        percentage: -2.5,
+        percentage: 2.5,
         icon: receiveMoneyIcon,
         iconColor: const Color(0xFF6133BD),
         backgoundColor: const Color(0xFFEBE5F7),
-        arrow: decreaseArrowIcon,
+        arrow: increaseArrowIcon,
       ),
+      // --- Card 2: Expenses  (totalSpent from /budgets/summary) ---
       GridItemModel(
         title: 'Expenses',
-        amount: 2558.0,
-        percentage: 2.0,
+        amount: totalSpent,
+        percentage: expensesPct,
         icon: sendModeyIcon,
         iconColor: const Color(0xFF16C087),
         backgoundColor: const Color(0xFFDCFCE7),
-        arrow: increaseArrowIcon,
+        arrow: expensesArrow,
       ),
+      // --- Card 3: Total Debt  (static / handled elsewhere) ---
       GridItemModel(
         title: 'Total Debt',
         amount: 12450,
@@ -122,6 +173,5 @@ class BudgetCubit extends Cubit<BudgetState> {
         arrow: increaseArrowIcon,
       ),
     ];
-    return _cachedGridItems!;
   }
 }

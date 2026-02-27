@@ -14,6 +14,7 @@ import '../../features/budget/data/repo/budget_repository_impl.dart';
 import '../../features/budget/domain/repo/budget_repository.dart';
 import '../../features/budget/domain/usecase/ask_ai_usecase.dart';
 import '../../features/budget/domain/usecase/get_budget_usecase.dart';
+import '../../features/budget/domain/usecase/get_budget_summary_usecase.dart';
 import '../services/network/main_service/network_service.dart';
 
 final sl = GetIt.instance;
@@ -52,6 +53,9 @@ Future<void> init() async {
 
   // Usecases
   sl.registerLazySingleton<GetBudgetUsecase>(() => GetBudgetUsecase(sl()));
+  sl.registerLazySingleton<GetBudgetSummaryUsecase>(
+    () => GetBudgetSummaryUsecase(sl()),
+  );
   sl.registerLazySingleton<GetChartDataUsecase>(
     () => GetChartDataUsecase(sl()),
   );

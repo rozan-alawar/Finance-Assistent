@@ -1,9 +1,7 @@
-import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/config/theme/app_color/color_palette.dart';
-import '../../../../core/config/theme/styles/styles.dart';
 import '../../domain/entity/category_chart_date.dart';
 import '../cubits/budget_cubit.dart';
 import '../cubits/budget_state.dart';
@@ -83,30 +81,26 @@ class _ChartSectionState extends State<ChartSection>
                 ),
               ),
               const Divider(color: ColorPalette.dividerGrey3, thickness: 0.5),
-              if (chartData.isNotEmpty)
-                ChartResults(
-                  title1: chartData[0].title,
-                  amonut1: chartData[0].amount,
-                  color1: chartData[0].color,
-                  title2: chartData.length > 1 ? chartData[1].title : null,
-                  amonut2: chartData.length > 1 ? chartData[1].amount : null,
-                  color2: chartData.length > 1 ? chartData[1].color : null,
-                ),
+              Column(
+                children: List.generate(chartData.length, (index) {
+                  final item = chartData[index];
+                  return Row(
+                    children: [
+                      CircleAvatar(backgroundColor: item.color, radius: 4),
+                      SizedBox(width: 8),
+                      Text(item.title),
+                      Spacer(),
+                      Text('\$${item.amount}'),
+                    ],
+                  );
+                }),
+              ),
               const Divider(
                 color: ColorPalette.dividerGrey3,
                 thickness: 0.5,
                 indent: 30,
                 endIndent: 30,
               ),
-              if (chartData.length > 2)
-                ChartResults(
-                  title1: chartData[2].title,
-                  amonut1: chartData[2].amount,
-                  color1: chartData[2].color,
-                  title2: chartData.length > 3 ? chartData[3].title : null,
-                  amonut2: chartData.length > 3 ? chartData[3].amount : null,
-                  color2: chartData.length > 3 ? chartData[3].color : null,
-                ),
             ],
           ),
         );
@@ -121,77 +115,5 @@ class _ChartSectionState extends State<ChartSection>
     List<CategoryChartData> chartData,
   ) {
     return PercentageScatterChart(data: chartData);
-  }
-}
-
-class ChartResults extends StatelessWidget {
-  final String title1;
-  final double amonut1;
-  final Color color1;
-  final String? title2;
-  final double? amonut2;
-  final Color? color2;
-
-  const ChartResults({
-    super.key,
-    required this.title1,
-    required this.amonut1,
-    required this.color1,
-    this.title2,
-    this.amonut2,
-    this.color2,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CircleAvatar(backgroundColor: color1, radius: 4),
-        const SizedBox(width: Sizes.paddingH8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title1,
-                style: TextStyles.f14(context).copyWith(color: color1),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                '\$$amonut1',
-                style: TextStyles.f12(
-                  context,
-                ).medium.copyWith(color: ColorPalette.titleGrey1),
-              ),
-            ],
-          ),
-        ),
-        if (title2 != null) ...[
-          const SizedBox(width: Sizes.paddingH8),
-          CircleAvatar(backgroundColor: color2, radius: 4),
-          const SizedBox(width: Sizes.paddingH8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title2!,
-                  style: TextStyles.f14(context).copyWith(color: color2),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '\$$amonut2',
-                  style: TextStyles.f12(
-                    context,
-                  ).medium.copyWith(color: ColorPalette.titleGrey1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
-    );
   }
 }

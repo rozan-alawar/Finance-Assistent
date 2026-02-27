@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -9,15 +11,15 @@ class PercentageScatterChart extends StatelessWidget {
 
   const PercentageScatterChart({super.key, required this.data});
 
-  static const minRadius = 20.0;
-  static const maxRadius = 140.0;
+  static const minRadius = 10.0;
+  static const maxRadius = 100.0;
 
-  static const List<Offset> _positions = [
-    Offset(2.4, 5),
-    Offset(6, 7),
-    Offset(5.5, 2),
-    Offset(8.2, 4),
-  ];
+  List<Offset> get generatedPositions => List.generate(data.length, (index) {
+    final angle = (index / data.length) * 2 * pi;
+    final x = 5 + 3 * cos(angle);
+    final y = 5 + 3 * sin(angle);
+    return Offset(x, y);
+  });
 
   double _radiusFromPercentage(int percent) {
     return minRadius + (percent / 100) * (maxRadius - minRadius);
@@ -38,9 +40,11 @@ class PercentageScatterChart extends StatelessWidget {
             }
 
             final spots = List.generate(data.length, (index) {
+              final pos = generatedPositions[index];
+
               return ScatterSpot(
-                _positions[index].dx,
-                _positions[index].dy,
+                pos.dx,
+                pos.dy,
                 dotPainter: FlDotCirclePainter(
                   radius: _radiusFromPercentage(data[index].percentage),
                   color: data[index].bgColor,
@@ -64,20 +68,21 @@ class PercentageScatterChart extends StatelessWidget {
                 ),
 
                 ...List.generate(data.length, (index) {
-                  final center = chartToPixel(
-                    _positions[index].dx,
-                    _positions[index].dy,
-                  );
+                  final pos = generatedPositions[index];
+                  final center = chartToPixel(pos.dx, pos.dy);
 
                   return Positioned(
-                    left: center.dx - 18,
-                    top: center.dy - 12,
-                    child: Text(
-                      '${data[index].percentage}%',
-                      style: TextStyles.f16(
-                        context,
-                      ).medium.copyWith(color: data[index].textColor),
-                      textAlign: TextAlign.center,
+                    left: center.dx,
+                    top: center.dy,
+                    child: Transform.translate(
+                      offset: const Offset(-20, -10),
+                      child: Text(
+                        '${data[index].percentage}%',
+                        style: TextStyles.f16(
+                          context,
+                        ).medium.copyWith(color: data[index].textColor),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   );
                 }),
