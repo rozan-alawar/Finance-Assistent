@@ -1,6 +1,7 @@
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/services/network/main_service/network_service.dart';
 import '../models/ai_chat_model.dart';
+import '../models/bills_model.dart';
 import '../models/budget_data_model.dart';
 import '../models/budget_model.dart';
 import '../models/budget_summary_model.dart';
@@ -10,6 +11,7 @@ import '../models/summary_data_model.dart';
 
 abstract class BudgetRemoteDatasource {
   Future<List<BudgetDataModel>> getBudgets();
+  Future<List<BillItems>> getBills();
   Future<SummaryDataModel> getSummary();
   Future<AiChatModel> askAI(String message, {String? chatId});
   Future<DebtsDataModel> getTotalDebts();
@@ -89,6 +91,20 @@ class BudgetRemoteDataSourceImpl implements BudgetRemoteDatasource {
       return incomeModel.data!;
     } else {
       throw Exception('Failed to get total income');
+    }
+  }
+
+  @override
+  Future<List<BillItems>> getBills() async {
+    final response = await networkService.get<Map<String, dynamic>>(
+      path: ApiEndpoints.bills,
+    );
+
+    if (response.statusCode == 200) {
+      final billsModel = BillsModel.fromJson(response.data!);
+      return billsModel.data!.items ?? [];
+    } else {
+      throw Exception('Failed to get bills');
     }
   }
 }

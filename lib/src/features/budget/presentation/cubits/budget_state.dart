@@ -1,3 +1,4 @@
+import '../../domain/entity/bill_data.dart';
 import '../../domain/entity/budget_data.dart';
 import '../../domain/entity/budget_summary.dart';
 import '../../domain/entity/debts_summary.dart';
@@ -29,6 +30,18 @@ class BudgetSummaryErrorState extends BudgetState {
 class BudgetErrorState extends BudgetState {
   final String exception;
   BudgetErrorState(this.exception);
+}
+
+class BillsLoadingState extends BudgetState {}
+
+class BillsLoadedState extends BudgetState {
+  final List<BillData> bills;
+  BillsLoadedState(this.bills);
+}
+
+class BillsErrorState extends BudgetState {
+  final String exception;
+  BillsErrorState(this.exception);
 }
 
 class DebtsSummaryLoadingState extends BudgetState {}

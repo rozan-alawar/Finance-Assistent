@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../domain/entity/budget_data.dart';
+import '../../domain/entity/bill_data.dart';
 import '../cubits/budget_cubit.dart';
 import '../cubits/budget_state.dart';
 import '../../../../core/config/theme/app_color/color_palette.dart';
@@ -72,18 +71,18 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
             curve: Curves.easeInOut,
             child: BlocBuilder<BudgetCubit, BudgetState>(
               builder: (context, state) {
-                if (state is BudgetLoadingState) {
+                if (state is BillsLoadingState) {
                   return const Padding(
                     padding: EdgeInsets.all(50.0),
                     child: Center(child: CircularProgressIndicator()),
                   );
-                } else if (state is BudgetErrorState) {
+                } else if (state is BillsErrorState) {
                   return Padding(
                     padding: const EdgeInsets.all(50.0),
                     child: Center(child: Text(state.exception)),
                   );
-                } else if (state is BudgetLoadedState) {
-                  return _buildTabContent(state.budgets);
+                } else if (state is BillsLoadedState) {
+                  return _buildTabContent(state.bills);
                 }
                 return const SizedBox.shrink();
               },
@@ -94,24 +93,24 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
     );
   }
 
-  Widget _buildTabContent(List<BudgetData> allBudgets) {
-    List<BudgetData> filtered = [];
+  Widget _buildTabContent(List<BillData> allBills) {
+    List<BillData> filtered = [];
     switch (_tabController.index) {
       case 0:
-        filtered = allBudgets;
+        filtered = allBills;
         break;
       case 1:
-        filtered = allBudgets
+        filtered = allBills
             .where((b) => b.status?.toLowerCase() == 'paid')
             .toList();
         break;
       case 2:
-        filtered = allBudgets
+        filtered = allBills
             .where((b) => b.status?.toLowerCase() == 'unpaid')
             .toList();
         break;
       case 3:
-        filtered = allBudgets
+        filtered = allBills
             .where((b) => b.status?.toLowerCase() == 'overdue')
             .toList();
         break;
@@ -119,8 +118,8 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
     return _budgetList(filtered);
   }
 
-  Widget _budgetList(List<BudgetData> budgets) {
-    if (budgets.isEmpty) {
+  Widget _budgetList(List<BillData> bills) {
+    if (bills.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(100),
         child: Center(child: Text('No budgets found here.')),
@@ -130,17 +129,17 @@ class _BudgetTableSectionState extends State<BudgetTableSection>
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: budgets.length,
+      itemCount: bills.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
-        final budget = budgets[index];
+        final bill = bills[index];
         return RepaintBoundary(
           child: BudgetCard(
-            username: budget.category ?? 'Unknown',
-            dueDate: budget.endDate ?? 'Unknown',
-            category: budget.category ?? 'Unknown',
-            amount: double.tryParse(budget.allocatedAmount ?? '0') ?? 0.0,
-            status: budget.status ?? 'Unknown',
+            username: 'Username',
+            dueDate: bill.date ?? 'Unknown',
+            category: bill.name ?? 'Unknown',
+            amount: double.tryParse(bill.amount ?? '0') ?? 0.0,
+            status: bill.status ?? 'Unknown',
           ),
         );
       },

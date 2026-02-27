@@ -21,6 +21,7 @@ import '../../features/budget/data/datasource/budget_remote_datasource.dart';
 import '../../features/budget/data/repo/budget_repository_impl.dart';
 import '../../features/budget/domain/repo/budget_repository.dart';
 import '../../features/budget/domain/usecase/ask_ai_usecase.dart';
+import '../../features/budget/domain/usecase/get_bills_usecase.dart';
 import '../../features/budget/domain/usecase/get_budget_summary_usecase.dart';
 import '../../features/budget/domain/usecase/get_budget_usecase.dart';
 import '../../features/currency/data/data_source/currency_remote_data_source.dart';
@@ -97,6 +98,7 @@ Future<void> init() async {
   sl.registerLazySingleton<GetTotalIncomeUseCase>(
     () => GetTotalIncomeUseCase(sl()),
   );
+  sl.registerLazySingleton<GetBillsUseCase>(() => GetBillsUseCase(sl()));
 
   // Cubits
   sl.registerFactory<AuthCubit>(() => AuthCubit(sl()));

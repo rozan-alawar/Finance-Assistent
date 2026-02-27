@@ -26,12 +26,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          BudgetCubit(sl(), sl<GetBudgetSummaryUsecase>(), sl(), sl())
-            ..getBudgets()
-            ..getSummary()
-            ..getIncome()
-            ..getDebts(),
+      create: (context) => BudgetCubit(sl(), sl(), sl(), sl(), sl())
+        ..getBudgets()
+        ..getSummary()
+        ..getIncome()
+        ..getDebts()
+        ..getBills(),
       lazy: false,
       child: BlocConsumer<BudgetCubit, BudgetState>(
         listener: (context, state) {
