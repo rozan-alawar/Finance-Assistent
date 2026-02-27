@@ -125,7 +125,7 @@ class PhoneTextField extends StatelessWidget {
       isRequired: true,
       maxLines: 1,
       validator: (phone) {
-        return ValidatorFields.phoneValidator(context)?.call(phone);
+        return ValidatorFields.phoneValidator(context).call(phone);
       },
       prefixIcon: AppAssetsSvg(
         AppAssets.ASSETS_ICONS_PHONE_SVG,

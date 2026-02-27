@@ -4,7 +4,7 @@ import '../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/gen/app_assets.dart';
 import '../../../../core/view/component/base/image.dart';
-import '../../data/model/grid_item_model.dart';
+import '../../data/models/grid_item_model.dart';
 
 class CustomBudgetItem extends StatelessWidget {
   const CustomBudgetItem({

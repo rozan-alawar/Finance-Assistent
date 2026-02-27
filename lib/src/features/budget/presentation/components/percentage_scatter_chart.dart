@@ -1,37 +1,25 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/config/theme/styles/styles.dart';
+import '../../domain/entity/category_chart_date.dart';
 
 class PercentageScatterChart extends StatelessWidget {
-  const PercentageScatterChart({super.key});
+  final List<CategoryChartData> data;
 
-  static const minRadius = 20.0;
-  static const maxRadius = 140.0;
+  const PercentageScatterChart({super.key, required this.data});
 
-  // Cache static data to avoid recreation on every build
-  static const List<int> _percentages = [48, 32, 25, 18];
-  
-  static const List<Offset> _positions = [
-    Offset(2.4, 5),
-    Offset(6, 7),
-    Offset(5.5, 2),
-    Offset(8.2, 4),
-  ];
+  static const minRadius = 15.0;
+  static const maxRadius = 75.0;
 
-  static const List<Color> _colors = [
-    Color.fromARGB(255, 242, 242, 255),
-    Color.fromARGB(255, 255, 245, 250),
-    Color.fromARGB(255, 255, 247, 247),
-    Color.fromARGB(255, 242, 247, 255),
-  ];
-
-  static const List<Color> _percentageTextColor = [
-    Color(0xFF686FFF),
-    Color(0xFFFFA9DC),
-    Color(0xFFFFBDBC),
-    Color(0xFF5792FF),
-  ];
+  List<Offset> get generatedPositions => List.generate(data.length, (index) {
+    final angle = (index / data.length) * 2 * pi;
+    final x = 5 + 3 * cos(angle);
+    final y = 5 + 3 * sin(angle);
+    return Offset(x, y);
+  });
 
   double _radiusFromPercentage(int percent) {
     return minRadius + (percent / 100) * (maxRadius - minRadius);
@@ -51,13 +39,15 @@ class PercentageScatterChart extends StatelessWidget {
               return Offset((x / 10) * width, height - (y / 10) * height);
             }
 
-            final spots = List.generate(4, (index) {
+            final spots = List.generate(data.length, (index) {
+              final pos = generatedPositions[index];
+
               return ScatterSpot(
-                _positions[index].dx,
-                _positions[index].dy,
+                pos.dx,
+                pos.dy,
                 dotPainter: FlDotCirclePainter(
-                  radius: _radiusFromPercentage(_percentages[index]),
-                  color: _colors[index],
+                  radius: _radiusFromPercentage(data[index].percentage),
+                  color: data[index].bgColor,
                 ),
               );
             });
@@ -77,21 +67,22 @@ class PercentageScatterChart extends StatelessWidget {
                   ),
                 ),
 
-                ...List.generate(4, (index) {
-                  final center = chartToPixel(
-                    _positions[index].dx,
-                    _positions[index].dy,
-                  );
+                ...List.generate(data.length, (index) {
+                  final pos = generatedPositions[index];
+                  final center = chartToPixel(pos.dx, pos.dy);
 
                   return Positioned(
-                    left: center.dx - 12,
-                    top: center.dy - 12,
-                    child: Text(
-                      '${_percentages[index]}%',
-                      style: TextStyles.f16(
-                        context,
-                      ).medium.copyWith(color: _percentageTextColor[index]),
-                      textAlign: TextAlign.center,
+                    left: center.dx,
+                    top: center.dy,
+                    child: Transform.translate(
+                      offset: const Offset(-20, -10),
+                      child: Text(
+                        '${data[index].percentage}%',
+                        style: TextStyles.f16(
+                          context,
+                        ).medium.copyWith(color: data[index].textColor),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   );
                 }),

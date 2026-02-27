@@ -1,4 +1,5 @@
 /// Import this file to get access to all use cases
+library;
 
 export 'usecase.dart';
 export 'get_expenses_usecase.dart';

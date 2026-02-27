@@ -53,20 +53,20 @@ class ColorPalette {
   static const Color orange40 = Color(0xFFFF3D23);
   static const Color orange50 = Color(0xFF8D7E08);
   static const Color orange60 = Color(0xFF7D3726);
-  static const Color orange70 = Color(0xFF5E72A9F);
+  static const Color orange70 = Color(0xff5e72a9f);
   static const Color orange80 = Color(0xFF672D0F);
   static const Color orange90 = Color(0xFF623B08);
   static const Color orange100 = Color(0xFF040300);
 
   // Red
-  static const Color red10 = Color(0xFFFFF02CD);
+  static const Color red10 = Color(0xfffff02cd);
   static const Color red20 = Color(0xFFFFA5D4);
   static const Color red30 = Color(0xFFFF70B7);
   static const Color red40 = Color(0xFFFF555C);
   static const Color red50 = Color(0xFFE73D22);
   static const Color red60 = Color(0xFF4D1625);
-  static const Color red70 = Color(0xFF88C191C);
-  static const Color red80 = Color(0xFF66BAE);
+  static const Color red70 = Color(0xff88c191c);
+  static const Color red80 = Color(0x0ff66bae);
   static const Color red90 = Color(0xFF6A20A7);
   static const Color red100 = Color(0xFF000001);
 
@@ -78,8 +78,8 @@ class ColorPalette {
   static const Color magenta50 = Color(0xFF0527B0);
   static const Color magenta60 = Color(0xFF7E086E);
   static const Color magenta70 = Color(0xFF7C105B);
-  static const Color magenta80 = Color(0xFF8041166);
-  static const Color magenta90 = Color(0xFF8038028);
+  static const Color magenta80 = Color(0xff8041166);
+  static const Color magenta90 = Color(0xff8038028);
   static const Color magenta100 = Color(0xFF000002);
 
   // Purple
@@ -88,8 +88,8 @@ class ColorPalette {
   static const Color purple30 = Color(0xFF8A8FF2);
   static const Color purple40 = Color(0xFF7E6538);
   static const Color purple50 = Color(0xFF985504);
-  static const Color purple60 = Color(0xFF7F4592B);
-  static const Color purple70 = Color(0xFF90D72);
+  static const Color purple60 = Color(0xff7f4592b);
+  static const Color purple70 = Color(0x0ff90d72);
   static const Color purple80 = Color(0xFF8E135D);
   static const Color purple90 = Color(0xFF331A41);
   static const Color purple100 = Color(0xFF030303);
@@ -108,7 +108,7 @@ class ColorPalette {
 
   // Warm Gray
   static const Color warmGray10 = Color(0xFFE8E5ED);
-  static const Color warmGray20 = Color(0xFF8D0C7C7);
+  static const Color warmGray20 = Color(0xff8d0c7c7);
   static const Color warmGray30 = Color(0xFF8BA4A8);
   static const Color warmGray40 = Color(0xFF8E8A8A);
   static const Color warmGray50 = Color(0xFF7D7373);

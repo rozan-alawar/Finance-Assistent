@@ -2,13 +2,10 @@ import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/utils/extensions/text_ex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../../core/config/theme/app_color/color_palette.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/gen/app_assets.dart';
-import '../../../../core/routing/app_route.dart';
 import '../../../../core/utils/const/app_strings.dart';
 import '../../../../core/view/component/base/button.dart';
 import '../../../../core/view/component/base/safe_scaffold.dart';

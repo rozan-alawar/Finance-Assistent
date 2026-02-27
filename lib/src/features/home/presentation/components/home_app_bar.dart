@@ -1,5 +1,6 @@
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
+import 'package:finance_assistent/src/features/home/domain/home_overview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,19 +8,18 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/config/theme/app_color/extensions_color.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/gen/app_assets.dart';
-import '../../../../core/utils/extensions/go_router_ex.dart';
 import '../../../../core/view/component/base/image.dart';
 import '../../../../core/view/component/base/login_required_dialog.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
 import '../../../auth/presentation/cubits/auth_state.dart';
-class HomeAppBar extends StatelessWidget {
-  const HomeAppBar({super.key});
 
+class HomeAppBar extends StatelessWidget {
+  const HomeAppBar({super.key, required this.user});
+  final OverviewUser user;
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthCubit>().state;
     final isGuest = authState is AuthGuest;
-    final user = authState is AuthSuccess ? authState.user : null;
 
     return AppBar(
       title: Row(
@@ -58,26 +58,34 @@ class HomeAppBar extends StatelessWidget {
                   ),
                 ),
             ],
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white,
-                    appSwitcherColors(context).primaryColor,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: AppAssetsImage(
-                AppAssets.ASSETS_IMAGES_AVATAR_PNG,
-                height: 35,
-                width: 30,
-                fit: BoxFit.fill,
-              ),
-            ),
+            child: isGuest
+                ? Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white,
+                          appSwitcherColors(context).primaryColor,
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: AppAssetsImage(
+                      AppAssets.ASSETS_IMAGES_AVATAR_PNG,
+                      height: 35,
+                      width: 30,
+                      fit: BoxFit.fill,
+                    ),
+                  )
+                : AppNetworkImageRounded(
+                    user.avatarUrl,
+                    height: 45,
+                    width: 45,
+                    radius: 50,
+                    fit: BoxFit.fill,
+                  ),
           ),
           const SizedBox(width: 12),
           Column(
@@ -86,7 +94,7 @@ class HomeAppBar extends StatelessWidget {
             children: [
               Text("Hello", style: TextStyles.f14(context).normal),
               Text(
-                isGuest ? "Guest" : (user?.fullName ?? "User"),
+                isGuest ? "Guest" : (user.fullName),
                 style: TextStyles.f18(context).medium,
               ),
             ],
@@ -105,7 +113,7 @@ class HomeAppBar extends StatelessWidget {
                 context,
                 title: 'Notifications',
                 message:
-                'Log in to receive notifications and stay informed about important updates.',
+                    'Log in to receive notifications and stay informed about important updates.',
               );
               return;
             }

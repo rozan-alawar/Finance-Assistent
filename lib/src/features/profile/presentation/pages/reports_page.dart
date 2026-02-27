@@ -14,7 +14,7 @@ import '../../../auth/domain/report_data_model.dart';
 import '../cubits/reports_cubit.dart';
 
 class ReportsPage extends StatefulWidget {
-  const ReportsPage({Key? key}) : super(key: key);
+  const ReportsPage({super.key});
 
   @override
   State<ReportsPage> createState() => _ReportsPageState();

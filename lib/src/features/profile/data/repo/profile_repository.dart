@@ -1,10 +1,16 @@
-import '../data_source/profile_remote_data_source.dart';
+import 'package:finance_assistent/src/features/auth/domain/auth_tokens.dart';
+
 import '../../../auth/domain/user_app_model.dart';
+import '../data_source/profile_remote_data_source.dart';
 
 abstract class ProfileRepository {
-  Future<UserApp> fetchProfile();
-
-  Future<void> updateDefaultCurrency({required String currencyId});
+  Future<({UserApp user, AuthTokens token})> fetchProfile();
+  Future<String> changePassword({
+    required String id,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  });
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -13,12 +19,22 @@ class ProfileRepositoryImpl implements ProfileRepository {
   ProfileRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<UserApp> fetchProfile() {
+  Future<({UserApp user, AuthTokens token})> fetchProfile() {
     return _remoteDataSource.fetchProfile();
   }
 
   @override
-  Future<void> updateDefaultCurrency({required String currencyId}) {
-    return _remoteDataSource.updateDefaultCurrency(currencyId: currencyId);
+  Future<String> changePassword({
+    required String id,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) {
+    return _remoteDataSource.changePassword(
+      id: id,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword,
+    );
   }
 }

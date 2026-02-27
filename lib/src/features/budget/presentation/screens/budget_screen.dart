@@ -10,8 +10,10 @@ import '../components/budget_table_section.dart';
 import '../components/custom_budget_item.dart';
 import '../components/search_box.dart';
 import '../components/chart_section.dart';
+import '../../../../core/di/dependency_injection.dart';
 import '../cubits/budget_cubit.dart';
 import '../cubits/budget_state.dart';
+import '../../domain/usecase/get_budget_summary_usecase.dart';
 
 class BudgetScreen extends StatefulWidget {
   const BudgetScreen({super.key});
@@ -24,10 +26,19 @@ class _BudgetScreenState extends State<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BudgetCubit(),
-      lazy: false, // Create immediately for better initial performance
+      create: (context) =>
+          BudgetCubit(sl(), sl<GetBudgetSummaryUsecase>(), sl(), sl())
+            ..getBudgets()
+            ..getSummary()
+            ..getIncome()
+            ..getDebts(),
+      lazy: false,
       child: BlocConsumer<BudgetCubit, BudgetState>(
-        listener: (context, state) => {},
+        listener: (context, state) {
+          // Rebuild grid whenever debts data arrives.
+          if (state is DebtsSummaryLoadedState ||
+              state is BudgetSummaryLoadedState) {}
+        },
         builder: (context, state) {
           final cubit = context.read<BudgetCubit>();
           final gridItems = cubit.gridItems;

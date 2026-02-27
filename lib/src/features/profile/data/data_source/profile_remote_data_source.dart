@@ -1,75 +1,55 @@
-import 'package:dio/dio.dart';
+import 'package:finance_assistent/src/features/auth/domain/auth_tokens.dart';
+import 'package:finance_assistent/src/features/auth/domain/user_app_model.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/exceptions/app_error_extension.dart';
 import '../../../../core/services/network/main_service/network_service.dart';
-import '../../../auth/domain/user_app_model.dart';
 
 @immutable
 class ProfileRemoteDataSource {
   const ProfileRemoteDataSource(this.mainApiFacade);
-
   final NetworkService mainApiFacade;
 
-  List<String> get profilePaths => const [
-        '/user/profile',
-        '/user/me',
-        '/users/me',
-        '/user',
-      ];
+  String get profilePaths => '/auth/me';
+  String changePasswordPath(String id) => '/users/change-password/$id';
 
-  String get updateCurrencyPath => '/user/currency';
-
-  Future<UserApp> fetchProfile() async {
-    final dio = mainApiFacade.dio;
-
-    for (final path in profilePaths) {
-      final response = await dio.get<Map<String, dynamic>>(
-        path,
-        options: Options(
-          validateStatus: (status) => status != null && status < 500,
-        ),
-      );
-
-      final status = response.statusCode ?? 0;
-      if (status == 404) {
-        continue;
-      }
-      if (status == 401 || status == 403) {
-        throw const UserFriendlyException(
-          'Your session expired. Please sign in again.',
-        );
-      }
-      if (status < 200 || status >= 300) {
-        throw UserFriendlyException('Failed to load profile (HTTP $status).');
-      }
-
-      final root = response.data ?? const <String, dynamic>{};
-      final dynamic data = root['data'];
-
-      final dynamic userMap = switch (data) {
-        final Map<String, dynamic> m when m['user'] is Map => m['user'],
-        final Map<String, dynamic> m when m['id'] != null => m,
-        _ => root['user'],
-      };
-
-      if (userMap is! Map) {
-        throw const UserFriendlyException('Invalid profile response.');
-      }
-
-      return UserApp.fromMap(Map<String, dynamic>.from(userMap));
-    }
-
-    throw const UserFriendlyException('Profile endpoint not found.');
+  Future<({UserApp user, AuthTokens token})> fetchProfile() async {
+    final response = await mainApiFacade.get<Map<String, dynamic>>(
+      path: profilePaths,
+    );
+    return _parseAuthResponse(response.data!);
   }
 
-  Future<void> updateDefaultCurrency({required String currencyId}) async {
-    await mainApiFacade.patch<Map<String, dynamic>>(
-      path: updateCurrencyPath,
+  Future<String> changePassword({
+    required String id,
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
+    final response = await mainApiFacade.patch<Map<String, dynamic>>(
+      path: changePasswordPath(id),
       data: {
-        'currencyId': currencyId,
-        'defaultCurrencyId': currencyId,
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+        'confirmNewPassword': confirmNewPassword,
       },
     );
+    final data = response.data ?? const {};
+    final message = (data['data'] is Map && (data['data'] as Map).containsKey('message'))
+        ? ((data['data'] as Map)['message']?.toString() ?? '')
+        : (data['message']?.toString() ?? '');
+    return message.isNotEmpty ? message : 'Password changed successfully';
   }
+}
+
+({UserApp user, AuthTokens token}) _parseAuthResponse(
+  Map<String, dynamic> response,
+) {
+  final data = response['data'] as Map<String, dynamic>;
+  final userMap = data['user'] as Map<String, dynamic>;
+  final tokenString = data['token'] as String;
+
+  final user = UserAppMapper.fromMap(userMap);
+  final token = AuthTokens(token: tokenString);
+
+  return (user: user, token: token);
 }

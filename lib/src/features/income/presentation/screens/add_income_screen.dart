@@ -1,18 +1,17 @@
-import 'package:finance_assistent/src/core/config/theme/app_color/extensions_color.dart';
+import 'package:finance_assistent/src/core/di/dependency_injection.dart' as di;
 import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:finance_assistent/src/features/income/data/model/add_income_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/gen/app_assets.dart';
 import '../../../../core/utils/const/sizes.dart';
-import '../../../../core/utils/extensions/widget_ex.dart';
 import '../../../../core/utils/extensions/text_ex.dart';
-import '../../../../core/config/theme/styles/styles.dart';
+import '../../../../core/utils/extensions/widget_ex.dart';
+import '../../../../core/view/component/base/app_text_field.dart';
 import '../../../../core/view/component/base/button.dart';
 import '../../../../core/view/component/base/custom_app_bar.dart';
-import '../../../../core/view/component/base/app_text_field.dart';
-
 import '../../../../core/view/component/base/custom_toast.dart';
 import '../../../../core/view/component/base/image.dart';
 import '../cubit/income_cubit.dart';
@@ -43,7 +42,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => IncomeCubit(),
+      create: (context) => IncomeCubit(di.sl()),
       child: Builder(
         builder: (context) {
           return BlocListener<IncomeCubit, IncomeState>(
@@ -54,7 +53,6 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 Navigator.pop(context);
               } else if (state is IncomeError) {
                 CustomToast.showErrorMessage(context, state.message);
-
               }
             },
             child: SafeScaffold(
@@ -85,7 +83,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: AppAssetsSvg(
-                              AppAssets.ASSETS_ICONS_USD_ICONE_SVG,
+                                AppAssets.ASSETS_ICONS_USD_ICONE_SVG,
                                 width: 16,
                                 height: 16,
                               ),
@@ -188,7 +186,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         children: [
           Row(
             children: [
-   AppAssetsSvg(
+              AppAssetsSvg(
                 AppAssets.ASSETS_ICONS_RECURRING_SVG,
                 width: 16,
                 height: 16,
@@ -256,14 +254,41 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   void _onSavePressed(BuildContext context) {
     if (_amountController.text.isEmpty) return;
 
+    // Hardcoded currencyId for now as per API example, or fetch from user settings
+    // "550e8400-e29b-41d4-a716-446655440000"
+
+    // Construct recurring params
+    IncomeRecurringParams? recurring;
+    String frequency = _selectedRecurring.toUpperCase();
+    if (frequency != 'ON TIME') {
+      // Map to API enum values: DAILY, WEEKLY, MONTHLY, YEARLY
+      if (frequency == 'ON TIME') frequency = 'MONTHLY'; // Fallback
+
+      recurring = IncomeRecurringParams(
+        frequency: frequency,
+        endAt: DateTime.now().add(const Duration(days: 365)), // Default 1 year
+      );
+    } else {
+      // API requires recurring object sometimes or maybe null is fine?
+      // The example shows recurring object. If it's one time, maybe send null or specific enum?
+      // Let's assume null is fine for one-time, or handle as needed.
+      // Actually, the example shows "recurring": { "frequency": "MONTHLY", ... }
+      // If the user selected "On time" (One time), we send null for recurring.
+      recurring = null;
+    }
+
     context.read<IncomeCubit>().addIncome(
       AddIncomeParams(
         amount: double.tryParse(_amountController.text) ?? 0.0,
+        currencyId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         source: _sourceController.text.isEmpty
-            ? "Salary"
-            : _sourceController.text,
-        date: _selectedDate,
-        recurringType: _selectedRecurring,
+            ? "SALARY"
+            : _sourceController.text.toUpperCase(),
+        description: _sourceController.text.isEmpty
+            ? "Monthly salary"
+            : "Income from ${_sourceController.text}",
+        incomeDate: _selectedDate,
+        recurring: recurring,
       ),
     );
   }

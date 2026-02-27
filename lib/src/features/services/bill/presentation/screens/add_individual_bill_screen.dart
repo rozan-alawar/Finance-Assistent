@@ -332,7 +332,7 @@ class _AddIndividualBillContentState extends State<_AddIndividualBillContent> {
             value: state.reminderEnabled,
             onChanged: (value) =>
                 context.read<AddIndividualBillCubit>().toggleReminder(value),
-            activeColor: ColorPalette.primary,
+            activeThumbColor: ColorPalette.primary,
           ),
         ],
       ),

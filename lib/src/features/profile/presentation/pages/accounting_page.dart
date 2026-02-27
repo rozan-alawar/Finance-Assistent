@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
 import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
@@ -13,9 +12,10 @@ import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_sta
 import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:go_router/go_router.dart';
 import '../components/logout_dialog.dart';
+import 'package:finance_assistent/src/features/profile/presentation/pages/profile_page.dart';
 
 class AccountingPage extends StatefulWidget {
-  const AccountingPage({Key? key}) : super(key: key);
+  const AccountingPage({super.key});
   @override
   State<AccountingPage> createState() => _AccountingPageState();
 }
@@ -29,7 +29,7 @@ class _AccountingPageState extends State<AccountingPage> {
     _loadThemeMode();
   }
 
-  // التعديل 3: دالة لجلب حالة الوضع الليلي المحفوظة مسبقاً
+  
   Future<void> _loadThemeMode() async {
     final isDark = HiveService.get(
       HiveService.settingsBoxName,
@@ -41,7 +41,7 @@ class _AccountingPageState extends State<AccountingPage> {
     });
   }
 
-  // التعديل 2: دالة تسجيل الخروج فعلية
+  
   Future<void> _confirmLogout() async {
     final shouldLogout = await showDialog<bool>(
       context: context,
@@ -61,7 +61,7 @@ class _AccountingPageState extends State<AccountingPage> {
 
   @override
   Widget build(BuildContext context) {
-    // التعديل 1: جلب بيانات المستخدم الحالي من الـ AuthCubit
+
     final authState = context.watch<AuthCubit>().state;
     final user = authState is AuthSuccess ? authState.user : null;
 
@@ -120,7 +120,7 @@ class _AccountingPageState extends State<AccountingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // عرض اسم المستخدم الحقيقي
+                      
                       Text(
                         user?.fullName ?? 'Guest User', 
                         style: TextStyles.f18(context).bold,
@@ -128,7 +128,7 @@ class _AccountingPageState extends State<AccountingPage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      // عرض إيميل المستخدم الحقيقي
+                      
                       Text(
                         user?.email ?? '',
                         style: TextStyles.f12(
@@ -154,9 +154,8 @@ class _AccountingPageState extends State<AccountingPage> {
               bgColor: const Color(0xFFFCE4EC),
               title: 'profile',
               onTap: () {
-                // التعديل 4: استخدام go_router إذا كانت معرفة، أو نبقيها هكذا
                 context.push(const ProfileRoute().location); 
-                // تأكد أن ProfileRoute معرفة لديك في الـ app_routes
+               
               },
             ),
               SizedBox(height: Sizes.marginV18),
@@ -199,7 +198,7 @@ class _AccountingPageState extends State<AccountingPage> {
                 setState(() {
                   _isDarkMode = value;
                 });
-                // حفظ حالة الوضع الليلي في الذاكرة المحلية
+           
                 await HiveService.put(
                   HiveService.settingsBoxName,
                   'is_dark_mode',
@@ -215,7 +214,7 @@ class _AccountingPageState extends State<AccountingPage> {
               bgColor: const Color(0xFFFFEBEE),
               title: 'Log Out',
               hasArrow: false,
-              onTap: _confirmLogout, // ربط دالة تسجيل الخروج بالزر
+              onTap: _confirmLogout, 
             ),
 
             const SizedBox(height: 30),
@@ -225,7 +224,6 @@ class _AccountingPageState extends State<AccountingPage> {
     );
   }
   
-  // دالة _buildSettingItem تبقى كما هي بدون تغيير...
   Widget _buildSettingItem(
     BuildContext context, {
     IconData? icon,
@@ -276,7 +274,7 @@ class _AccountingPageState extends State<AccountingPage> {
                 child: Switch(
                   value: switchValue,
                   onChanged: onSwitchChanged,
-                  activeColor: Colors.white,
+                  activeThumbColor: Colors.white,
                   activeTrackColor: const Color(0xFF3F51B5),
                 ),
               )

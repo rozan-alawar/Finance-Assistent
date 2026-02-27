@@ -1,13 +1,8 @@
 import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
-import 'package:finance_assistent/src/core/utils/extensions/widget_ex.dart';
 
-import '../../../../core/config/theme/app_color/color_palette.dart';
-import '../../../../core/view/component/base/app_text_field.dart';
 import '../components/reminder_search_bar.dart';
 
 class ReminderScreen extends StatefulWidget {
@@ -177,7 +172,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
               Switch(
                 value: isSwitchedOn,
                 onChanged: (val) {},
-                activeColor: Colors.blue,
+                activeThumbColor: Colors.blue,
               ),
             ],
           ),
@@ -327,7 +322,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
               Switch(
                 value: true,
                 onChanged: (val) {},
-                activeColor: Colors.blue,
+                activeThumbColor: Colors.blue,
               ),
             ],
           ),

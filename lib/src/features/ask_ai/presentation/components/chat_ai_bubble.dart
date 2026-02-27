@@ -12,7 +12,7 @@ class ChatBubbleAi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_color/extensions_color.dart';
-import '../../../config/theme/app_color/extensions_color.dart';
 import '../../../config/theme/styles/styles.dart';
 import '../../../utils/const/sizes.dart';
 import 'indicator.dart';

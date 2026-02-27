@@ -35,12 +35,12 @@ extension WidgetExtension on Widget? {
     return InkWell(
       onTap: function as void Function()?,
       borderRadius: borderRadius,
-      child: this,
       splashColor: splashColor,
       hoverColor: hoverColor,
       highlightColor: highlightColor,
       focusColor: focusColor,
       overlayColor: overlayColor,
+      child: this,
     );
   }
 
