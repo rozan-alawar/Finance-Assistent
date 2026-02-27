@@ -1,6 +1,7 @@
 import 'package:finance_assistent/src/features/budget/domain/entity/ai_chat.dart';
 import 'package:finance_assistent/src/features/budget/domain/entity/budget_summary.dart';
 import 'package:finance_assistent/src/features/budget/domain/entity/debts_summary.dart';
+import 'package:finance_assistent/src/features/budget/domain/entity/income_summary.dart';
 
 import '../../domain/entity/budget_data.dart';
 import '../../domain/repo/budget_repository.dart';
@@ -33,5 +34,11 @@ class BudgetRepositoryImpl implements BudgetRepository {
   Future<DebtsSummary> getTotalDebts() async {
     final model = await remoteDatasource.getTotalDebts();
     return model.toDebtsSummary();
+  }
+
+  @override
+  Future<IncomeSummary> getTotalIncome() async {
+    final model = await remoteDatasource.getTotalIncome();
+    return model.toIncomeSummary();
   }
 }

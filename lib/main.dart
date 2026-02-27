@@ -4,6 +4,7 @@ import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/routing/navigation_service.dart';
 import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
 import 'package:finance_assistent/src/features/auth/data/repo/auth_repository.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,21 +12,11 @@ import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cub
 import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
 import 'package:finance_assistent/src/core/services/sync/sync_service.dart';
 
-import 'src/core/services/network/main_service/network_service.dart';
-import 'src/features/ask_ai/data/datasource/ai_chat_remote_datasource.dart';
-import 'src/features/ask_ai/data/repo/budget_repository_impl.dart';
-import 'src/features/ask_ai/domain/usecases/get_chart_data_usecase.dart';
-import 'src/features/budget/data/datasource/budget_remote_datasource.dart';
-import 'src/features/budget/data/repo/budget_repository_impl.dart';
-import 'src/features/budget/domain/usecase/get_budget_summary_usecase.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
   await di.init();
   SyncService().init();
-  // testBudgets();
-  testChartData();
   runApp(const MyApp());
 }
 
@@ -62,32 +53,6 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-}
-
-// void testBudgets() async {
-//   final networkService = NetworkService();
-//   final datasource = BudgetRemoteDataSourceImpl(networkService);
-//   final repo = BudgetRepositoryImpl(datasource);
-//   final usecase = GetBudgetUsecase(repo);
-
-//   final result = await usecase.call();
-//   print('*******************************************************');
-
-//   print(result);
-//   print('*******************************************************');
-// }
-
-void testChartData() async {
-  final networkService = NetworkService();
-  final datasource = BudgetRemoteDataSourceImpl(networkService);
-  final repo = BudgetRepositoryImpl(datasource);
-  final usecase = GetBudgetSummaryUsecase(repo);
-
-  final result = await usecase.call();
-  print('*******************************************************');
-
-  print(result);
-  print('*******************************************************');
 }
 
 ///moamen@example.com

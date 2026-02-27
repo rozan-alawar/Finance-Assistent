@@ -1,4 +1,5 @@
 import 'package:finance_assistent/src/features/budget/domain/usecase/get_total_debts_usecase.dart';
+import 'package:finance_assistent/src/features/budget/domain/usecase/get_total_income_usecase.dart';
 import 'package:get_it/get_it.dart';
 import '../../features/ask_ai/data/datasource/ai_chat_remote_datasource.dart';
 import '../../features/ask_ai/data/repo/budget_repository_impl.dart';
@@ -63,5 +64,8 @@ Future<void> init() async {
   sl.registerLazySingleton<AskAIUseCase>(() => AskAIUseCase(sl()));
   sl.registerLazySingleton<GetTotalDebtsUsecase>(
     () => GetTotalDebtsUsecase(sl()),
+  );
+  sl.registerLazySingleton<GetTotalIncomeUseCase>(
+    () => GetTotalIncomeUseCase(sl()),
   );
 }

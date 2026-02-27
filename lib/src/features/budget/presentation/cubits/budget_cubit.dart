@@ -6,26 +6,31 @@ import '../../domain/entity/budget_data.dart';
 import '../../domain/entity/budget_summary.dart';
 import '../../domain/entity/category_chart_date.dart';
 import '../../domain/entity/debts_summary.dart';
+import '../../domain/entity/income_summary.dart';
 import '../../domain/usecase/get_budget_summary_usecase.dart';
 import '../../domain/usecase/get_budget_usecase.dart';
 import '../../domain/usecase/get_total_debts_usecase.dart';
+import '../../domain/usecase/get_total_income_usecase.dart';
 import 'budget_state.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
   final GetBudgetUsecase getBudgetUsecase;
   final GetBudgetSummaryUsecase getBudgetSummaryUsecase;
   final GetTotalDebtsUsecase getTotalDebtsUsecase;
+  final GetTotalIncomeUseCase getTotalIncomeUseCase;
 
   BudgetCubit(
     this.getBudgetUsecase,
     this.getBudgetSummaryUsecase,
     this.getTotalDebtsUsecase,
+    this.getTotalIncomeUseCase,
   ) : super(InitialBudgetState());
 
   List<BudgetData> allBudgets = [];
 
   BudgetSummary? _summary;
   DebtsSummary? _debtsSummary;
+  IncomeSummary? _incomeSummary;
 
   Future<void> getBudgets() async {
     emit(BudgetLoadingState());
@@ -59,6 +64,18 @@ class BudgetCubit extends Cubit<BudgetState> {
       emit(DebtsSummaryLoadedState(result));
     } catch (e) {
       emit(DebtsSummaryErrorState(e.toString()));
+    }
+  }
+
+  Future<void> getIncome() async {
+    emit(IncomeSummaryLoadingState());
+    try {
+      final result = await getTotalIncomeUseCase();
+      _incomeSummary = result;
+      _cachedGridItems = null;
+      emit(IncomeSummaryLoadedState(result));
+    } catch (e) {
+      emit(IncomeSummaryErrorState(e.toString()));
     }
   }
 
@@ -133,6 +150,17 @@ class BudgetCubit extends Cubit<BudgetState> {
     return change.abs();
   }
 
+  double _incomeChangePercent() {
+    final totalIncome =
+        double.tryParse(_incomeSummary?.totalIncome ?? '0') ?? 0;
+    if (totalIncome == 0) return 0;
+    // Simulate previous month as 85 % of current → ~17.6 % increase.
+    // Replace with real previous-month data when the API supports it.
+    const double simulatedLastMonth = 0.85;
+    final change = ((1 - simulatedLastMonth) / simulatedLastMonth) * 100;
+    return change.abs();
+  }
+
   List<GridItemModel>? _cachedGridItems;
 
   List<GridItemModel> get gridItems {
@@ -169,15 +197,17 @@ class BudgetCubit extends Cubit<BudgetState> {
         backgoundColor: const Color(0xFFFDF5F7),
         arrow: balanceArrow,
       ),
-      // --- Card 1: Revenues  (static / handled elsewhere) ---
+      // --- Card 1: Revenues  (totalIncome from /incomes/summary) ---
       GridItemModel(
         title: 'Revenues',
-        amount: 1700.0,
-        percentage: 2.5,
+        amount: double.tryParse(_incomeSummary?.totalIncome ?? '0') ?? 0,
+        percentage: _incomeChangePercent(),
         icon: receiveMoneyIcon,
         iconColor: const Color(0xFF6133BD),
         backgoundColor: const Color(0xFFEBE5F7),
-        arrow: increaseArrowIcon,
+        arrow: (double.tryParse(_incomeSummary?.totalIncome ?? '0') ?? 0) > 0
+            ? increaseArrowIcon
+            : decreaseArrowIcon,
       ),
       // --- Card 2: Expenses  (totalSpent from /budgets/summary) ---
       GridItemModel(

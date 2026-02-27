@@ -22,6 +22,7 @@ class ApiEndpoints {
   static const String suggestBudget = '/ai/suggest-budget';
   static const String aiChat = '/ai/chat';
 
-  // Debts & Income endpoints
+  // Debts & Income summary endpoints
   static const String debtsSummary = '/debts/summary';
+  static const String incomeSummary = '/incomes/summary';
 }
