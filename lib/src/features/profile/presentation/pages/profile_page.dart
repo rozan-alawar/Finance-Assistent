@@ -16,6 +16,7 @@ import 'package:finance_assistent/src/features/currency/data/repo/currency_repos
 import 'package:finance_assistent/src/features/currency/domain/currency.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:finance_assistent/src/features/profile/presentation/cubits/profile_state.dart';
+import 'package:finance_assistent/src/features/profile/presentation/pages/about_us_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -470,6 +471,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         iconData: Icons.card_giftcard,
                         title: 'Rewards',
                         onTap: () => context.push(RewardsRoute().location),
+                      ),
+                      _buildSecurityItem(
+                        context,
+                        iconData: Icons.info_outline, 
+                        title: 'About Us',
+                        onTap: () {
+                      
+                          context.push(const AboutUsRoute().location);
+                        
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AboutUsPage(),
+                            ),
+                          );
+                          
+                        },
                       ),
                       _buildSecurityItem(
                         context,
