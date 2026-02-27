@@ -161,3 +161,14 @@ We use **GetIt** for dependency injection. This allows us to decouple classes an
     ```bash
     flutter run
     ```
+
+## 👥 Mobile Team - Group(5)
+
+- Mustafa Shihab 
+- Rozan Alawar
+- Alaa Moqade
+- Zainab Atwa
+- Marah Saadeh
+
+
+
