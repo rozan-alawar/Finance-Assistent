@@ -1,5 +1,4 @@
 import 'package:finance_assistent/src/core/view/component/base/indicator.dart';
-import 'package:finance_assistent/src/features/debts/presentation/components/debts_search_bar.dart';
 import 'package:finance_assistent/src/features/debts/presentation/cubit/debt_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,9 +7,12 @@ import '../../../../core/utils/extensions/widget_ex.dart';
 import '../../../../core/utils/extensions/text_ex.dart';
 import '../../../../core/config/theme/styles/styles.dart';
 import '../../../../core/config/theme/app_color/extensions_color.dart';
+import '../../../../core/config/theme/app_color/color_palette.dart';
+import '../../../../core/gen/app_assets.dart';
 import '../../../../core/view/component/base/button.dart';
 import '../../../../core/view/component/base/custom_app_bar.dart';
 import '../../../../core/view/component/base/safe_scaffold.dart';
+import '../../../../core/view/component/base/image.dart';
 import '../components/debt_list_item.dart';
 import '../components/debt_summary_card.dart';
 import 'add_debt_screen.dart';
@@ -30,75 +32,178 @@ class DebtsScreen extends StatelessWidget {
         ),
         body: BlocBuilder<DebtCubit, DebtState>(
           builder: (context, state) {
-            if (state is! DebtLoaded) {
+            if (state is DebtLoading && state is! DebtLoaded) {
               return const LoadingAppIndicator();
             }
 
-            return Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+            if (state is DebtLoaded) {
+              return Column(
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () => context.read<DebtCubit>().fetchDebts(
+                        filter: state.selectedFilter,
+                        query: state.searchQuery,
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: Sizes.marginV12),
+                            TextField(
+                              onChanged: (value) =>
+                                  context.read<DebtCubit>().fetchDebts(
+                                    filter: state.selectedFilter,
+                                    query: value,
+                                  ),
+                              decoration: InputDecoration(
+                                hintText: 'Search for Invoices',
+                                hintStyle: TextStyles.f14(
+                                  context,
+                                ).colorWith(Colors.grey),
+                                filled: true,
+                                fillColor: ColorPalette.fillGrey,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 16,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 16,
+                                    right: 8,
+                                  ),
+                                  child: AppAssetsSvg(
+                                    AppAssets.ASSETS_ICONS_SEARCH_SVG,
+                                  ),
+                                ),
+                                prefixIconConstraints: const BoxConstraints(
+                                  minWidth: 40,
+                                ),
+                              ),
+                            ).paddingSymmetric(
+                              horizontal: Sizes.screenPaddingH16,
+                            ),
+                            const SizedBox(height: Sizes.marginV20),
+                            _buildSummaryGrid(context, state.summary),
+                            const SizedBox(height: Sizes.marginV24),
+                            Text(
+                              "Recent Debts",
+                              style: TextStyles.f16(context).bold,
+                            ).paddingSymmetric(
+                              horizontal: Sizes.screenPaddingH16,
+                            ),
+                            const SizedBox(height: Sizes.marginV12),
+                            _buildFilterRow(
+                              context,
+                              state.selectedFilter,
+                              state.searchQuery,
+                            ),
+                            const SizedBox(height: Sizes.marginV16),
+                            state.debts.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      "No results found",
+                                      style: TextStyles.f14(context),
+                                    ),
+                                  ).paddingOnly(top: 40)
+                                : ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: Sizes.screenPaddingH16,
+                                    ),
+                                    itemCount: state.debts.length,
+                                    itemBuilder: (context, index) {
+                                      final debt = state.debts[index];
+                                      final cubit = context.read<DebtCubit>();
 
-                        DebtSearchBar().paddingSymmetric(horizontal: Sizes.paddingH16),
-
-                        const SizedBox(height: Sizes.marginV20),
-
-                        _buildSummaryGrid(context),
-
-                        const SizedBox(height: Sizes.marginV24),
-                        Text(
-                          "Recent Debts",
-                          style: TextStyles.f16(context).bold,
-                        ).paddingSymmetric(horizontal: Sizes.screenPaddingH16),
-
-                        const SizedBox(height: Sizes.marginV12),
-
-                        _buildFilterRow(context, state.selectedFilter),
-
-                        const SizedBox(height: Sizes.marginV16),
-
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: Sizes.screenPaddingH16,
-                          ),
-                          itemCount: state.debts.length,
-                          itemBuilder: (context, index) =>
-                              DebtListItem(model: state.debts[index]),
+                                      return DebtListItem(
+                                        model: debt,
+                                        onDelete: () =>
+                                            cubit.deleteDebt(debt.id),
+                                        onEdit: () => _showUpdateStatusDialog(
+                                          context,
+                                          cubit,
+                                          debt,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                            const SizedBox(height: Sizes.marginV20),
+                          ],
                         ),
-                        const SizedBox(height: Sizes.marginV20),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-
-                AppButton(
-                  type: AppButtonType.primary,
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddDebtScreen(),
+                  AppButton(
+                    type: AppButtonType.primary,
+                    onPressed: () {
+                      final debtCubit = context.read<DebtCubit>();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider.value(
+                            value: debtCubit,
+                            child: const AddDebtScreen(),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Add Debt",
+                      style: TextStyles.f14(context).medium.white,
                     ),
-                  ),
-                  child: Text(
-                    "Add Debt",
-                    style: TextStyles.f14(context).medium.white,
-                  ),
-                ).paddingAll(Sizes.screenPaddingH16),
-              ],
-            );
+                  ).paddingAll(Sizes.screenPaddingH16),
+                ],
+              );
+            }
+            if (state is DebtError) {
+              return Center(child: Text(state.message));
+            }
+            return const SizedBox.shrink();
           },
         ),
       ),
     );
   }
 
-  Widget _buildSummaryGrid(BuildContext context) {
+  void _showUpdateStatusDialog(
+    BuildContext context,
+    DebtCubit cubit,
+    dynamic debt,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: ["PAID", "UNPAID", "OVERDUE"].map((status) {
+          return ListTile(
+            title: Text(status),
+            onTap: () {
+              cubit.updateDebt(debt.id, {"status": status});
+              Navigator.pop(context);
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildSummaryGrid(BuildContext context, Map<String, dynamic> summary) {
     final switcher = appSwitcherColors(context);
     return GridView.count(
       shrinkWrap: true,
@@ -109,26 +214,26 @@ class DebtsScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         DebtSummaryCard(
-          title: "Total Debts",
-          amount: "234.783",
+          title: "Total",
+          amount: summary['totalAmount'].toString(),
           svgPath: "assets/icons/debts.svg",
           iconColor: switcher.primaryColor,
         ),
         DebtSummaryCard(
           title: "Unpaid",
-          amount: "8,203",
+          amount: summary['unpaidAmount'].toString(),
           svgPath: "assets/icons/error.svg",
           iconColor: switcher.dangerColor,
         ),
         DebtSummaryCard(
           title: "Overdue",
-          amount: "1,450",
+          amount: summary['overdueAmount'].toString(),
           svgPath: "assets/icons/warning.svg",
           iconColor: switcher.warningColor,
         ),
         DebtSummaryCard(
           title: "Paid",
-          amount: "12,000",
+          amount: summary['paidAmount'].toString(),
           svgPath: "assets/icons/done.svg",
           iconColor: switcher.successColor,
         ),
@@ -136,14 +241,21 @@ class DebtsScreen extends StatelessWidget {
     ).paddingSymmetric(horizontal: Sizes.screenPaddingH16);
   }
 
-  Widget _buildFilterRow(BuildContext context, String selectedFilter) {
+  Widget _buildFilterRow(
+    BuildContext context,
+    String selectedFilter,
+    String currentQuery,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: ["All", "Paid", "Un Paid", "Overdue"].map((label) {
           bool isSelected = label == selectedFilter;
           return GestureDetector(
-            onTap: () => context.read<DebtCubit>().fetchDebts(filter: label),
+            onTap: () => context.read<DebtCubit>().fetchDebts(
+              filter: label,
+              query: currentQuery,
+            ),
             child: _buildFilterWidget(context, label, isSelected: isSelected),
           );
         }).toList(),
@@ -158,7 +270,6 @@ class DebtsScreen extends StatelessWidget {
   }) {
     final switcher = appSwitcherColors(context);
     final common = appCommonUIColors(context);
-
     return Container(
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -166,9 +277,7 @@ class DebtsScreen extends StatelessWidget {
         color: isSelected ? switcher.primaryColor : common.white,
         borderRadius: BorderRadius.circular(Sizes.radius20),
         border: Border.all(
-          color: isSelected
-              ? Colors.transparent
-              : Colors.grey.withValues(alpha: 0.2),
+          color: isSelected ? Colors.transparent : Colors.grey.withOpacity(0.2),
         ),
       ),
       child: Text(

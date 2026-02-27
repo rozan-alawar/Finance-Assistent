@@ -21,7 +21,7 @@ class DebtSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(Sizes.paddingV12),
+      padding: const EdgeInsets.all(Sizes.paddingV12),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(Sizes.radius16),
@@ -42,15 +42,17 @@ class DebtSummaryCard extends StatelessWidget {
               height: 18,
             ),
           ),
-          const SizedBox(height: 12), 
+          const SizedBox(height: 12),
           Text(
-            title, 
-            style: TextStyles.f14(context).colorWith(Colors.grey.shade500)
+            title,
+            style: TextStyles.f14(context).colorWith(Colors.grey.shade500),
           ),
-          const SizedBox(height: 2), 
+          const SizedBox(height: 2),
           Text(
-            '\$$amount', 
-            style: TextStyles.f16(context).bold
+            '\$$amount',
+            style: TextStyles.f16(context).bold,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
