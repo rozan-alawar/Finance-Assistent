@@ -4,6 +4,7 @@ import 'package:finance_assistent/src/core/routing/app_route.dart';
 import 'package:finance_assistent/src/core/routing/navigation_service.dart';
 import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
 import 'package:finance_assistent/src/features/auth/data/repo/auth_repository.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,34 +30,33 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-
     return BlocProvider(
       create: (context) => AuthCubit(di.sl<AuthRepository>())..checkSession(),
 
       child: Builder(
         builder: (context) {
           return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Finance Assistent',
-      theme: AppTheme(themeMode: AppThemeMode.light).getThemeData('ExpoArabic'),
-      routerConfig: goRouter(context.read<AuthCubit>()),
-      builder: (_, child) {
-        return GestureDetector(
-          onTap: NavigationService.removeFocus,
-          child: FToastOverlay(child: child!),
-        );
-      },
-    );
-        }
+            debugShowCheckedModeBanner: false,
+            title: 'Finance Assistent',
+            theme: AppTheme(
+              themeMode: AppThemeMode.light,
+            ).getThemeData('ExpoArabic'),
+            routerConfig: goRouter(context.read<AuthCubit>()),
+            builder: (_, child) {
+              return GestureDetector(
+                onTap: NavigationService.removeFocus,
+                child: FToastOverlay(child: child!),
+              );
+            },
+          );
+        },
       ),
     );
   }
 }
-
 
 ///moamen@example.com
 ///StrongP@ssw0rd
 ///
 ///
 ///
-

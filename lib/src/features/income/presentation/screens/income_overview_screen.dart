@@ -28,7 +28,8 @@ class IncomeOverviewScreen extends StatelessWidget {
               showBackButton: true,
               onBackButtonPressed: () => Navigator.pop(context),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
             floatingActionButton: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SizedBox(
@@ -38,7 +39,9 @@ class IncomeOverviewScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const AddIncomeScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const AddIncomeScreen(),
+                      ),
                     );
                   },
                   type: AppButtonType.primary,
@@ -67,7 +70,10 @@ class IncomeOverviewScreen extends StatelessWidget {
 
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 24,
+                            horizontal: 20,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
@@ -88,14 +94,18 @@ class IncomeOverviewScreen extends StatelessWidget {
                         ),
 
                         const SizedBox(height: 35),
-                        Text("Recent Income", style: TextStyles.f16(context).bold),
+                        Text(
+                          "Recent Income",
+                          style: TextStyles.f16(context).bold,
+                        ),
                         const SizedBox(height: 20),
 
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: data.recentTransactions.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 12),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             return TransactionListItem(
                               transaction: data.recentTransactions[index],
