@@ -1,13 +1,17 @@
 import 'package:finance_assistent/src/core/view/component/base/custom_app_bar.dart';
 import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'dart:math';
-
 import '../components/reports_search_bar.dart';
+import 'package:finance_assistent/src/core/di/dependency_injection.dart';
+import '../../data/data_source/reports_remote_data_source.dart';
+import '../../../auth/domain/report_data_model.dart';
+import '../cubits/reports_cubit.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -19,80 +23,117 @@ class ReportsPage extends StatefulWidget {
 class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
-    return SafeScaffold(
-      appBar: CustomAppBar(title: "Reports", showBackButton: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: Sizes.paddingH20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ReportsSearchBar(),
-            const SizedBox(height: 20),
+    return BlocProvider(
+      create: (context) =>
+          ReportsCubit(ReportsRemoteDataSource(sl()))..loadReports(),
 
-            _buildStatsGrid(),
-            const SizedBox(height: 30),
+      child: BlocBuilder<ReportsCubit, ReportsState>(
+        builder: (context, state) {
+          if (state is ReportsLoading) {
+            return const Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
-            _buildSectionHeader("Weekly Expense", "View report"),
-            Text(
-              "From 1 - 6 Apr, 2024",
-              style: TextStyles.f12(context).copyWith(color: Colors.grey),
-            ),
-            const SizedBox(height: 15),
-            _buildTimeTabs(),
-            const SizedBox(height: 20),
+          if (state is ReportsError) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: CustomAppBar(title: "Reports", showBackButton: true),
+              body: Center(child: Text(state.message)),
+            );
+          }
 
-            _buildBubbleChart(),
-            _buildCategoryList(),
-            const SizedBox(height: 30),
+          if (state is ReportsLoaded) {
+            final data = state.reportData;
 
-            Center(child: _buildDonutChart()),
-            const SizedBox(height: 30),
+            if (data == null) {
+              return const NoReportPage();
+            }
 
-            _buildBillItem(
-              title: "Paid",
-              subtitle: "7 bills",
-              amount: "\$78.99",
-              percentage: "70%",
-              color: const Color(0xFF4CAF50),
-              bgColor: const Color(0xFFE8F5E9),
-            ),
-            const SizedBox(height: 10),
-            _buildBillItem(
-              title: "Unpaid",
-              subtitle: "7 bills",
-              amount: "\$78.99",
-              percentage: "70%",
-              color: const Color(0xFFF44336),
-              bgColor: const Color(0xFFFFEBEE),
-            ),
-            const SizedBox(height: 10),
-            _buildBillItem(
-              title: "Overdue",
-              subtitle: "7 bills",
-              amount: "\$78.99",
-              percentage: "70%",
-              color: const Color(0xFFFFC107),
-              bgColor: const Color(0xFFFFF8E1),
-            ),
+            return SafeScaffold(
+              appBar: CustomAppBar(title: "Reports", showBackButton: true),
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Sizes.paddingH20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ReportsSearchBar(),
+                    const SizedBox(height: 20),
 
-            const SizedBox(height: 10),
-            _buildBillItem(
-              title: "Total Bills",
-              subtitle: "Total Amount",
-              amount: "10",
-              percentage: "\$8767.",
-              color: Color.fromARGB(255, 226, 221, 221),
-              bgColor: const Color(0xFFE0E0E0),
-            ),
+                    _buildStatsGrid(data),
+                    const SizedBox(height: 30),
 
-            const SizedBox(height: 30),
-          ],
-        ),
+                    _buildSectionHeader("Weekly Expense", "View report"),
+                    Text(
+                      data.dateRange,
+                      style: TextStyles.f12(
+                        context,
+                      ).copyWith(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 15),
+                    _buildTimeTabs(),
+                    const SizedBox(height: 20),
+
+                    _buildBubbleChart(),
+                    _buildCategoryList(data.categories),
+                    const SizedBox(height: 30),
+
+                    Center(child: _buildDonutChart(data.donutTotalAmount)),
+                    const SizedBox(height: 30),
+
+                    _buildBillItem(
+                      title: "Paid",
+                      subtitle: data.paidBills.subtitle,
+                      amount: data.paidBills.amount,
+                      percentage: data.paidBills.percentage,
+                      color: const Color(0xFF4CAF50),
+                      bgColor: const Color(0xFFE8F5E9),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildBillItem(
+                      title: "Unpaid",
+                      subtitle: data.unpaidBills.subtitle,
+                      amount: data.unpaidBills.amount,
+                      percentage: data.unpaidBills.percentage,
+                      color: const Color(0xFFF44336),
+                      bgColor: const Color(0xFFFFEBEE),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildBillItem(
+                      title: "Overdue",
+                      subtitle: data.overdueBills.subtitle,
+                      amount: data.overdueBills.amount,
+                      percentage: data.overdueBills.percentage,
+                      color: const Color(0xFFFFC107),
+                      bgColor: const Color(0xFFFFF8E1),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildBillItem(
+                      title: "Total Bills",
+                      subtitle: data.totalBills.subtitle,
+                      amount: data.totalBills.amount,
+                      percentage: data.totalBills.percentage,
+                      color: const Color.fromARGB(255, 226, 221, 221),
+                      bgColor: const Color(0xFFE0E0E0),
+                    ),
+
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
       ),
     );
   }
 
-  Widget _buildStatsGrid() {
+  Widget _buildStatsGrid(ReportDataModel data) {
     return Column(
       children: [
         Row(
@@ -100,8 +141,7 @@ class _ReportsPageState extends State<ReportsPage> {
             Expanded(
               child: _buildStatCard(
                 "Net balance",
-                "\$234.783",
-                // AppAssets.ASSETS_ICONS_BET_BALANCE_SVG,
+                data.netBalance,
                 AppAssets.ASSETS_ICONS_NET_BALANCE_SVG,
                 Colors.blue[100]!,
                 Colors.blue,
@@ -111,7 +151,7 @@ class _ReportsPageState extends State<ReportsPage> {
             Expanded(
               child: _buildStatCard(
                 "Total expense",
-                "\$8,2033",
+                data.totalExpense,
                 AppAssets.ASSETS_ICONS_TOTAL_EXPENSE_SVG,
                 Colors.red[100]!,
                 Colors.red,
@@ -125,7 +165,7 @@ class _ReportsPageState extends State<ReportsPage> {
             Expanded(
               child: _buildStatCard(
                 "Total balance",
-                "\$234.783",
+                data.totalBalance,
                 AppAssets.ASSETS_ICONS_NAV_BUDGET_SVG,
                 Colors.blue[50]!,
                 Colors.blue,
@@ -135,7 +175,7 @@ class _ReportsPageState extends State<ReportsPage> {
             Expanded(
               child: _buildStatCard(
                 "Paid",
-                "\$234.783",
+                data.paidAmount,
                 AppAssets.ASSETS_ICONS_PAID_SVG,
                 const Color(0xFFE8FEF1),
                 const Color(0xFF00C853),
@@ -296,46 +336,31 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  Widget _buildCategoryList() {
+  Widget _buildCategoryList(List<CategoryModel> categories) {
+    if (categories.isEmpty) return const SizedBox.shrink();
+
     return Column(
       children: [
         const Divider(),
         const SizedBox(height: 10),
         Row(
           children: [
-            Expanded(
-              child: _buildCategoryItem("Fookkd", "\$758.20", Colors.blue),
-            ),
-
-            Expanded(
-              child: _buildCategoryItem(
-                "Housing",
-                "\$758.20",
-                Colors.pinkAccent,
+            if (categories.isNotEmpty)
+              Expanded(
+                child: _buildCategoryItem(
+                  categories[0].title,
+                  categories[0].amount,
+                  categories[0].color,
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        const Divider(),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _buildCategoryItem(
-                "Transport",
-                "\$758.20",
-                Colors.orangeAccent,
+            if (categories.length > 1)
+              Expanded(
+                child: _buildCategoryItem(
+                  categories[1].title,
+                  categories[1].amount,
+                  categories[1].color,
+                ),
               ),
-            ),
-            Expanded(
-              child: _buildCategoryItem(
-                "Health",
-                "\$758.20",
-                Colors.blueAccent,
-              ),
-            ),
           ],
         ),
       ],
@@ -365,7 +390,7 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  Widget _buildDonutChart() {
+  Widget _buildDonutChart(String totalAmount) {
     return SizedBox(
       width: 150,
       height: 150,
@@ -388,9 +413,9 @@ class _ReportsPageState extends State<ReportsPage> {
                 ),
               ],
             ),
-            child: const Text(
-              "\$1,758",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            child: Text(
+              totalAmount,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
         ],
@@ -448,7 +473,7 @@ class DonutChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    final strokeWidth = 25.0;
+    const strokeWidth = 25.0;
 
     final rect = Rect.fromCircle(center: center, radius: radius);
     final paint = Paint()
@@ -468,4 +493,66 @@ class DonutChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class NoReportPage extends StatelessWidget {
+  const NoReportPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "Reports",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+      ),
+      body: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                AppAssets.ASSETS_IMAGES_NO_REPORTS_PNG,
+                width: 350,
+                height: 215,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Reports will appear as soon as you use the app live by default.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF9E9E9E),
+                  fontSize: 15,
+                  height: 1.5,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

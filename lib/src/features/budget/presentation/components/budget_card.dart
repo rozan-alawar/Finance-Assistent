@@ -53,7 +53,7 @@ class BudgetCard extends StatelessWidget {
                   ),
                   const SizedBox(height: Sizes.paddingV8),
                   Text(
-                    'Due: Dec 25, 2026',
+                    'Date: $dueDate',
                     style: TextStyles.f12(
                       context,
                     ).copyWith(color: ColorPalette.dueDateGrey2),

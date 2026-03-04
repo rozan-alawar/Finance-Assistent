@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart'; 
 import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/core/config/theme/styles/styles.dart';
 import 'package:finance_assistent/src/core/utils/const/sizes.dart';
 import 'package:finance_assistent/src/core/view/component/base/image.dart';
+import 'package:finance_assistent/src/core/view/component/base/custom_toast.dart';
+import 'package:finance_assistent/src/core/services/local_storage/hive_service.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
+import 'package:finance_assistent/src/core/routing/app_route.dart';
+import 'package:go_router/go_router.dart';
+import '../components/logout_dialog.dart';
 import 'package:finance_assistent/src/features/profile/presentation/pages/profile_page.dart';
 
 class AccountingPage extends StatefulWidget {
@@ -12,9 +21,50 @@ class AccountingPage extends StatefulWidget {
 }
 
 class _AccountingPageState extends State<AccountingPage> {
-  bool _isDarkMode = true;
+  bool _isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeMode();
+  }
+
+  
+  Future<void> _loadThemeMode() async {
+    final isDark = HiveService.get(
+      HiveService.settingsBoxName,
+      'is_dark_mode',
+      defaultValue: false,
+    ) as bool;
+    setState(() {
+      _isDarkMode = isDark;
+    });
+  }
+
+  
+  Future<void> _confirmLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => LogoutDialog(),
+    );
+
+    if (shouldLogout != true) return;
+    if (!mounted) return;
+    
+    await context.read<AuthCubit>().logout();
+    
+    if (!mounted) return;
+    CustomToast.showSuccessMessage(context, 'Logged out successfully');
+    const LoginRoute().go(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    final authState = context.watch<AuthCubit>().state;
+    final user = authState is AuthSuccess ? authState.user : null;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -41,7 +91,7 @@ class _AccountingPageState extends State<AccountingPage> {
               children: [
                 Container(
                   width: 80,
-                  height: 80,
+                  height: 90,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
@@ -66,25 +116,36 @@ class _AccountingPageState extends State<AccountingPage> {
                   ),
                 ),
                 const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Ghydaa Ahmed', style: TextStyles.f18(context).bold),
-                    const SizedBox(height: 4),
-                    Text(
-                      'ghydaaahmed@gmail.com',
-                      style: TextStyles.f12(
-                        context,
-                      ).medium.copyWith(color: Colors.grey),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      
+                      Text(
+                        user?.fullName ?? 'Guest User', 
+                        style: TextStyles.f18(context).bold,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      
+                      Text(
+                        user?.email ?? '',
+                        style: TextStyles.f12(
+                          context,
+                        ).medium.copyWith(color: Colors.grey),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
 
-            SizedBox(height: Sizes.marginV32),
+            SizedBox(height: Sizes.marginV18),
             Text('General', style: TextStyles.f18(context).bold),
-            SizedBox(height: Sizes.marginV16),
+            SizedBox(height: Sizes.marginV32),
 
             _buildSettingItem(
               context,
@@ -93,12 +154,11 @@ class _AccountingPageState extends State<AccountingPage> {
               bgColor: const Color(0xFFFCE4EC),
               title: 'profile',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
+                context.push(const ProfileRoute().location); 
+               
               },
             ),
+              SizedBox(height: Sizes.marginV18),
             _buildSettingItem(
               context,
               svgIcon:
@@ -134,10 +194,16 @@ class _AccountingPageState extends State<AccountingPage> {
               title: 'Dark Mode',
               isSwitch: true,
               switchValue: _isDarkMode,
-              onSwitchChanged: (value) {
+              onSwitchChanged: (value) async {
                 setState(() {
                   _isDarkMode = value;
                 });
+           
+                await HiveService.put(
+                  HiveService.settingsBoxName,
+                  'is_dark_mode',
+                  value,
+                );
               },
             ),
 
@@ -148,6 +214,7 @@ class _AccountingPageState extends State<AccountingPage> {
               bgColor: const Color(0xFFFFEBEE),
               title: 'Log Out',
               hasArrow: false,
+              onTap: _confirmLogout, 
             ),
 
             const SizedBox(height: 30),
@@ -156,6 +223,7 @@ class _AccountingPageState extends State<AccountingPage> {
       ),
     );
   }
+  
   Widget _buildSettingItem(
     BuildContext context, {
     IconData? icon,

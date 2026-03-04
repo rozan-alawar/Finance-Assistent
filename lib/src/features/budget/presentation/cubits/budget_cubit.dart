@@ -2,6 +2,7 @@ import 'package:finance_assistent/src/core/gen/app_assets.dart';
 import 'package:finance_assistent/src/features/budget/data/models/grid_item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/entity/bill_data.dart';
 import '../../domain/entity/budget_data.dart';
 import '../../domain/entity/budget_summary.dart';
 import '../../domain/entity/category_chart_date.dart';
@@ -11,22 +12,26 @@ import '../../domain/usecase/get_budget_summary_usecase.dart';
 import '../../domain/usecase/get_budget_usecase.dart';
 import '../../domain/usecase/get_total_debts_usecase.dart';
 import '../../domain/usecase/get_total_income_usecase.dart';
+import '../../domain/usecase/get_bills_usecase.dart';
 import 'budget_state.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
   final GetBudgetUsecase getBudgetUsecase;
+  final GetBillsUseCase getBillsUseCase;
   final GetBudgetSummaryUsecase getBudgetSummaryUsecase;
   final GetTotalDebtsUsecase getTotalDebtsUsecase;
   final GetTotalIncomeUseCase getTotalIncomeUseCase;
 
   BudgetCubit(
     this.getBudgetUsecase,
+    this.getBillsUseCase,
     this.getBudgetSummaryUsecase,
     this.getTotalDebtsUsecase,
     this.getTotalIncomeUseCase,
   ) : super(InitialBudgetState());
 
   List<BudgetData> allBudgets = [];
+  List<BillData> allBills = [];
 
   BudgetSummary? _summary;
   DebtsSummary? _debtsSummary;
@@ -40,6 +45,17 @@ class BudgetCubit extends Cubit<BudgetState> {
       emit(BudgetLoadedState(result));
     } catch (e) {
       emit(BudgetErrorState(e.toString()));
+    }
+  }
+
+  Future<void> getBills() async {
+    emit(BillsLoadingState());
+    try {
+      final result = await getBillsUseCase();
+      allBills = result;
+      emit(BillsLoadedState(result));
+    } catch (e) {
+      emit(BillsErrorState(e.toString()));
     }
   }
 
