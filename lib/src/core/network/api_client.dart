@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
+import '../services/network/interceptors/dio_logger_interceptor.dart';
 import '../services/network/interceptors/token_interceptor.dart';
 
 /// API Client configuration using Dio
@@ -32,10 +34,20 @@ class ApiClient {
     // Add token interceptor to attach auth token from Hive
     dio.interceptors.add(TokenInterceptor());
 
-    // Add logging in debug mode
-    dio.interceptors.add(
-      LogInterceptor(requestBody: true, responseBody: true, error: true),
-    );
+    // Add pretty logging for all requests
+    dio.interceptors.add(dioInterceptor);
+
+    // Add Dio's built-in logger for additional logging in debug mode
+    if (kDebugMode) {
+      dio.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+          error: true,
+          logPrint: (object) => debugPrint('DioLog: $object'),
+        ),
+      );
+    }
 
     return dio;
   }
