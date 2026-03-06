@@ -1,5 +1,7 @@
 import 'package:finance_assistent/src/core/di/dependency_injection.dart' as di;
 import 'package:finance_assistent/src/core/view/component/base/safe_scaffold.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:finance_assistent/src/features/auth/presentation/cubits/auth_state.dart';
 import 'package:finance_assistent/src/features/income/data/model/add_income_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,15 +28,20 @@ class AddIncomeScreen extends StatefulWidget {
 
 class _AddIncomeScreenState extends State<AddIncomeScreen> {
   final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _sourceController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String _selectedRecurring = 'On time';
+  String _selectedSource = 'SALARY';
   DateTime _selectedDate = DateTime.now();
+
+  static const List<String> _sourcesOptions = [
+    'SALARY',
+    'FREELANCE',
+    'BUSINESS',
+  ];
 
   @override
   void dispose() {
     _amountController.dispose();
-    _sourceController.dispose();
     _dateController.dispose();
     super.dispose();
   }
@@ -92,16 +99,52 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                           SizedBox(height: Sizes.marginV16),
                           Text("Source", style: TextStyles.f14(context).medium),
                           SizedBox(height: Sizes.marginV8),
-                          AppTextField(
-                            controller: _sourceController,
-                            textFieldType: TextFieldType.name,
-                            hint: "Salary",
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: AppAssetsSvg(
-                                AppAssets.ASSETS_ICONS_SALARY_IC_SVG,
-                                width: 16,
-                                height: 16,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                Sizes.radius12,
+                              ),
+                              border: Border.all(
+                                color: const Color(0xFFF1F1F1),
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedSource,
+                                isExpanded: true,
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                ),
+                                items: _sourcesOptions
+                                    .map(
+                                      (s) => DropdownMenuItem(
+                                        value: s,
+                                        child: Row(
+                                          children: [
+                                            AppAssetsSvg(
+                                              AppAssets
+                                                  .ASSETS_ICONS_SALARY_IC_SVG,
+                                              width: 16,
+                                              height: 16,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              s,
+                                              style: TextStyles.f14(
+                                                context,
+                                              ).normal,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value != null)
+                                    setState(() => _selectedSource = value);
+                                },
                               ),
                             ),
                           ),
@@ -252,10 +295,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   }
 
   void _onSavePressed(BuildContext context) {
-    if (_amountController.text.isEmpty) return;
+    final authState = context.read<AuthCubit>().state;
+    final user = authState is AuthSuccess ? authState.user : null;
 
-    // Hardcoded currencyId for now as per API example, or fetch from user settings
-    // "550e8400-e29b-41d4-a716-446655440000"
+    if (_amountController.text.isEmpty) return;
 
     // Construct recurring params
     IncomeRecurringParams? recurring;
@@ -280,13 +323,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     context.read<IncomeCubit>().addIncome(
       AddIncomeParams(
         amount: double.tryParse(_amountController.text) ?? 0.0,
-        currencyId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        source: _sourceController.text.isEmpty
-            ? "SALARY"
-            : _sourceController.text.toUpperCase(),
-        description: _sourceController.text.isEmpty
-            ? "Monthly salary"
-            : "Income from ${_sourceController.text}",
+        currencyId: user!.defaultCurrency,
+        source: _selectedSource,
+        description: "Income from $_selectedSource",
         incomeDate: _selectedDate,
         recurring: recurring,
       ),

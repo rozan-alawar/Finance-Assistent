@@ -44,7 +44,11 @@ class IncomeOverviewScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => const AddIncomeScreen(),
                       ),
-                    );
+                    ).then((_) {
+                      if (context.mounted) {
+                        context.read<IncomeCubit>().fetchIncomeOverview();
+                      }
+                    });
                   },
                   type: AppButtonType.primary,
                   child: const Text(

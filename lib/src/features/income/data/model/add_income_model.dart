@@ -4,7 +4,6 @@ class AddIncomeParams {
   final String source;
   final String description;
   final DateTime incomeDate;
-  final Map<String, dynamic>? assetId;
   final IncomeRecurringParams? recurring;
 
   AddIncomeParams({
@@ -13,7 +12,6 @@ class AddIncomeParams {
     required this.source,
     required this.description,
     required this.incomeDate,
-    this.assetId,
     this.recurring,
   });
 
@@ -24,7 +22,6 @@ class AddIncomeParams {
       "source": source,
       "description": description,
       "incomeDate": incomeDate.toIso8601String().split('T')[0],
-      "assetId": assetId ?? {},
       if (recurring != null) "recurring": recurring!.toJson(),
     };
   }
@@ -34,10 +31,7 @@ class IncomeRecurringParams {
   final String frequency;
   final DateTime? endAt;
 
-  IncomeRecurringParams({
-    required this.frequency,
-    this.endAt,
-  });
+  IncomeRecurringParams({required this.frequency, this.endAt});
 
   Map<String, dynamic> toJson() {
     return {

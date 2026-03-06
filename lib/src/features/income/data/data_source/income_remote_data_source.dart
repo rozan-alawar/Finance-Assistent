@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:finance_assistent/src/core/services/network/main_service/network_service.dart';
 import 'package:finance_assistent/src/features/income/data/model/income_model.dart';
 import 'package:finance_assistent/src/features/income/data/model/income_summary_model.dart';
@@ -10,13 +12,21 @@ class IncomeRemoteDataSource {
   String get getIncomsPath => '/incomes';
 
   Future<void> createIncome(Map<String, dynamic> body) async {
+    log('➡️ POST $getIncomsPath');
+    log('📦 Request body: $body');
+
     final response = await mainApiFacade.post<Map<String, dynamic>>(
       path: getIncomsPath,
       data: body,
     );
 
+    log('⬅️ Response status: ${response.statusCode}');
+    log('📨 Response body: ${response.data}');
+
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Failed to create income');
+      final serverMessage = response.data?['message'] ?? response.data?['error'] ?? 'Failed to create income';
+      log('❌ Error: $serverMessage');
+      throw Exception(serverMessage);
     }
   }
 

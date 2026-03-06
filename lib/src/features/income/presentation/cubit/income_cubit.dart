@@ -107,12 +107,11 @@ class IncomeCubit extends Cubit<IncomeState> {
     emit(IncomeLoading());
     try {
       await _repository.createIncome(params);
-
       emit(AddIncomeSuccess());
-
       fetchIncomeOverview();
-    } catch (e) {
-      emit(IncomeError("Error while adding income: ${e.toString()}"));
+    } catch (e, st) {
+      debugPrint('❌ addIncome error: $e\n$st');
+      emit(IncomeError(e.toString().replaceFirst('Exception: ', '')));
     }
   }
 }

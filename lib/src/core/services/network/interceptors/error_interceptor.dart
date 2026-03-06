@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 
 
@@ -49,6 +51,8 @@ class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final statusCode = err.response?.statusCode;
+    log('❌ [ErrorInterceptor] ${err.requestOptions.method} ${err.requestOptions.path}');
+    log('❌ Status: $statusCode | Body: ${err.response?.data}');
 
     if ([400, 404, 409, 422, 429].any((code) => code == statusCode) || err.error is _RejectError) {
       final response = err.response!;

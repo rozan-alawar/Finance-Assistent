@@ -80,14 +80,52 @@ class _HomeScreenState extends State<HomeScreen> {
       child: BlocBuilder<HomeOverviewCubit, HomeOverviewState>(
         builder: (context, pageState) {
           if (pageState is HomeOverviewLoading) {
-            return Container(
-              color: Colors.white,
-              child: const LoadingAppIndicator(size: 36),
+            final appBarUser = OverviewUser(
+              id: (user?.id ?? ''),
+              fullName: isGuest ? 'Guest' : (user?.fullName ?? 'User'),
+              avatarUrl: null,
+            );
+            return SafeScaffold(
+              appBar: PreferredSize(
+                preferredSize: Size.fromHeight(70),
+                child: HomeAppBar(user: appBarUser),
+              ),
+              body: const Center(child: LoadingAppIndicator(size: 36)),
             );
           }
 
           return BlocBuilder<HomeOverviewCubit, HomeOverviewState>(
             builder: (context, overviewState) {
+              if (overviewState is HomeOverviewError) {
+                final appBarUser = OverviewUser(
+                  id: (user?.id ?? ''),
+                  fullName: isGuest ? 'Guest' : (user?.fullName ?? 'User'),
+                  avatarUrl: null,
+                );
+                return SafeScaffold(
+                  appBar: PreferredSize(
+                    preferredSize: Size.fromHeight(70),
+                    child: HomeAppBar(user: appBarUser),
+                  ),
+                  body: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Failed to load home data',
+                          style: TextStyles.f14(context).medium,
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () =>
+                              context.read<HomeOverviewCubit>().fetch(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
               String balanceText = isGuest
                   ? "0.00"
                   : user?.currentBalance ?? "0.00";
