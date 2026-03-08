@@ -2,6 +2,8 @@
 
 Finance Assistant is a comprehensive Flutter application designed to help users manage their personal finances effectively. It provides tools for tracking income, expenses, budgets, debts, and bills, all within a user-friendly interface powered by modern technologies.
 
+<img width="913" height="515" alt="image" src="https://github.com/user-attachments/assets/70517481-4a11-4539-a4df-326cb2d776bc" />
+
 ## 🚀 Key Features
 
 - **Dashboard Overview**: Get a quick snapshot of your financial health with intuitive charts and summaries.
@@ -161,14 +163,6 @@ We use **GetIt** for dependency injection. This allows us to decouple classes an
     ```bash
     flutter run
     ```
-
-## 👥 Mobile Team - Group(5)
-
-- Mustafa Shihab 
-- Rozan Alawar
-- Alaa Moqade
-- Zainab Atwa
-- Marah Saadeh
 
 
 
